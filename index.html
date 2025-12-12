@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一週飲食與營養追蹤器 (PWA 離線版)</title>
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="description" content="一個使用瀏覽器本地儲存的一週飲食和營養目標追蹤應用程式。">
+    
+    <!-- 1. PWA Manifest Link -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- 載入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 載入 Lucide Icons -->
+    <script type="module" src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* 使用 Inter 字體以獲得更好的可讀性 */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+        }
+        /* 自定義進度條顏色 */
+        .progress-bar-fill-calories { background-color: #ef4444; } /* Red for Calories */
+        .progress-bar-fill-carbs { background-color: #3b82f6; } /* Blue for Carbs */
+        .progress-bar-fill-fat { background-color: #f59e0b; } /* Amber for Fat */
+        .progress-bar-fill-protein { background-color: #10b981; } /* Emerald for Protein */
+
+        /* 隱藏原生數字輸入的箭頭 */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        /* 模態框動畫 */
+        .modal {
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- 主容器 -->
+    <div id="app" class="max-w-7xl mx-auto bg-white shadow-2xl rounded-xl p-4 md:p-8">
+        
+        <h1 class="text-3xl font-extrabold text-gray-900 mb-6 flex items-center justify-between">
+            <span class="flex items-center">
+                <i data-lucide="utensils" class="w-8 h-8 mr-2 text-indigo-600"></i>
+                一週飲食追蹤器
+            </span>
+            <div class="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full flex items-center">
+                <i data-lucide="hard-drive" class="w-3 h-3 inline mr-1"></i>
+                PWA 本地儲存模式
+            </div>
+        </h1>
+        
+        <!-- 狀態訊息區域 -->
+        <div id="status-message" class="hidden p-3 mb-4 text-sm text-green-700 bg-green-100 rounded-lg"></div>
+
+        <!-- 主要內容 (在資料載入完成後顯示) -->
+        <div id="main-content" class="opacity-50 pointer-events-none transition-opacity duration-300">
+            
+            <!-- 導航：選擇星期幾 -->
+            <div class="mb-8 overflow-x-auto">
+                <div id="day-tabs" class="flex space-x-2 p-1 bg-gray-100 rounded-lg">
+                    <!-- Tabs will be injected here -->
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- 左側：控制面板 -->
+                <div class="lg:col-span-1 space-y-8">
+                    
+                    <!-- 1. 每日計畫指派 -->
+                    <div id="daily-assignment-section" class="bg-indigo-50 p-6 rounded-xl shadow-md border-t-4 border-indigo-600">
+                        <h2 class="text-xl font-bold text-indigo-800 mb-4 flex items-center">
+                            <i data-lucide="calendar-check" class="w-5 h-5 mr-2"></i>
+                            指派 <span id="assignment-day-title">星期一</span> 的營養計畫
+                        </h2>
+                        
+                        <div class="space-y-3">
+                            <div>
+                                <label for="profile-select" class="block text-sm font-medium text-gray-700 mb-1">選擇計畫類型</label>
+                                <select id="profile-select" class="w-full p-2 border border-indigo-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                                    <!-- Options will be injected -->
+                                </select>
+                            </div>
+                            
+                            <div class="bg-white p-3 rounded-lg border border-gray-200">
+                                <h3 class="text-sm font-semibold mb-1 text-gray-700">當日目標預覽:</h3>
+                                <div id="current-day-goals" class="text-xs text-gray-600 space-y-1">
+                                    <!-- Goals preview will be injected -->
+                                    <p>熱量: <span class="font-bold text-red-600" id="preview-calories">0</span> kcal</p>
+                                    <p>碳水: <span class="font-bold text-blue-600" id="preview-carbs">0</span> g</p>
+                                    <p>脂肪: <span class="font-bold text-amber-600" id="preview-fat">0</span> g</p>
+                                    <p>蛋白質: <span class="font-bold text-emerald-600" id="preview-protein">0</span> g</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    
+                    <!-- 2. 每日進度摘要 -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg border">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                            <i data-lucide="activity" class="w-5 h-5 mr-2 text-indigo-600"></i>
+                            每日追蹤進度 (<span id="summary-day-title">星期一</span>)
+                        </h2>
+                        <div id="summary-cards" class="space-y-4">
+                            <!-- Summary cards will be injected here -->
+                        </div>
+                    </div>
+                    
+                    <!-- 3. 系統功能按鈕 -->
+                    <div class="p-6 bg-white rounded-xl shadow-lg border space-y-3">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                            <i data-lucide="settings" class="w-5 h-5 mr-2 text-indigo-600"></i>
+                            設定與工具
+                        </h2>
+                        <!-- 開啟計畫設定模態框的按鈕 -->
+                        <button id="open-profile-modal-btn" class="w-full bg-blue-500 text-white p-3 rounded-lg font-semibold hover:bg-blue-600 transition duration-150 flex items-center justify-center">
+                            <i data-lucide="edit-3" class="w-5 h-5 mr-2"></i>
+                            編輯營養計畫 (高/低碳日等)
+                        </button>
+
+                        <button id="export-btn" class="w-full bg-green-500 text-white p-3 rounded-lg font-semibold hover:bg-green-600 transition duration-150 flex items-center justify-center">
+                            <i data-lucide="download" class="w-5 h-5 mr-2"></i>
+                            下載一週清單 (CSV)
+                        </button>
+                        <button id="reset-btn" class="w-full bg-red-500 text-white p-3 rounded-lg font-semibold hover:bg-red-600 transition duration-150 flex items-center justify-center">
+                            <i data-lucide="trash-2" class="w-5 h-5 mr-2"></i>
+                            初始化並清除所有紀錄
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- 右側：新增食物記錄與列表 -->
+                <div class="lg:col-span-2 space-y-8">
+                    
+                    <!-- 新增食物紀錄表單 -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg border">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                            <i data-lucide="plus-circle" class="w-5 h-5 mr-2 text-indigo-600"></i>
+                            新增食物紀錄
+                        </h2>
+                        <form id="food-entry-form" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="meal-type" class="block text-sm font-medium text-gray-700">餐點類型</label>
+                                    <select id="meal-type" required class="mt-1 block w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                                        <option value="早餐">早餐</option>
+                                        <option value="午餐">午餐</option>
+                                        <option value="晚餐">晚餐</option>
+                                        <option value="點心">點心</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="food-item" class="block text-sm font-medium text-gray-700">餐點內容品項</label>
+                                    <input type="text" id="food-item" required placeholder="例如：雞胸肉沙拉"
+                                           class="mt-1 block w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                                </div>
+                            </div>
+                            
+                            <!-- 營養素輸入 -->
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div class="col-span-1">
+                                    <label for="entry-calories" class="block text-sm font-medium text-gray-700">熱量 (kcal)</label>
+                                    <input type="number" id="entry-calories" min="0" required value="0"
+                                           class="mt-1 block w-full p-2 border border-red-300 rounded-lg focus:ring-red-500 focus:border-red-500 text-right">
+                                </div>
+                                <div class="col-span-1">
+                                    <label for="entry-carbs" class="block text-sm font-medium text-gray-700">碳水 (g)</label>
+                                    <input type="number" id="entry-carbs" min="0" required value="0"
+                                           class="mt-1 block w-full p-2 border border-blue-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-right">
+                                </div>
+                                <div class="col-span-1">
+                                    <label for="entry-fat" class="block text-sm font-medium text-gray-700">脂肪 (g)</label>
+                                    <input type="number" id="entry-fat" min="0" required value="0"
+                                           class="mt-1 block w-full p-2 border border-amber-300 rounded-lg focus:ring-amber-500 focus:border-amber-500 text-right">
+                                </div>
+                                <div class="col-span-1">
+                                    <label for="entry-protein" class="block text-sm font-medium text-gray-700">蛋白質 (g)</label>
+                                    <input type="number" id="entry-protein" min="0" required value="0"
+                                           class="mt-1 block w-full p-2 border border-emerald-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-right">
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="w-full bg-indigo-600 text-white p-3 rounded-lg font-semibold hover:bg-indigo-700 transition duration-150">
+                                <i data-lucide="check" class="w-5 h-5 inline mr-1"></i>
+                                記錄此餐點
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- 每日紀錄清單 -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg border">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                            <i data-lucide="list-ordered" class="w-5 h-5 mr-2 text-indigo-600"></i>
+                            <span id="list-day-title">星期一</span> 紀錄清單
+                        </h2>
+                        
+                        <!-- 篩選器 -->
+                        <div class="mb-4 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+                            <select id="filter-meal-type" class="p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">所有餐點類型</option>
+                                <option value="早餐">早餐</option>
+                                <option value="午餐">午餐</option>
+                                <option value="晚餐">晚餐</option>
+                                <option value="點心">點心</option>
+                            </select>
+                            <input type="text" id="filter-item-search" placeholder="篩選品項名稱..."
+                                   class="p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 flex-grow">
+                        </div>
+
+                        <div id="food-list" class="space-y-3">
+                            <!-- Food entries will be listed here -->
+                        </div>
+                        
+                        <p id="empty-list-message" class="text-gray-500 italic mt-4 hidden">
+                            此日尚未有餐點紀錄。
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 模態框：巨量營養素計畫設定 -->
+    <div id="profile-settings-modal" class="modal fixed inset-0 bg-gray-900 bg-opacity-80 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 md:p-10 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-indigo-700 flex items-center">
+                    <i data-lucide="edit" class="w-6 h-6 mr-2"></i>
+                    編輯巨量營養素計畫
+                </h2>
+                <button id="close-profile-modal-btn" class="text-gray-400 hover:text-gray-700 transition duration-150">
+                    <i data-lucide="x-circle" class="w-8 h-8"></i>
+                </button>
+            </div>
+            
+            <p class="text-gray-600 mb-6">為高碳日、低碳日、中碳日和休息日設定您的巨量營養素目標。</p>
+
+            <form id="profile-setting-form" class="space-y-6">
+                <div id="profile-settings-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Profile forms will be injected here -->
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 text-white p-3 rounded-lg font-semibold hover:bg-indigo-700 transition duration-150">
+                    <i data-lucide="save" class="w-5 h-5 inline mr-1"></i>
+                    儲存所有計畫設定
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- 模態框：清除紀錄確認 -->
+    <div id="reset-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full">
+            <h3 class="text-xl font-bold text-red-700 mb-4">確認清除所有紀錄</h3>
+            <p class="mb-6 text-gray-700">
+                您確定要清除**所有**日期的目標設定和食物紀錄嗎？此操作將永久清除本地儲存的數據。
+            </p>
+            <div class="flex justify-end space-x-4">
+                <button id="cancel-reset" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition duration-150">
+                    取消
+                </button>
+                <button id="confirm-reset" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-150">
+                    確認清除
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        
+        // --- 服務工作者 (Service Worker) 註冊 ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // 修復：明確指定路徑 `./service-worker.js` 和作用域 `{ scope: '/' }`
+                navigator.serviceWorker.register('./service-worker.js', { scope: '/' })
+                    .then(registration => {
+                        console.log('Service Worker 註冊成功，範圍:', registration.scope);
+                        showStatusMessage('應用程式已啟用離線功能 (PWA)。', 'success');
+                    })
+                    .catch(error => {
+                        console.error('Service Worker 註冊失敗:', error);
+                        showStatusMessage('警告：離線功能註冊失敗。請檢查控制台錯誤。', 'error');
+                    });
+            });
+        }
+        
+        // --- 本地儲存金鑰 ---
+        const LOCAL_STORAGE_KEY = 'macroTrackerData';
+        
+        // --- 常數與設定 ---
+        const DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        const DAYS_OF_WEEK_CN = ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'];
+        const MACRO_TYPES = ['calories', 'carbs', 'fat', 'protein'];
+        const PROFILE_MAP = {
+            HighCarb: '高碳日',
+            LowCarb: '低碳日',
+            ModCarb: '中碳日',
+            Rest: '休息日'
+        };
+        
+        // --- 狀態 ---
+        let currentDayIndex = new Date().getDay(); // 0 (Sun) to 6 (Sat)
+        currentDayIndex = (currentDayIndex === 0 ? 6 : currentDayIndex - 1); // 轉為 0 (Mon) to 6 (Sun)
+        let currentDay = DAYS_OF_WEEK[currentDayIndex];
+        
+        // 應用程式數據結構
+        let data = null; 
+
+        // --- DOM 元素快取 ---
+        const $mainContent = document.getElementById('main-content');
+        const $dayTabs = document.getElementById('day-tabs');
+        const $profileSettingsModal = document.getElementById('profile-settings-modal');
+        const $openProfileModalBtn = document.getElementById('open-profile-modal-btn');
+        const $closeProfileModalBtn = document.getElementById('close-profile-modal-btn');
+        const $profileSettingForm = document.getElementById('profile-setting-form');
+        const $profileSettingsContainer = document.getElementById('profile-settings-container');
+        const $profileSelect = document.getElementById('profile-select');
+        const $foodEntryForm = document.getElementById('food-entry-form');
+        const $foodList = document.getElementById('food-list');
+        const $filterMealType = document.getElementById('filter-meal-type');
+        const $filterItemSearch = document.getElementById('filter-item-search');
+        const $resetModal = document.getElementById('reset-modal');
+        const $statusMessage = document.getElementById('status-message');
+
+
+        // --- 本地儲存層 ---
+        
+        function getDefaultData() {
+            const defaultProfiles = {};
+            Object.keys(PROFILE_MAP).forEach(key => {
+                const isRest = key === 'Rest';
+                defaultProfiles[key] = { 
+                    calories: isRest ? 1800 : 2200, 
+                    carbs: isRest ? 50 : 250, 
+                    fat: isRest ? 60 : 70, 
+                    protein: isRest ? 180 : 180 
+                };
+            });
+            
+            const defaultAssignments = {};
+            DAYS_OF_WEEK.forEach(day => {
+                defaultAssignments[day] = 'ModCarb'; 
+            });
+            
+            const defaultEntries = {};
+            DAYS_OF_WEEK.forEach(day => {
+                defaultEntries[day] = [];
+            });
+
+            return {
+                profiles: defaultProfiles,
+                dailyAssignments: defaultAssignments,
+                foodEntries: defaultEntries,
+                createdAt: Date.now()
+            };
+        }
+        
+        /**
+         * 將當前的數據狀態儲存到瀏覽器的 localStorage。
+         */
+        function saveDataToLocal() {
+            try {
+                const serializedData = JSON.stringify(data);
+                localStorage.setItem(LOCAL_STORAGE_KEY, serializedData);
+                console.log("Data successfully saved to Local Storage.");
+                return true;
+            } catch (error) {
+                console.error("Error saving data to Local Storage:", error);
+                showStatusMessage('錯誤：無法儲存數據到本地儲存。', 'error');
+                return false;
+            }
+        }
+        
+        /**
+         * 從瀏覽器的 localStorage 載入數據。
+         * 如果沒有找到數據，則返回預設數據。
+         */
+        function loadDataFromLocal() {
+            try {
+                const serializedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (serializedData === null) {
+                    showStatusMessage('未找到本地儲存數據，已載入預設值。', 'warning');
+                    return getDefaultData();
+                }
+                const loadedData = JSON.parse(serializedData);
+                
+                // 檢查是否為舊版數據，如果是，可能需要做數據遷移
+                if (!loadedData.profiles) {
+                    throw new Error("Invalid data structure in local storage.");
+                }
+                
+                console.log("Data loaded from Local Storage.", loadedData);
+                return loadedData;
+            } catch (error) {
+                console.error("Error loading data from Local Storage:", error);
+                // 如果載入失敗，返回預設結構以避免應用程式崩潰
+                showStatusMessage('錯誤：無法從本地儲存載入數據，已使用預設值。', 'error');
+                return getDefaultData();
+            }
+        }
+        
+        // --- 應用程式初始化 ---
+        
+        window.addEventListener('load', () => {
+            // 1. 載入或初始化數據
+            data = loadDataFromLocal();
+            
+            // 2. 渲染 UI
+            renderAll();
+            
+            // 3. 顯示內容
+            $mainContent.classList.remove('opacity-50', 'pointer-events-none');
+            // 移除原本的成功訊息，改為 Service Worker 的註冊成功訊息
+            // showStatusMessage('資料已從本地儲存載入。', 'success');
+
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons();
+            }
+        });
+
+        // --- 渲染和邏輯函式 (大部分不變) ---
+
+        function getDayGoals(day) {
+            const profileKey = data.dailyAssignments[day];
+            return data.profiles[profileKey] || { calories: 0, carbs: 0, fat: 0, protein: 0 };
+        }
+
+        function renderAll() {
+            renderDayTabs();
+            renderProfileSettings(); 
+            renderDailyAssignmentSection(); 
+            renderFoodList();
+            renderSummary();
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons();
+            }
+        }
+
+        function renderDayTabs() {
+            $dayTabs.innerHTML = DAYS_OF_WEEK.map((day, index) => {
+                const dayCn = DAYS_OF_WEEK_CN[index];
+                const isActive = day === currentDay;
+                return `
+                    <button data-day="${day}"
+                            class="day-tab px-3 py-1.5 text-sm font-medium rounded-lg transition duration-150 ${
+                                isActive ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'
+                            }">
+                        ${dayCn}
+                    </button>
+                `;
+            }).join('');
+            
+            document.querySelectorAll('.day-tab').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    switchDay(e.currentTarget.dataset.day);
+                });
+            });
+        }
+
+        function switchDay(day) {
+            currentDay = day;
+            const dayIndex = DAYS_OF_WEEK.indexOf(day);
+            const dayCn = DAYS_OF_WEEK_CN[dayIndex];
+
+            document.getElementById('assignment-day-title').textContent = dayCn;
+            document.getElementById('summary-day-title').textContent = dayCn;
+            document.getElementById('list-day-title').textContent = dayCn;
+
+            renderDailyAssignmentSection();
+            renderFoodList();
+            renderSummary();
+            renderDayTabs();
+        }
+        
+        function renderProfileSettings() {
+            $profileSettingsContainer.innerHTML = Object.keys(PROFILE_MAP).map(key => {
+                const cnName = PROFILE_MAP[key];
+                const profileData = data.profiles[key];
+                
+                const colorClass = key === 'HighCarb' ? 'bg-red-50' : 
+                                   key === 'LowCarb' ? 'bg-blue-50' : 
+                                   key === 'ModCarb' ? 'bg-green-50' : 
+                                   'bg-gray-50';
+
+                const borderColor = key === 'HighCarb' ? 'border-red-300' : 
+                                    key === 'LowCarb' ? 'border-blue-300' : 
+                                    key === 'ModCarb' ? 'border-green-300' : 
+                                    'border-gray-300';
+                
+                return `
+                    <div class="p-4 border rounded-lg shadow-sm ${colorClass} ${borderColor}">
+                        <h3 class="text-lg font-bold ${borderColor.replace('border', 'text').replace('-300', '-700')} mb-3">${cnName}</h3>
+                        <div class="space-y-2">
+                            ${MACRO_TYPES.map(macro => {
+                                const macroCn = { 'calories': '熱量 (kcal)', 'carbs': '碳水 (g)', 'fat': '脂肪 (g)', 'protein': '蛋白質 (g)' }[macro];
+                                return `
+                                    <div class="flex items-center justify-between">
+                                        <label for="${key}-${macro}" class="text-sm font-medium text-gray-700">${macroCn}</label>
+                                        <input type="number" id="${key}-${macro}" data-profile="${key}" data-macro="${macro}" min="0" required 
+                                               value="${profileData[macro] || 0}"
+                                               class="w-20 p-1 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-right text-sm">
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function renderDailyAssignmentSection() {
+            const currentAssignment = data.dailyAssignments[currentDay];
+            const currentGoals = getDayGoals(currentDay);
+            
+            // 1. 渲染下拉選單
+            $profileSelect.innerHTML = Object.keys(PROFILE_MAP).map(key => {
+                const cnName = PROFILE_MAP[key];
+                return `<option value="${key}" ${currentAssignment === key ? 'selected' : ''}>${cnName}</option>`;
+            }).join('');
+
+            // 2. 渲染目標預覽
+            document.getElementById('preview-calories').textContent = currentGoals.calories;
+            document.getElementById('preview-carbs').textContent = currentGoals.carbs;
+            document.getElementById('preview-fat').textContent = currentGoals.fat;
+            document.getElementById('preview-protein').textContent = currentGoals.protein;
+        }
+
+        function renderSummary() {
+            const currentEntries = data.foodEntries[currentDay] || [];
+            const currentGoals = getDayGoals(currentDay);
+
+            const totals = currentEntries.reduce((acc, entry) => {
+                acc.calories += entry.calories;
+                acc.carbs += entry.carbs;
+                acc.fat += entry.fat;
+                acc.protein += entry.protein;
+                return acc;
+            }, { calories: 0, carbs: 0, fat: 0, protein: 0 });
+
+            document.getElementById('summary-cards').innerHTML = MACRO_TYPES.map(type => {
+                const total = totals[type];
+                const goal = currentGoals[type] || 0;
+                const remaining = Math.max(0, goal - total);
+                const percent = goal > 0 ? Math.min(100, (total / goal) * 100) : (total > 0 ? 100 : 0);
+                const unit = type === 'calories' ? 'kcal' : 'g';
+                const typeCn = { 'calories': '熱量', 'carbs': '碳水', 'fat': '脂肪', 'protein': '蛋白質' }[type];
+                const colorClass = `progress-bar-fill-${type}`;
+                const goalSet = goal > 0;
+
+                let goalStatus = '';
+                let displayPercent = percent;
+
+                if (goalSet) {
+                    if (total > goal) {
+                        goalStatus = '已超標';
+                        displayPercent = 100;
+                    } else if (remaining === 0) {
+                        goalStatus = '已達成';
+                    } else {
+                        goalStatus = '剩餘';
+                    }
+                }
+
+                return `
+                    <div class="p-4 border rounded-lg shadow-sm">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-bold text-lg text-gray-700">${typeCn}</span>
+                            <span class="text-sm font-semibold text-gray-900">${total} / ${goalSet ? goal : '0'} ${unit}</span>
+                        </div>
+                        
+                        ${goalSet ? 
+                            `<div class="h-2 bg-gray-200 rounded-full overflow-hidden mb-2">
+                                <div class="h-full ${colorClass} transition-all duration-500" style="width: ${displayPercent}%;"></div>
+                            </div>
+                            <p class="text-sm text-gray-600">
+                                ${goalStatus}: <span class="font-semibold ${total > goal ? 'text-red-500' : 'text-indigo-600'}">${total > goal ? (total - goal) : remaining} ${unit}</span>
+                            </p>` :
+                            `<p class="text-sm text-red-500 italic">當日計畫未設定或目標為零。</p>`
+                        }
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderFoodList() {
+            const currentEntries = data.foodEntries[currentDay] || [];
+            const mealFilter = $filterMealType.value;
+            const itemSearch = $filterItemSearch.value.toLowerCase().trim();
+            
+            const sortedEntries = [...currentEntries].sort((a, b) => b.timestamp - a.timestamp);
+
+            const filteredEntries = sortedEntries.filter(entry => {
+                const matchesMeal = !mealFilter || entry.mealType === mealFilter;
+                const matchesItem = !itemSearch || entry.item.toLowerCase().includes(itemSearch);
+                return matchesMeal && matchesItem;
+            });
+
+            if (filteredEntries.length === 0) {
+                $foodList.innerHTML = '';
+                document.getElementById('empty-list-message').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('empty-list-message').classList.add('hidden');
+
+            $foodList.innerHTML = filteredEntries.map(entry => {
+                const timestampDate = new Date(entry.timestamp);
+                const timestamp = isNaN(timestampDate) ? '無時間' : timestampDate.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
+                
+                return `
+                    <div class="flex items-start p-4 bg-gray-50 rounded-lg border hover:bg-gray-100 transition duration-150 relative">
+                        <button data-id="${entry.id}" class="delete-entry-btn absolute top-2 right-2 text-gray-400 hover:text-red-500 transition duration-150 p-1 rounded-full bg-gray-100 hover:bg-white">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                        
+                        <div class="flex-shrink-0 w-16 text-center pt-1">
+                            <span class="text-xs font-semibold text-indigo-600 bg-indigo-100 px-2 py-0.5 rounded-full">${entry.mealType}</span>
+                            <p class="text-xs text-gray-500 mt-1">${timestamp}</p>
+                        </div>
+
+                        <div class="ml-4 flex-grow">
+                            <p class="text-base font-bold text-gray-800 mb-1">${entry.item}</p>
+                            <div class="flex flex-wrap text-sm text-gray-600 space-x-3">
+                                <span class="text-red-600 font-semibold">熱量: ${entry.calories} kcal</span>
+                                <span class="text-blue-600">碳水: ${entry.carbs} g</span>
+                                <span class="text-amber-600">脂肪: ${entry.fat} g</span>
+                                <span class="text-emerald-600">蛋白質: ${entry.protein} g</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons();
+            }
+
+            document.querySelectorAll('.delete-entry-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const entryId = e.currentTarget.dataset.id;
+                    deleteFoodEntry(entryId);
+                });
+            });
+        }
+        
+        // --- 事件處理函式 ---
+
+        // Modal 開啟/關閉
+        $openProfileModalBtn.addEventListener('click', () => {
+            renderProfileSettings(); 
+            $profileSettingsModal.classList.remove('hidden');
+            $profileSettingsModal.classList.add('flex');
+        });
+        $closeProfileModalBtn.addEventListener('click', () => {
+            $profileSettingsModal.classList.add('hidden');
+            $profileSettingsModal.classList.remove('flex');
+        });
+        $profileSettingsModal.addEventListener('click', (e) => {
+            if (e.target === $profileSettingsModal) {
+                $profileSettingsModal.classList.add('hidden');
+                $profileSettingsModal.classList.remove('flex');
+            }
+        });
+
+
+        // 1. 儲存所有計畫設定 (觸發本地儲存)
+        $profileSettingForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // 1. 從表單中讀取並更新 data.profiles
+            Object.keys(PROFILE_MAP).forEach(profileKey => {
+                MACRO_TYPES.forEach(macro => {
+                    const input = document.getElementById(`${profileKey}-${macro}`);
+                    if (input) {
+                        data.profiles[profileKey][macro] = parseInt(input.value) || 0;
+                    }
+                });
+            });
+            
+            // 2. 儲存到本地儲存
+            if (saveDataToLocal()) {
+                $profileSettingsModal.classList.add('hidden');
+                $profileSettingsModal.classList.remove('flex');
+                showStatusMessage('所有巨量營養素計畫設定已成功儲存到本地！', 'success');
+                renderAll(); 
+            }
+        });
+        
+        // 2. 變更每日指派計畫 (觸發本地儲存)
+        $profileSelect.addEventListener('change', (e) => {
+            const newProfileKey = e.target.value;
+            data.dailyAssignments[currentDay] = newProfileKey;
+            
+            // 儲存到本地儲存
+            if (saveDataToLocal()) {
+                showStatusMessage(`${DAYS_OF_WEEK_CN[DAYS_OF_WEEK.indexOf(currentDay)]} 已指派為 ${PROFILE_MAP[newProfileKey]}，並儲存到本地。`, 'success');
+                renderAll(); 
+            }
+        });
+
+
+        // 3. 新增食物紀錄 (觸發本地儲存)
+        $foodEntryForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const newEntry = {
+                id: crypto.randomUUID(), 
+                day: currentDay,
+                mealType: document.getElementById('meal-type').value,
+                item: document.getElementById('food-item').value.trim(),
+                calories: parseInt(document.getElementById('entry-calories').value) || 0,
+                carbs: parseInt(document.getElementById('entry-carbs').value) || 0,
+                fat: parseInt(document.getElementById('entry-fat').value) || 0,
+                protein: parseInt(document.getElementById('entry-protein').value) || 0,
+                timestamp: Date.now(), 
+            };
+
+            if (!newEntry.item) {
+                return showStatusMessage('餐點內容品項不可為空。', 'warning');
+            }
+
+            // 1. 更新本地狀態
+            data.foodEntries[currentDay].push(newEntry);
+            
+            // 2. 儲存到本地儲存
+            if (saveDataToLocal()) {
+                showStatusMessage('餐點紀錄已成功儲存到本地！', 'success');
+                renderAll(); 
+            }
+            
+            $foodEntryForm.reset(); 
+            document.getElementById('entry-calories').value = 0;
+            document.getElementById('entry-carbs').value = 0;
+            document.getElementById('entry-fat').value = 0;
+            document.getElementById('entry-protein').value = 0;
+        });
+
+        // 4. 刪除食物紀錄 (觸發本地儲存)
+        function deleteFoodEntry(entryId) {
+            if (data.foodEntries[currentDay]) {
+                const initialLength = data.foodEntries[currentDay].length;
+                
+                // 1. 更新本地狀態
+                data.foodEntries[currentDay] = data.foodEntries[currentDay].filter(entry => entry.id !== entryId);
+                
+                if (data.foodEntries[currentDay].length < initialLength) {
+                    // 2. 儲存到本地儲存
+                    if (saveDataToLocal()) {
+                        showStatusMessage('餐點紀錄已成功從本地儲存刪除。', 'success');
+                        renderAll(); 
+                    }
+                }
+            }
+        }
+        
+        // 5. 篩選事件 (只影響本地渲染，不影響儲存)
+        $filterMealType.addEventListener('change', renderFoodList);
+        $filterItemSearch.addEventListener('input', renderFoodList);
+
+        // 6. 匯出 CSV (不變)
+        document.getElementById('export-btn').addEventListener('click', exportToCsv);
+
+        function exportToCsv() {
+            if (Object.keys(data.foodEntries).every(day => (data.foodEntries[day] || []).length === 0)) {
+                return showStatusMessage('沒有任何食物紀錄可以匯出。', 'warning');
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; 
+
+            csvContent += "星期,計畫類型,餐點類型,餐點內容品項,熱量(kcal),碳水(g),脂肪(g),蛋白質(g),當日目標熱量,當日目標碳水,當日目標脂肪,當日目標蛋白質\n";
+
+            DAYS_OF_WEEK.forEach((day, index) => {
+                const dayCn = DAYS_OF_WEEK_CN[index];
+                const entries = data.foodEntries[day] || [];
+                const profileKey = data.dailyAssignments[day];
+                const profileCn = PROFILE_MAP[profileKey] || '未指派';
+                const goal = getDayGoals(day);
+
+                entries.sort((a, b) => b.timestamp - a.timestamp).forEach((entry, entryIndex) => {
+                    const safeItem = entry.item.replace(/,/g, '，').replace(/\n/g, ' ');
+                    
+                    // 只有第一條紀錄才顯示目標
+                    const goalsToExport = entryIndex === 0 ? [goal.calories, goal.carbs, goal.fat, goal.protein] : ['', '', '', ''];
+
+                    const row = [
+                        dayCn,
+                        profileCn,
+                        entry.mealType,
+                        `"${safeItem}"`, 
+                        entry.calories,
+                        entry.carbs,
+                        entry.fat,
+                        entry.protein,
+                        ...goalsToExport
+                    ].join(',');
+                    csvContent += row + "\n";
+                });
+
+                if (entries.length === 0) {
+                    // 如果這天沒有紀錄，也匯出目標
+                    const row = [
+                        dayCn,
+                        profileCn,
+                        '無紀錄', 
+                        0, 0, 0, 0,
+                        goal.calories, goal.carbs, goal.fat, goal.protein
+                    ].join(',');
+                    csvContent += row + "\n";
+                }
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "一週飲食追蹤清單.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showStatusMessage('一週清單已下載為 CSV 檔案。', 'success');
+        }
+
+        // 7. 初始化並清除紀錄 (清除本地儲存)
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            $resetModal.classList.remove('hidden');
+            $resetModal.classList.add('flex');
+        });
+
+        document.getElementById('cancel-reset').addEventListener('click', () => {
+            $resetModal.classList.add('hidden');
+            $resetModal.classList.remove('flex');
+        });
+
+        document.getElementById('confirm-reset').addEventListener('click', () => {
+            $resetModal.classList.add('hidden');
+            $resetModal.classList.remove('flex');
+            
+            // 1. 清除本地儲存
+            localStorage.removeItem(LOCAL_STORAGE_KEY);
+            
+            // 2. 重新載入預設數據
+            data = getDefaultData(); 
+            
+            showStatusMessage('所有紀錄已從本地儲存清除並重新初始化！', 'success');
+            renderAll(); 
+        });
+
+
+        // --- UI 輔助函式 ---
+        function showStatusMessage(message, type) {
+            let className = 'p-3 mb-4 text-sm rounded-lg';
+            
+            if (type === 'success') {
+                className += ' text-green-700 bg-green-100';
+            } else if (type === 'error') {
+                className += ' text-red-700 bg-red-100';
+            } else if (type === 'warning') {
+                className += ' text-yellow-700 bg-yellow-100';
+            }
+            
+            $statusMessage.className = className;
+            $statusMessage.textContent = message;
+            $statusMessage.classList.remove('hidden');
+            
+            setTimeout(() => {
+                $statusMessage.classList.add('hidden');
+            }, 5000);
+        }
+
+    </script>
+</body>
+</html>

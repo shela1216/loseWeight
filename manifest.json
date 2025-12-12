@@ -1,0 +1,21 @@
+{
+    "name": "一週飲食追蹤器",
+    "short_name": "飲食追蹤",
+    "description": "本地儲存的巨量營養素與飲食追蹤應用程式。",
+    "start_url": "/index_pwa.html",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#4f46e5",
+    "icons": [
+        {
+            "src": "https://placehold.co/192x192/4f46e5/ffffff?text=DT",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "https://placehold.co/512x512/4f46e5/ffffff?text=DT",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
