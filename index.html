@@ -275,42 +275,36 @@
                         <div class="space-y-6">
                             <div v-for="(meal, index) in currentDayRecord.meals" :key="index"
                                 class="bg-slate-50 p-6 md:p-8 rounded-[2.5rem] border border-slate-100 space-y-6">
-                                <div
-                                    class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                    <div class="flex flex-1 items-center gap-3 w-full">
-                                        <select v-model="meal.type" @change="saveToCloud"
-                                            class="meal-select bg-white rounded-xl px-4 py-3 text-sm font-black shadow-sm outline-none border border-slate-100 min-w-[110px]">
+                                <!-- 修正跑版的區塊 -->
+                                <div class="flex flex-col md:flex-row items-start md:items-center gap-3">
+                                    <div class="flex items-center gap-2 w-full md:w-auto">
+                                        <select v-model="meal.type" @change="debouncedSave" class="meal-select bg-white rounded-xl px-4 py-3 text-sm font-black shadow-sm outline-none border border-slate-100 w-full md:w-32">
                                             <option value="breakfast">🌅 早餐</option>
                                             <option value="lunch">☀️ 午餐</option>
                                             <option value="dinner">🌙 晚餐</option>
                                             <option value="snack">🍰 點心</option>
                                         </select>
-                                        <input type="text" v-model="meal.name" @input="saveToCloud"
-                                            class="flex-1 bg-white rounded-xl px-5 py-3 text-base font-bold shadow-sm outline-none border border-slate-100 focus:ring-2 focus:ring-indigo-100 transition-all"
-                                            placeholder="輸入餐點名稱...">
                                     </div>
-                                    <button @click="removeMeal(index)"
-                                        class="text-slate-300 hover:text-rose-500 p-2 self-end md:self-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
+                                    <div class="flex flex-1 items-center gap-3 w-full">
+                                        <input type="text" v-model="meal.name" @input="debouncedSave" class="flex-1 bg-white rounded-xl px-5 py-3 text-base font-bold shadow-sm outline-none border border-slate-100" placeholder="輸入餐點名稱...">
+                                        <button @click="removeMeal(index)" class="text-slate-300 hover:text-rose-500 p-2 md:hidden">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                        </button>
+                                    </div>
+                                    <button @click="removeMeal(index)" class="hidden md:block text-slate-300 hover:text-rose-500 p-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                     </button>
                                 </div>
-                                <div class="grid grid-cols-4 gap-3 md:gap-4">
+                                
+                                <!-- 營養數據網格：手機 2x2，電腦 1x4 -->
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                                     <div class="flex flex-col">
-                                        <span
-                                            class="text-[10px] text-slate-400 font-black mb-1 uppercase text-center tracking-tight">Calories</span>
-                                        <input type="number" v-model.number="meal.calories" @input="saveToCloud"
-                                            class="w-full bg-white rounded-xl px-2 py-3 text-base font-black text-center shadow-sm outline-none border border-slate-100">
+                                        <span class="text-[10px] text-slate-400 font-black mb-1 text-center">熱量 kcal</span>
+                                        <input type="number" v-model.number="meal.calories" @input="debouncedSave" class="w-full bg-white rounded-xl px-2 py-3 text-base font-black text-center shadow-sm outline-none border border-slate-100">
                                     </div>
                                     <div v-for="n in nutrientKeys" :key="n.key" class="flex flex-col">
-                                        <span
-                                            class="text-[10px] text-slate-400 font-black mb-1 uppercase text-center tracking-tight">{{
-                                            n.label }} (g)</span>
-                                        <input type="number" v-model.number="meal[n.key]" @input="saveToCloud"
-                                            class="w-full bg-white rounded-xl px-2 py-3 text-base font-black text-center shadow-sm outline-none border border-slate-100">
+                                        <span class="text-[10px] text-slate-400 font-black mb-1 text-center">{{ n.label }} (g)</span>
+                                        <input type="number" v-model.number="meal[n.key]" @input="debouncedSave" class="w-full bg-white rounded-xl px-2 py-3 text-base font-black text-center shadow-sm outline-none border border-slate-100">
                                     </div>
                                 </div>
                             </div>
