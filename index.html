@@ -22,18 +22,8 @@
             grid-template-columns: repeat(7, 1fr);
         }
         .day-cell {
-            aspect-ratio: 1.1 / 1;
+            aspect-ratio: 1 / 1.1;
             transition: all 0.2s;
-        }
-        .custom-scroll::-webkit-scrollbar {
-            width: 4px;
-        }
-        .custom-scroll::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
         }
         .auth-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -43,123 +33,148 @@
 <body class="bg-slate-50 min-h-screen font-sans text-slate-900">
     <div id="app" v-cloak>
         
-        <!-- 1. 登入/註冊頁面 -->
+        <!-- 1. 登入頁面 -->
         <div v-if="!user && authInitialized" class="min-h-screen auth-bg flex items-center justify-center p-4">
             <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 space-y-6">
                 <div class="text-center">
                     <h1 class="text-3xl font-black text-indigo-600 mb-2">飲食追蹤器</h1>
-                    <p class="text-slate-400 text-sm">{{ isLoginMode ? '歡迎回來，請登入您的帳號' : '建立新帳號以開始追蹤' }}</p>
+                    <p class="text-slate-400 text-sm">{{ isLoginMode ? '歡迎回來' : '建立新帳號' }}</p>
                 </div>
-
-                <!-- Google 登入按鈕 -->
                 <button @click="handleGoogleLogin" :disabled="loading" class="w-full flex items-center justify-center gap-3 border-2 border-slate-100 py-3 rounded-xl font-bold hover:bg-slate-50 transition text-slate-600">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                    </svg>
+                    <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
                     使用 Google 帳號登入
                 </button>
-
-                <div class="flex items-center gap-4 my-4">
-                    <div class="h-px bg-slate-100 flex-grow"></div>
-                    <span class="text-xs text-slate-300 font-bold uppercase">或使用信箱</span>
-                    <div class="h-px bg-slate-100 flex-grow"></div>
-                </div>
-
                 <form @submit.prevent="handleAuth" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">電子郵件</label>
-                        <input type="email" v-model="authForm.email" required class="w-full border rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-100 transition" placeholder="example@mail.com">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">密碼</label>
-                        <input type="password" v-model="authForm.password" required class="w-full border rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-100 transition" placeholder="••••••••">
-                    </div>
-                    
-                    <div v-if="authError" class="bg-rose-50 text-rose-500 text-xs p-3 rounded-lg border border-rose-100">
-                        {{ authError }}
-                    </div>
-
-                    <button type="submit" :disabled="loading" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-100 disabled:opacity-50">
-                        {{ loading ? '處理中...' : (isLoginMode ? '立即登入' : '註冊帳號') }}
+                    <input type="email" v-model="authForm.email" required class="w-full border rounded-xl p-3" placeholder="電子郵件">
+                    <input type="password" v-model="authForm.password" required class="w-full border rounded-xl p-3" placeholder="密碼">
+                    <div v-if="authError" class="text-rose-500 text-xs">{{ authError }}</div>
+                    <button type="submit" :disabled="loading" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold">
+                        {{ loading ? '處理中...' : (isLoginMode ? '登入' : '註冊') }}
                     </button>
                 </form>
-
-                <div class="text-center border-t pt-6">
-                    <button @click="isLoginMode = !isLoginMode; authError = ''" class="text-sm font-medium text-indigo-600 hover:underline">
-                        {{ isLoginMode ? '還沒有帳號？點此註冊' : '已有帳號？返回登入' }}
-                    </button>
-                </div>
+                <button @click="isLoginMode = !isLoginMode" class="w-full text-center text-sm text-indigo-600">
+                    {{ isLoginMode ? '還沒有帳號？按此註冊' : '已有帳號？按此登入' }}
+                </button>
             </div>
         </div>
 
-        <!-- 2. 主應用程式 (追蹤器) -->
-        <div v-if="user" class="max-w-[1600px] mx-auto px-4 py-6">
-            <header class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <!-- 2. 主應用程式介面 -->
+        <div v-if="user" class="max-w-[1400px] mx-auto px-4 py-6">
+            <header class="flex justify-between items-center mb-8">
                 <div>
-                    <h1 class="text-2xl font-bold text-indigo-600 flex items-center">
-                        <span class="mr-2">📅</span> 月度飲食追蹤器
-                    </h1>
-                    <div class="flex items-center gap-3 mt-1">
-                        <div class="flex items-center gap-1.5">
-                            <span class="inline-block w-2 h-2 bg-emerald-500 rounded-full"></span>
-                            <p class="text-[10px] text-slate-500 font-mono">{{ user.email || 'Google 使用者' }}</p>
-                        </div>
-                        <button @click="handleLogout" class="text-[10px] text-rose-500 hover:underline font-bold">登出</button>
-                    </div>
+                    <h1 class="text-2xl font-black text-indigo-600">月度飲食追蹤器</h1>
+                    <p class="text-xs text-slate-500 font-mono">Hi, {{ user.email }}</p>
                 </div>
-                
-                <div class="flex gap-2 items-center">
-                    <button @click="exportMonthCSV" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg transition text-xs flex items-center">
-                        📥 匯出 CSV
-                    </button>
-                </div>
+                <button @click="handleLogout" class="text-xs font-bold text-rose-500 border border-rose-200 px-3 py-1 rounded-lg hover:bg-rose-50">登出</button>
             </header>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- 左側：模板 + 月曆 -->
-                <aside class="lg:col-span-4 space-y-5">
-                    <!-- 此處省略模板介面以保持程式碼精簡 -->
-                    <section class="glass-card p-4 rounded-xl shadow-sm text-center">
-                        歡迎進入管理介面
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- 左側：月曆與設定 -->
+                <div class="lg:col-span-4 space-y-6">
+                    <!-- 模板設定 -->
+                    <section class="glass-card p-5 rounded-2xl shadow-sm">
+                        <h2 class="text-sm font-bold mb-4 text-slate-700">🎯 目標模板</h2>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div v-for="(plan, key) in plans" :key="key" class="p-3 bg-white rounded-xl border border-slate-100">
+                                <span class="text-[10px] font-bold text-indigo-500 block mb-1 uppercase">{{ key }}</span>
+                                <input type="number" v-model.number="plans[key].calories" @change="saveToCloud" class="w-full text-lg font-bold outline-none" placeholder="kcal">
+                                <div class="grid grid-cols-3 gap-1 mt-1">
+                                    <input type="number" v-model.number="plans[key].carbs" @change="saveToCloud" class="text-[10px] w-full" placeholder="C">
+                                    <input type="number" v-model.number="plans[key].protein" @change="saveToCloud" class="text-[10px] w-full" placeholder="P">
+                                    <input type="number" v-model.number="plans[key].fat" @change="saveToCloud" class="text-[10px] w-full" placeholder="F">
+                                </div>
+                            </div>
+                        </div>
                     </section>
-                </aside>
-                <main class="lg:col-span-8">
-                    <div class="glass-card p-10 rounded-xl text-center">
-                        開始追蹤您的健康生活吧！
+
+                    <!-- 月曆 -->
+                    <section class="glass-card p-5 rounded-2xl shadow-sm">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="font-bold text-slate-800">{{ currentYear }} / {{ currentMonth + 1 }}</h2>
+                            <div class="flex gap-2">
+                                <button @click="changeMonth(-1)" class="p-1 hover:bg-slate-100 rounded">◀</button>
+                                <button @click="changeMonth(1)" class="p-1 hover:bg-slate-100 rounded">▶</button>
+                            </div>
+                        </div>
+                        <div class="calendar-grid gap-1">
+                            <div v-for="d in ['日','一','二','三','四','五','六']" :key="d" class="text-center text-[10px] font-bold text-slate-400 py-2">{{ d }}</div>
+                            <div v-for="empty in firstDayOfMonth" :key="'e'+empty"></div>
+                            <div v-for="date in daysInMonth" :key="date" 
+                                 @click="selectedDate = formatKey(date)"
+                                 class="day-cell border rounded-xl p-1 cursor-pointer relative"
+                                 :class="[selectedDate === formatKey(date) ? 'border-indigo-600 ring-2 ring-indigo-50' : 'border-slate-50 hover:border-indigo-200', isToday(date) ? 'bg-indigo-50' : 'bg-white']">
+                                <span class="text-[10px]" :class="isToday(date) ? 'text-indigo-600 font-bold' : 'text-slate-500'">{{ date }}</span>
+                                <!-- 進度條 -->
+                                <div v-if="allData[formatKey(date)]" class="absolute bottom-1 left-1 right-1 h-1 bg-slate-100 rounded-full overflow-hidden">
+                                    <div class="h-full bg-indigo-500" :style="{ width: Math.min(100, (getDailyTotal(formatKey(date), 'calories') / getPlan(formatKey(date)).calories) * 100) + '%' }"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- 右側：編輯詳情 -->
+                <div class="lg:col-span-8">
+                    <div v-if="selectedDate" class="glass-card rounded-3xl shadow-sm overflow-hidden min-h-[500px]">
+                        <div class="bg-indigo-600 p-6 text-white flex justify-between items-center">
+                            <div>
+                                <h2 class="text-2xl font-bold">{{ selectedDate }}</h2>
+                                <select v-model="getRecord(selectedDate).planType" @change="saveToCloud" class="bg-indigo-500 text-white text-xs rounded px-2 py-1 mt-1 border-none">
+                                    <option v-for="(p, k) in plans" :value="k">{{ k.toUpperCase() }} 模式</option>
+                                </select>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-black">{{ getDailyTotal(selectedDate, 'calories') }} / {{ getPlan(selectedDate).calories }}</div>
+                                <div class="text-[10px] opacity-80 uppercase tracking-widest">Calories Kcal</div>
+                            </div>
+                        </div>
+
+                        <div class="p-6 space-y-6">
+                            <!-- 數值輸入 -->
+                            <div class="grid grid-cols-3 gap-4">
+                                <div v-for="nutri in ['carbs', 'protein', 'fat']" :key="nutri" class="bg-slate-50 p-4 rounded-2xl">
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">{{ nutri }}</label>
+                                    <input type="number" v-model.number="getRecord(selectedDate)[nutri]" @change="saveToCloud" class="bg-transparent text-xl font-bold w-full outline-none">
+                                    <div class="text-[10px] text-slate-400">Target: {{ getPlan(selectedDate)[nutri] }}g</div>
+                                </div>
+                            </div>
+
+                            <!-- 備註 -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-2">飲食備註</label>
+                                <textarea v-model="getRecord(selectedDate).note" @input="saveToCloud" class="w-full h-32 p-4 bg-slate-50 rounded-2xl outline-none border-2 border-transparent focus:border-indigo-100 transition" placeholder="記錄今天吃了什麼..."></textarea>
+                            </div>
+                        </div>
                     </div>
-                </main>
+                    <div v-else class="h-full flex flex-col items-center justify-center text-slate-300 space-y-4">
+                        <div class="text-6xl">🗓️</div>
+                        <p class="font-medium">請在月曆上選擇一個日期開始紀錄</p>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- 儲存指示 -->
-        <div v-if="saving" class="fixed bottom-6 right-6 bg-slate-900 text-white px-5 py-2.5 rounded-full text-xs shadow-2xl flex items-center gap-3 z-50">
-            正在同步...
+        <!-- 儲存狀態 -->
+        <div v-if="saving" class="fixed bottom-6 right-6 bg-slate-900 text-white px-5 py-2 rounded-full text-xs shadow-xl animate-pulse">
+            正在同步至雲端...
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const { createApp, ref, reactive, onMounted, watch } = Vue;
+        const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
 
-        /**
-         * 安全部署建議：
-         * 1. 不要在此處硬編碼敏感資訊。
-         * 2. 在 Firebase Console 限制此 API Key 僅限您的 GitHub Pages 網域使用。
-         * 3. 確保 Firestore 安全規則已啟用身分驗證檢查。
-         */
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "AIzaSyC2xMAVAdN3674qtALhqblQncn33TwFPss", // 這裡填入你的 Key
+        // --- ！！！在此填入您的真實 Firebase 配置 ！！！ ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyC2xMAVAdN3674qtALhqblQncn33TwFPss", 
             authDomain: "loseweight-4b745.firebaseapp.com",
             projectId: "loseweight-4b745",
             storageBucket: "loseweight-4b745.firebasestorage.app",
-            messagingSenderId: "76431868318",
-            appId: "1:76431868318:web:98e0267325ea1fd9f8d68f"
+            messagingSenderId: "您的_發送者ID",
+            appId: "您的_應用程式ID"
         };
         
         const app = initializeApp(firebaseConfig);
@@ -176,57 +191,91 @@
                 const authError = ref('');
                 const authForm = reactive({ email: '', password: '' });
                 const saving = ref(false);
+
+                // 應用程式數據
+                const currentYear = ref(new Date().getFullYear());
+                const currentMonth = ref(new Date().getMonth());
+                const selectedDate = ref(null);
                 const plans = reactive({
-                    high: { calories: 2500, carbs: 350, protein: 180, fat: 50 },
+                    high: { calories: 2400, carbs: 300, protein: 180, fat: 50 },
                     med: { calories: 2000, carbs: 200, protein: 180, fat: 60 },
                     low: { calories: 1800, carbs: 80, protein: 180, fat: 85 },
                     rest: { calories: 1600, carbs: 50, protein: 150, fat: 90 }
                 });
                 const allData = reactive({});
 
-                // 認證邏輯
-                const handleGoogleLogin = async () => {
-                    loading.value = true;
-                    try { await signInWithPopup(auth, new GoogleAuthProvider()); } 
-                    catch (e) { authError.value = e.message; }
-                    finally { loading.value = false; }
-                };
-
+                // 認證函數
+                const handleGoogleLogin = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => authError.value = e.message);
                 const handleAuth = async () => {
                     loading.value = true;
                     try {
                         if (isLoginMode.value) await signInWithEmailAndPassword(auth, authForm.email, authForm.password);
                         else await createUserWithEmailAndPassword(auth, authForm.email, authForm.password);
-                    } catch (e) { authError.value = "驗證失敗: " + e.message; }
+                    } catch (e) { authError.value = e.message; }
                     finally { loading.value = false; }
                 };
+                const handleLogout = () => signOut(auth);
 
-                const handleLogout = () => signOut(auth).then(() => location.reload());
+                // Firestore 同步
+                const saveToCloud = async () => {
+                    if (!user.value) return;
+                    saving.value = true;
+                    try {
+                        await setDoc(doc(db, 'artifacts', appId, 'users', user.value.uid, 'settings', 'main'), {
+                            plans: JSON.parse(JSON.stringify(plans)),
+                            allData: JSON.parse(JSON.stringify(allData))
+                        });
+                    } catch (e) { console.error(e); }
+                    finally { setTimeout(() => saving.value = false, 800); }
+                };
 
-                // 同步數據 (使用 userId 路徑確保安全性)
-                watch(user, (u) => {
-                    if (u) {
-                        const docRef = doc(db, 'artifacts', appId, 'users', u.uid, 'data', 'records');
-                        onSnapshot(docRef, (snap) => {
-                            if (snap.exists()) {
-                                const data = snap.data();
-                                if (data.plans) Object.assign(plans, data.plans);
-                                if (data.records) Object.assign(allData, data.records);
-                            }
-                        }, (err) => console.error("資料存取受限：", err));
-                    }
-                });
-
+                // 監聽登入狀態與載入資料
                 onMounted(() => {
                     onAuthStateChanged(auth, (u) => {
                         user.value = u;
                         authInitialized.value = true;
+                        if (u) {
+                            onSnapshot(doc(db, 'artifacts', appId, 'users', u.uid, 'settings', 'main'), (snap) => {
+                                if (snap.exists()) {
+                                    const d = snap.data();
+                                    if (d.plans) Object.assign(plans, d.plans);
+                                    if (d.allData) Object.assign(allData, d.allData);
+                                }
+                            });
+                        }
                     });
                 });
 
+                // 月曆邏輯
+                const daysInMonth = computed(() => new Date(currentYear.value, currentMonth.value + 1, 0).getDate());
+                const firstDayOfMonth = computed(() => new Date(currentYear.value, currentMonth.value, 1).getDay());
+                const formatKey = (d) => `${currentYear.value}-${String(currentMonth.value + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const isToday = (d) => formatKey(d) === new Date().toISOString().split('T')[0];
+                
+                const getRecord = (key) => {
+                    if (!allData[key]) {
+                        allData[key] = { planType: 'med', carbs: 0, protein: 0, fat: 0, note: '' };
+                    }
+                    return allData[key];
+                };
+
+                const getPlan = (key) => plans[getRecord(key).planType] || plans.med;
+                const getDailyTotal = (key, type) => {
+                    const r = getRecord(key);
+                    if (type === 'calories') return (r.carbs * 4) + (r.protein * 4) + (r.fat * 9);
+                    return r[type] || 0;
+                };
+
                 return { 
                     user, authInitialized, isLoginMode, loading, authError, authForm,
-                    handleGoogleLogin, handleAuth, handleLogout, plans, allData, saving
+                    handleGoogleLogin, handleAuth, handleLogout,
+                    currentYear, currentMonth, daysInMonth, firstDayOfMonth, selectedDate,
+                    plans, allData, formatKey, isToday, getRecord, getPlan, getDailyTotal,
+                    saveToCloud, changeMonth: (v) => {
+                        currentMonth.value += v;
+                        if (currentMonth.value > 11) { currentMonth.value = 0; currentYear.value++; }
+                        if (currentMonth.value < 0) { currentMonth.value = 11; currentYear.value--; }
+                    }
                 };
             }
         }).mount('#app');
