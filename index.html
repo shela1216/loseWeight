@@ -592,7 +592,7 @@
                         const day = allData[date];
                         if (day.meals && day.meals.length > 0) {
                             day.meals.forEach(m => {
-                                csvContent += `${date},${day.planType},${m.name},${m.type},${m.calories},${m.carbs},${m.protein},${m.fat}\n`;
+                                csvContent += `${date},${getPlanLabel(day.planType)},${m.name},${m.type},${m.calories},${m.carbs},${m.protein},${m.fat}\n`;
                             });
                         }
                     });
