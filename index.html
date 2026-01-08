@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>每日飲食追蹤器</title>
+    <title>每日私人飲食追蹤器</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js" type="module"></script>
@@ -56,6 +56,7 @@
             backdrop-filter: blur(4px);
         }
 
+        /* 模式背景色 */
         .plan-high {
             background-color: #ef4444;
         }
@@ -70,6 +71,23 @@
 
         .plan-rest {
             background-color: #6366f1;
+        }
+
+        /* 餐點類型顏色 */
+        .meal-border-breakfast {
+            border-left-color: #f97316;
+        }
+
+        .meal-border-lunch {
+            border-left-color: #eab308;
+        }
+
+        .meal-border-dinner {
+            border-left-color: #6366f1;
+        }
+
+        .meal-border-snack {
+            border-left-color: #d946ef;
         }
     </style>
 </head>
@@ -144,7 +162,6 @@
                     </div>
                 </div>
                 <div class="flex gap-2">
-                    <!-- 下載 CSV 按鈕 -->
                     <button @click="downloadCSV"
                         class="w-10 h-10 flex items-center justify-center bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 shadow-sm"
                         title="下載資料備份 (CSV)">
@@ -195,20 +212,44 @@
                             </select>
                         </div>
                         <div class="grid grid-cols-3 gap-4">
+                            <!-- 碳水、蛋白、脂肪各欄位 -->
                             <div v-for="n in nutrientKeys" :key="n.key"
-                                class="bg-white/10 rounded-2xl p-4 border border-white/10">
+                                class="bg-white/10 rounded-2xl p-4 border border-white/10 relative overflow-hidden">
                                 <div class="text-[10px] font-black uppercase opacity-70 mb-1">{{ n.label }}</div>
-                                <div class="text-xl md:text-2xl font-black">{{ getDailySum(selectedDate, n.key) }} <span
-                                        class="text-xs opacity-50 font-medium">/ {{ getPlan(selectedDate)[n.key]
-                                        }}g</span></div>
+                                <div class="text-xl md:text-2xl font-black">
+                                    {{ getDailySum(selectedDate, n.key) }}
+                                    <span class="text-[10px] opacity-50 font-medium">/ {{ getPlan(selectedDate)[n.key]
+                                        }}g</span>
+                                </div>
+                                <!-- 差距標籤 (營養素) -->
+                                <div v-if="getRecord(selectedDate).meals.length > 0"
+                                    class="absolute top-2 right-2 text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm transition-colors duration-300"
+                                    :class="getDiffClass(getDailySum(selectedDate, n.key) - getPlan(selectedDate)[n.key])">
+                                    {{ getDiffPrefix(getDailySum(selectedDate, n.key) - getPlan(selectedDate)[n.key])
+                                    }}{{ Math.abs(getDailySum(selectedDate, n.key) - getPlan(selectedDate)[n.key]) }}
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="text-center md:text-right">
+
+                    <!-- 總熱量區域 -->
+                    <div class="text-center md:text-right relative">
                         <div class="text-xs font-black opacity-70 uppercase mb-1 tracking-widest">總攝取熱量</div>
                         <div class="text-6xl md:text-7xl font-black mb-2">{{ getDailySum(selectedDate, 'calories') }}
                         </div>
-                        <div class="text-xs font-black opacity-70">目標預算: {{ getPlan(selectedDate).calories }} kcal</div>
+                        <div class="flex flex-col items-center md:items-end">
+                            <div class="text-xs font-black opacity-70">目標預算: {{ getPlan(selectedDate).calories }} kcal
+                            </div>
+                            <!-- 差距標籤 (熱量) -->
+                            <div v-if="getRecord(selectedDate).meals.length > 0"
+                                class="mt-3 text-xs font-black px-3 py-1.5 rounded-full inline-flex items-center gap-1 shadow-lg"
+                                :class="getDiffClass(getDailySum(selectedDate, 'calories') - getPlan(selectedDate).calories)">
+                                <span class="opacity-80">差距:</span>
+                                <span>{{ getDiffPrefix(getDailySum(selectedDate, 'calories') -
+                                    getPlan(selectedDate).calories) }}{{ Math.abs(getDailySum(selectedDate, 'calories')
+                                    - getPlan(selectedDate).calories) }} kcal</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -231,16 +272,25 @@
 
                     <div class="space-y-4">
                         <div v-for="(meal, index) in getRecord(selectedDate).meals" :key="index"
-                            class="flex flex-wrap md:flex-nowrap items-center gap-4 bg-slate-50 p-6 rounded-[2rem] border border-slate-100 group transition-all hover:bg-white hover:shadow-md">
-                            <select v-model="meal.type" @change="saveToCloud"
-                                class="bg-white rounded-xl px-4 py-3 text-sm font-black w-full md:w-32 border-none shadow-sm">
-                                <option value="breakfast">早餐</option>
-                                <option value="lunch">午餐</option>
-                                <option value="dinner">晚餐</option>
-                                <option value="snack">點心</option>
-                            </select>
+                            class="flex flex-wrap md:flex-nowrap items-center gap-4 bg-slate-50 p-6 rounded-[2rem] border-l-[6px] border-y border-r border-slate-100 group transition-all hover:bg-white hover:shadow-md"
+                            :class="'meal-border-' + meal.type">
+
+                            <div class="flex items-center gap-3 w-full md:w-40 shrink-0">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                                    :class="getMealColorClass(meal.type)">
+                                    <span v-html="getMealIcon(meal.type)"></span>
+                                </div>
+                                <select v-model="meal.type" @change="saveToCloud"
+                                    class="bg-white rounded-xl px-3 py-2 text-sm font-black w-full border-none shadow-sm focus:ring-2 focus:ring-indigo-100 outline-none">
+                                    <option value="breakfast">早餐</option>
+                                    <option value="lunch">午餐</option>
+                                    <option value="dinner">晚餐</option>
+                                    <option value="snack">點心</option>
+                                </select>
+                            </div>
+
                             <input type="text" v-model="meal.name" @input="saveToCloud"
-                                class="flex-1 min-w-[200px] bg-white rounded-xl px-6 py-3 text-base font-bold shadow-sm border-none focus:ring-2 focus:ring-indigo-100 outline-none"
+                                class="flex-1 min-w-[180px] bg-white rounded-xl px-6 py-3 text-base font-bold shadow-sm border-none focus:ring-2 focus:ring-indigo-100 outline-none"
                                 placeholder="輸入餐點名稱...">
 
                             <div class="grid grid-cols-4 gap-3 w-full md:w-auto">
@@ -273,7 +323,7 @@
             </main>
         </div>
 
-        <!-- 3. 彈出視窗：目標計畫設定 -->
+        <!-- 目標計畫設定 Modal -->
         <transition name="fade">
             <div v-if="showPlans" class="fixed inset-0 z-50 flex items-center justify-center p-4">
                 <div class="absolute inset-0 modal-overlay" @click="showPlans = false"></div>
@@ -312,7 +362,7 @@
             </div>
         </transition>
 
-        <!-- 4. 彈出視窗：月曆日期選擇 -->
+        <!-- 月曆 Modal -->
         <transition name="fade">
             <div v-if="showCalendar" class="fixed inset-0 z-50 flex items-center justify-center p-4">
                 <div class="absolute inset-0 modal-overlay" @click="showCalendar = false"></div>
@@ -350,7 +400,7 @@
             </div>
         </transition>
 
-        <!-- 儲存提示 -->
+        <!-- 儲存狀態 -->
         <transition name="fade">
             <div v-if="saving"
                 class="fixed bottom-8 right-8 bg-slate-900 text-white px-6 py-3 rounded-2xl text-xs font-bold shadow-2xl flex items-center gap-3 z-50">
@@ -359,7 +409,7 @@
             </div>
         </transition>
 
-        <!-- 初始加載中 -->
+        <!-- 加載遮罩 -->
         <div v-if="!authInitialized" class="min-h-screen flex items-center justify-center bg-slate-50">
             <div class="text-center animate-pulse">
                 <div
@@ -372,7 +422,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const { createApp, ref, reactive, computed, onMounted } = Vue;
@@ -386,6 +436,7 @@
             appId: "1:76431868318:web:98e0267325ea1fd9f8d68f",
             measurementId: "G-V3ZXWD5HP7"
         };
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -448,7 +499,6 @@
                             case 'auth/user-not-found': authError.value = "此帳號不存在"; break;
                             case 'auth/wrong-password': authError.value = "密碼錯誤"; break;
                             case 'auth/email-already-in-use': authError.value = "此信箱已被註冊"; break;
-                            case 'auth/weak-password': authError.value = "密碼強度不足 (需至少6位)"; break;
                             default: authError.value = "驗證失敗，請檢查輸入內容";
                         }
                     } finally { loading.value = false; }
@@ -482,7 +532,6 @@
                             });
                         } else {
                             user.value = null;
-                            resetLocalData();
                         }
                         authInitialized.value = true;
                     });
@@ -508,37 +557,19 @@
                 const downloadCSV = () => {
                     const headers = ["日期", "模式", "餐點類型", "餐點名稱", "熱量(kcal)", "碳水(g)", "蛋白質(g)", "脂肪(g)"];
                     const rows = [];
-
-                    // 遍歷所有日期資料
                     Object.keys(allData).sort().forEach(date => {
                         const record = allData[date];
                         if (record.meals && record.meals.length > 0) {
                             record.meals.forEach(meal => {
-                                rows.push([
-                                    date,
-                                    record.planType,
-                                    meal.type,
-                                    meal.name || '-',
-                                    meal.calories || 0,
-                                    meal.carbs || 0,
-                                    meal.protein || 0,
-                                    meal.fat || 0
-                                ]);
+                                rows.push([date, record.planType, meal.type, meal.name || '-', meal.calories || 0, meal.carbs || 0, meal.protein || 0, meal.fat || 0]);
                             });
                         }
                     });
-
-                    if (rows.length === 0) {
-                        alert("目前尚無資料可匯出！");
-                        return;
-                    }
-
-                    // 加上 BOM 防止 Excel 中文亂碼
+                    if (rows.length === 0) { return; }
                     const csvContent = "\uFEFF" + [headers, ...rows].map(e => e.join(",")).join("\n");
                     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                     const link = document.createElement("a");
                     const url = URL.createObjectURL(blob);
-
                     link.setAttribute("href", url);
                     link.setAttribute("download", `飲食追蹤紀錄匯出_${new Date().toISOString().split('T')[0]}.csv`);
                     link.style.visibility = 'hidden';
@@ -558,11 +589,41 @@
                 const getPlan = (key) => plans[getRecord(key).planType] || plans.med;
                 const getDailySum = (key, type) => (getRecord(key).meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0);
 
+                // 差距顯示顏色邏輯：
+                // 正數 (攝取超過目標) -> 紅色
+                // 負數或 0 (攝取未過目標) -> 綠色
+                const getDiffClass = (val) => {
+                    return val > 0 ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white';
+                };
+
+                const getDiffPrefix = (val) => (val > 0 ? '+' : '');
+
+                const getMealIcon = (type) => {
+                    const icons = {
+                        breakfast: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>',
+                        lunch: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path></svg>',
+                        dinner: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>',
+                        snack: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5a2 2 0 00-2 2h2zM7 21h10a2 2 0 002-2v-1a2 2 0 00-2-2H7a2 2 0 00-2 2v1a2 2 0 002 2z"></path></svg>'
+                    };
+                    return icons[type] || icons.snack;
+                };
+
+                const getMealColorClass = (type) => {
+                    const colors = {
+                        breakfast: 'bg-orange-100 text-orange-600',
+                        lunch: 'bg-yellow-100 text-yellow-600',
+                        dinner: 'bg-indigo-100 text-indigo-600',
+                        snack: 'bg-purple-100 text-purple-600'
+                    };
+                    return colors[type] || colors.snack;
+                };
+
                 return {
                     user, authInitialized, loading, authError, email, password,
                     handleAuth, handleAnonymousLogin, handleLogout,
                     selectedDate, plans, allData, saving, currentYear, currentMonth, nutrientKeys,
-                    showPlans, showCalendar, downloadCSV,
+                    showPlans, showCalendar, downloadCSV, getMealIcon, getMealColorClass,
+                    getDiffClass, getDiffPrefix,
                     daysInMonth: computed(() => new Date(currentYear.value, currentMonth.value + 1, 0).getDate()),
                     firstDayOfMonth: computed(() => new Date(currentYear.value, currentMonth.value, 1).getDay()),
                     getPlanName, getPlanColor, formatKey, isToday, getRecord, getPlan, getDailySum,
