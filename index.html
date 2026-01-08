@@ -59,7 +59,6 @@
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
         
-        /* 收合動畫 */
         .collapse-enter-active, .collapse-leave-active {
             transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-out;
             max-height: 1000px;
@@ -149,7 +148,7 @@
 
             <main class="space-y-6">
                 <!-- 今日概覽卡片 -->
-                <div class="rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl flex flex-col md:flex-row justify-between items-center gap-8 transition-colors duration-500" :class="'plan-' + (getRecord(selectedDate)?.planType || 'med')">
+                <div class="rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl flex flex-col md:flex-row justify-between items-center gap-8 transition-colors duration-500" :class="'plan-' + (getRecord(selectedDate).planType || 'med')">
                     <div class="flex-1 w-full">
                         <div class="flex items-center gap-4 mb-6">
                             <span class="px-4 py-1.5 bg-white/20 rounded-full text-xs font-black backdrop-blur-md tracking-wider uppercase">Today Summary</span>
@@ -167,8 +166,8 @@
                                     {{ getDailySum(selectedDate, n.key) }} 
                                     <span class="text-[10px] opacity-50 font-medium">/ {{ getPlan(selectedDate)[n.key] }}g</span>
                                 </div>
-                                <div v-if="getRecord(selectedDate).meals.length > 0" 
-                                     class="absolute top-2 right-2 text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm"
+                                <!-- 修正：移除了 v-if="getRecord(selectedDate).meals.length > 0"，確保始終顯示差距 -->
+                                <div class="absolute top-2 right-2 text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm"
                                      :class="getDiffClass(getDailySum(selectedDate, n.key) - getPlan(selectedDate)[n.key])">
                                     {{ getDiffPrefix(getDailySum(selectedDate, n.key) - getPlan(selectedDate)[n.key]) }}{{ Math.abs(getDailySum(selectedDate, n.key) - getPlan(selectedDate)[n.key]) }}
                                 </div>
@@ -181,6 +180,11 @@
                         <div class="text-6xl md:text-7xl font-black mb-2">{{ getDailySum(selectedDate, 'calories') }}</div>
                         <div class="flex flex-col items-center md:items-end">
                             <div class="text-xs font-black opacity-70">目標預算: {{ getPlan(selectedDate).calories }} kcal</div>
+                            <!-- 修正：新增熱量差距顯示 -->
+                            <div class="mt-1 text-[10px] font-black px-2 py-0.5 rounded shadow-sm inline-block"
+                                 :class="getDiffClass(getDailySum(selectedDate, 'calories') - getPlan(selectedDate).calories)">
+                                {{ getDiffPrefix(getDailySum(selectedDate, 'calories') - getPlan(selectedDate).calories) }}{{ Math.abs(getDailySum(selectedDate, 'calories') - getPlan(selectedDate).calories) }} kcal
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -237,8 +241,6 @@
             <div v-if="showPlans" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
                 <div class="absolute inset-0 modal-overlay" @click="showPlans = false"></div>
                 <div class="glass-card w-full max-w-4xl h-full max-h-[90vh] md:max-h-[85vh] rounded-[2.5rem] shadow-2xl relative flex flex-col overflow-hidden">
-                    
-                    <!-- 固定 Header -->
                     <div class="flex justify-between items-center p-6 md:p-10 pb-4 shrink-0 border-b border-slate-50">
                         <div>
                             <h2 class="text-2xl font-black text-slate-800">模式目標計畫</h2>
@@ -247,9 +249,7 @@
                         <button @click="showPlans = false" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-400 transition-colors">✕</button>
                     </div>
 
-                    <!-- 可捲動內容區 -->
                     <div class="flex-1 overflow-y-auto custom-scroll px-6 md:px-10 py-6">
-                        <!-- 收合式智慧計算機 -->
                         <div class="mb-8 border border-slate-100 rounded-[2rem] overflow-hidden shadow-sm bg-white">
                             <button @click="calcExpanded = !calcExpanded" class="w-full flex justify-between items-center p-6 hover:bg-slate-50 transition-colors">
                                 <div class="flex items-center gap-3">
@@ -316,7 +316,6 @@
                             </transition>
                         </div>
 
-                        <!-- 模式設定網格 (手動細調) -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-10">
                             <div v-for="(plan, key) in plans" :key="key" class="p-6 bg-slate-50 rounded-[2rem] border-l-8 transition-all hover:bg-white hover:shadow-lg" :class="'border-' + getPlanColor(key)">
                                 <div class="flex justify-between items-center mb-4">
@@ -383,7 +382,7 @@
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const { createApp, ref, reactive, computed, onMounted } = Vue;
+        const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'diet-tracker-v2';
 
@@ -427,7 +426,7 @@
                 const initFirebase = async () => {
                     let config;
                     try {
-                        const response = await fetch('config.json');
+                        const response = await fetch('firebase-config.json');
                         if (!response.ok) throw new Error();
                         config = await response.json();
                     } catch (e) {
@@ -539,14 +538,35 @@
                     getPlanColor: (k) => ({ high: 'rose-500', med: 'amber-500', low: 'emerald-500', rest: 'indigo-500' }[k]),
                     formatKey: (d) => `${currentYear.value}-${String(currentMonth.value + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,
                     isToday: (d) => `${currentYear.value}-${String(currentMonth.value+1).padStart(2,'0')}-${String(d).padStart(2,'0')}` === new Date().toISOString().split('T')[0],
-                    getRecord: (k) => { if(!allData[k]) allData[k] = { planType:'med', meals:[] }; return allData[k]; },
+                    getRecord: (k) => { 
+                        if(!allData[k]) {
+                            allData[k] = { planType:'med', meals:[] };
+                        }
+                        return allData[k]; 
+                    },
                     getPlan: (k) => plans[allData[k]?.planType || 'med'],
-                    getDailySum: (k, t) => (allData[k]?.meals || []).reduce((s, m) => s + (Number(m[t]) || 0), 0),
+                    getDailySum: (k, t) => {
+                        const record = allData[k];
+                        if (!record || !record.meals) return 0;
+                        return record.meals.reduce((s, m) => s + (Number(m[t]) || 0), 0);
+                    },
                     getDiffClass: (v) => v > 0 ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white',
                     getDiffPrefix: (v) => v > 0 ? '+' : '',
-                    addMeal: () => { allData[selectedDate.value].meals.push({ type:'breakfast', name:'', calories:0, carbs:0, protein:0, fat:0 }); saveToCloud(); },
-                    removeMeal: (i) => { allData[selectedDate.value].meals.splice(i, 1); saveToCloud(); },
-                    saveToCloud, changeMonth: (v) => { currentMonth.value += v; if(currentMonth.value>11){currentMonth.value=0;currentYear.value++;} if(currentMonth.value<0){currentMonth.value=11;currentYear.value--;} }
+                    addMeal: () => { 
+                        const record = getRecord(selectedDate.value);
+                        record.meals.push({ type:'breakfast', name:'', calories:0, carbs:0, protein:0, fat:0 }); 
+                        saveToCloud(); 
+                    },
+                    removeMeal: (i) => { 
+                        allData[selectedDate.value].meals.splice(i, 1); 
+                        saveToCloud(); 
+                    },
+                    saveToCloud, 
+                    changeMonth: (v) => { 
+                        currentMonth.value += v; 
+                        if(currentMonth.value>11){currentMonth.value=0;currentYear.value++;} 
+                        if(currentMonth.value<0){currentMonth.value=11;currentYear.value--;} 
+                    }
                 };
             }
         }).mount('#app');
