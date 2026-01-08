@@ -71,8 +71,8 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen font-sans text-slate-900">
-    <div id="app" v-cloak>
+<body class="bg-slate-50 min-h-screen font-sans text-slate-900 flex flex-col">
+    <div id="app" v-cloak class="flex-grow">
         
         <!-- 初始化載入中 -->
         <div v-if="!configLoaded" class="min-h-screen flex flex-col items-center justify-center space-y-4">
@@ -371,6 +371,12 @@
             </div>
         </transition>
     </div>
+
+    <!-- 版權宣告區 -->
+    <footer class="py-8 text-center text-slate-400 text-xs font-bold uppercase tracking-widest border-t border-slate-100 bg-white/50 backdrop-blur-sm">
+        <p>&copy; 2026 <a href="https://github.com/shela1216" target="_blank" class="hover:text-indigo-600 transition-colors underline decoration-indigo-200 underline-offset-4">shela1216</a>. All Rights Reserved.</p>
+        <p class="mt-1 opacity-50">您的私人健康管家</p>
+    </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
