@@ -77,7 +77,7 @@
 <body class="bg-slate-50 min-h-screen font-sans text-slate-900">
     <div id="app" v-cloak>
 
-        <!-- 1. 登入/註冊頁面 (改為信箱登入) -->
+        <!-- 1. 登入/註冊頁面 -->
         <div v-if="!user && authInitialized" class="min-h-screen auth-bg flex items-center justify-center p-4">
             <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 space-y-6">
                 <div class="text-center">
@@ -144,6 +144,16 @@
                     </div>
                 </div>
                 <div class="flex gap-2">
+                    <!-- 下載 CSV 按鈕 -->
+                    <button @click="downloadCSV"
+                        class="w-10 h-10 flex items-center justify-center bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 shadow-sm"
+                        title="下載資料備份 (CSV)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                    </button>
                     <button @click="showPlans = true"
                         class="w-10 h-10 flex items-center justify-center bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 shadow-sm"
                         title="目標設定">
@@ -495,6 +505,48 @@
                     }, 800);
                 };
 
+                const downloadCSV = () => {
+                    const headers = ["日期", "模式", "餐點類型", "餐點名稱", "熱量(kcal)", "碳水(g)", "蛋白質(g)", "脂肪(g)"];
+                    const rows = [];
+
+                    // 遍歷所有日期資料
+                    Object.keys(allData).sort().forEach(date => {
+                        const record = allData[date];
+                        if (record.meals && record.meals.length > 0) {
+                            record.meals.forEach(meal => {
+                                rows.push([
+                                    date,
+                                    record.planType,
+                                    meal.type,
+                                    meal.name || '-',
+                                    meal.calories || 0,
+                                    meal.carbs || 0,
+                                    meal.protein || 0,
+                                    meal.fat || 0
+                                ]);
+                            });
+                        }
+                    });
+
+                    if (rows.length === 0) {
+                        alert("目前尚無資料可匯出！");
+                        return;
+                    }
+
+                    // 加上 BOM 防止 Excel 中文亂碼
+                    const csvContent = "\uFEFF" + [headers, ...rows].map(e => e.join(",")).join("\n");
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement("a");
+                    const url = URL.createObjectURL(blob);
+
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", `飲食追蹤紀錄匯出_${new Date().toISOString().split('T')[0]}.csv`);
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                };
+
                 const getPlanName = (k) => ({ high: '高碳', med: '中碳', low: '低碳', rest: '休息' }[k]);
                 const getPlanColor = (k) => ({ high: 'rose-500', med: 'amber-500', low: 'emerald-500', rest: 'indigo-500' }[k]);
                 const formatKey = (d) => `${currentYear.value}-${String(currentMonth.value + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
@@ -510,7 +562,7 @@
                     user, authInitialized, loading, authError, email, password,
                     handleAuth, handleAnonymousLogin, handleLogout,
                     selectedDate, plans, allData, saving, currentYear, currentMonth, nutrientKeys,
-                    showPlans, showCalendar,
+                    showPlans, showCalendar, downloadCSV,
                     daysInMonth: computed(() => new Date(currentYear.value, currentMonth.value + 1, 0).getDate()),
                     firstDayOfMonth: computed(() => new Date(currentYear.value, currentMonth.value, 1).getDay()),
                     getPlanName, getPlanColor, formatKey, isToday, getRecord, getPlan, getDailySum,
