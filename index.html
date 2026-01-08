@@ -552,27 +552,49 @@
 
                 // Firebase
                 const initApp = async () => {
-                    try {
-                        // 透過外連 JSON 載入 Firebase 設定
-                        const response = await fetch('firebase-config.json');
-                        if (!response.ok) throw new Error('無法載入 Firebase 配置檔案');
-                        const firebaseConfig = await response.json();
-                        
-                        const fbApp = initializeApp(firebaseConfig);
-                        auth = getAuth(fbApp);
-                        db = getFirestore(fbApp);
+                    let firebaseConfig;
 
-                        onAuthStateChanged(auth, (u) => { 
-                            user.value = u; 
-                            if (u) setupDataSync(u);
-                            else initialized.value = true;
-                        });
+                    // 1. 嘗試載入遠端 config.json
+                    try {
+                        const response = await fetch('/firebase-config.json');
+                        if (response.ok) {
+                            firebaseConfig = await response.json();
+                        } else {
+                            throw new Error('遠端 config.json 不存在');
+                        }
                     } catch (e) {
-                        console.error("初始化失敗:", e);
-                        alert("系統初始化失敗，請檢查網路連線或配置檔案。");
-                        initialized.value = true;
+                        // 2. 如果遠端載入失敗，使用環境變數的 fallback
+                        if (typeof __firebase_config !== 'undefined') {
+                            firebaseConfig = JSON.parse(__firebase_config);
+                        } else {
+                            console.error("找不到 Firebase 配置路徑。");
+                            return;
+                        }
                     }
+
+                    const app = initializeApp(firebaseConfig);
+                    auth = getAuth(app);
+                    db = getFirestore(app);
+
+                    onAuthStateChanged(auth, (u) => {
+                        user.value = u;
+                        if (u) {
+                            const docRef = doc(db, 'artifacts', appId, 'users', u.uid, 'settings', 'dietData');
+                            unsubscribe = onSnapshot(docRef, (snap) => {
+                                if (snap.exists()) {
+                                    const data = snap.data();
+                                    if (data.plans) Object.assign(plans, data.plans);
+                                    if (data.profile) Object.assign(profile, data.profile);
+                                    if (data.allData) Object.assign(allData, data.allData);
+                                }
+                                initialized.value = true;
+                            }, () => { initialized.value = true; });
+                        } else {
+                            initialized.value = true;
+                        }
+                    });
                 };
+
 
                 const saveData = () => {
                     if (!user.value) return;
