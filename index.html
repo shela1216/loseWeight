@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>月度飲食追蹤器 - 私人版</title>
-
+    
     <link rel="apple-touch-icon" href="https://img.icons8.com/fluent/180/000000/healthy-food.png">
     <link rel="icon" type="image/png" sizes="32x32" href="https://img.icons8.com/fluent/32/000000/healthy-food.png">
     <link rel="icon" type="image/png" sizes="16x16" href="https://img.icons8.com/fluent/16/000000/healthy-food.png">
@@ -15,80 +14,45 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
-        [v-cloak] {
-            display: none;
-        }
-
+        [v-cloak] { display: none; }
         .glass-card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(229, 231, 235, 0.5);
         }
-
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
         }
-
         .day-cell {
             aspect-ratio: 1 / 1;
             transition: all 0.2s;
         }
-
         .auth-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-
         input::-webkit-outer-spin-button,
         input::-webkit-inner-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
-
-        .fade-enter-active,
-        .fade-leave-active {
-            transition: opacity 0.3s;
-        }
-
-        .fade-enter-from,
-        .fade-leave-to {
-            opacity: 0;
-        }
-
+        .fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
+        .fade-enter-from, .fade-leave-to { opacity: 0; }
+        
         .modal-overlay {
             background: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(4px);
         }
 
-        .plan-high {
-            background-color: #ef4444;
-        }
+        .plan-high { background-color: #ef4444; }
+        .plan-med { background-color: #f59e0b; }
+        .plan-low { background-color: #10b981; }
+        .plan-rest { background-color: #6366f1; }
 
-        .plan-med {
-            background-color: #f59e0b;
-        }
-
-        .plan-low {
-            background-color: #10b981;
-        }
-
-        .plan-rest {
-            background-color: #6366f1;
-        }
-
-        .custom-scroll::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .custom-scroll::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: #e2e8f0;
-            border-radius: 10px;
-        }
-
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        
         .meal-select {
             appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -99,10 +63,9 @@
         }
     </style>
 </head>
-
 <body class="bg-slate-50 min-h-screen font-sans text-slate-900 flex flex-col">
     <div id="app" v-cloak class="flex-grow flex flex-col">
-
+        
         <!-- 載入中遮罩 -->
         <div v-if="!configLoaded" class="min-h-screen flex flex-col items-center justify-center space-y-4">
             <div class="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
@@ -116,42 +79,34 @@
                     <h1 class="text-3xl font-black text-indigo-600 mb-2">飲食追蹤器 Pro</h1>
                     <p class="text-slate-400 text-sm">您的私人健康數據空間</p>
                 </div>
-
+                
                 <div class="space-y-4">
                     <div class="space-y-1">
                         <label class="text-xs font-black text-slate-400 uppercase ml-1">電子郵件信箱</label>
-                        <input type="email" v-model="email"
-                            class="w-full px-4 py-3 rounded-xl border border-slate-100 focus:ring-2 focus:ring-indigo-100 outline-none font-bold"
-                            placeholder="your@email.com">
+                        <input type="email" v-model="email" class="w-full px-4 py-3 rounded-xl border border-slate-100 focus:ring-2 focus:ring-indigo-100 outline-none font-bold" placeholder="your@email.com">
                     </div>
                     <div class="space-y-1">
                         <label class="text-xs font-black text-slate-400 uppercase ml-1">密碼</label>
-                        <input type="password" v-model="password"
-                            class="w-full px-4 py-3 rounded-xl border border-slate-100 focus:ring-2 focus:ring-indigo-100 outline-none font-bold"
-                            placeholder="••••••••">
+                        <input type="password" v-model="password" class="w-full px-4 py-3 rounded-xl border border-slate-100 focus:ring-2 focus:ring-indigo-100 outline-none font-bold" placeholder="••••••••">
                     </div>
-
+                    
                     <div class="flex gap-2 pt-2">
-                        <button @click="handleAuth('login')" :disabled="loading"
-                            class="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition disabled:opacity-50">
+                        <button @click="handleAuth('login')" :disabled="loading" class="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition disabled:opacity-50">
                             {{ loading ? '請稍候...' : '登入' }}
                         </button>
-                        <button @click="handleAuth('signup')" :disabled="loading"
-                            class="flex-1 bg-white border border-slate-200 text-slate-600 py-3 rounded-xl font-bold hover:bg-slate-50 transition disabled:opacity-50">
+                        <button @click="handleAuth('signup')" :disabled="loading" class="flex-1 bg-white border border-slate-200 text-slate-600 py-3 rounded-xl font-bold hover:bg-slate-50 transition disabled:opacity-50">
                             註冊
                         </button>
                     </div>
 
                     <div class="relative py-2 text-center">
-                        <button @click="handleAnonymousLogin"
-                            class="text-xs text-slate-400 hover:text-indigo-600 font-bold underline transition">
+                        <button @click="handleAnonymousLogin" class="text-xs text-slate-400 hover:text-indigo-600 font-bold underline transition">
                             暫時使用訪客身分體驗
                         </button>
                     </div>
                 </div>
 
-                <div v-if="authError"
-                    class="bg-rose-50 text-rose-600 text-xs p-4 rounded-xl border border-rose-100 font-bold">
+                <div v-if="authError" class="bg-rose-50 text-rose-600 text-xs p-4 rounded-xl border border-rose-100 font-bold">
                     ⚠️ {{ authError }}
                 </div>
             </div>
@@ -163,60 +118,35 @@
                 <header class="flex justify-between items-center mb-8">
                     <div class="flex items-center gap-4">
                         <div @click="showCalendar = true" class="cursor-pointer group">
-                            <h1
-                                class="text-2xl font-black text-slate-800 flex items-center gap-2 group-hover:text-indigo-600 transition">
+                            <h1 class="text-2xl font-black text-slate-800 flex items-center gap-2 group-hover:text-indigo-600 transition">
                                 {{ selectedDate }}
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="h-5 w-5 text-slate-400 group-hover:text-indigo-400" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                        d="M19 9l-7 7-7-7" />
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 group-hover:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </h1>
                             <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">點擊切換日期</p>
                         </div>
                     </div>
                     <div class="flex gap-2">
-                        <button @click="downloadCSV"
-                            class="w-10 h-10 flex items-center justify-center bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                            </svg>
+                        <button @click="downloadCSV" class="w-10 h-10 flex items-center justify-center bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                         </button>
-                        <button @click="showPlans = true"
-                            class="w-10 h-10 flex items-center justify-center bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
+                        <button @click="showPlans = true" class="w-10 h-10 flex items-center justify-center bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                         </button>
-                        <button @click="handleLogout"
-                            class="w-10 h-10 flex items-center justify-center bg-slate-800 text-white rounded-xl hover:bg-slate-900 shadow-md transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                            </svg>
+                        <button @click="handleLogout" class="w-10 h-10 flex items-center justify-center bg-slate-800 text-white rounded-xl hover:bg-slate-900 shadow-md transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                         </button>
                     </div>
                 </header>
 
                 <main class="space-y-6">
                     <!-- 今日概覽卡片 -->
-                    <div class="rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl flex flex-col md:flex-row justify-between items-center gap-8 transition-colors duration-500"
-                        :class="'plan-' + (currentDayRecord.planType || 'med')">
+                    <div class="rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl flex flex-col md:flex-row justify-between items-center gap-8 transition-colors duration-500" :class="'plan-' + (currentDayRecord.planType || 'med')">
                         <div class="flex-1 w-full">
                             <div class="flex items-center gap-4 mb-6">
-                                <span
-                                    class="px-4 py-1.5 bg-white/20 rounded-full text-xs font-black backdrop-blur-md tracking-wider uppercase">Today
-                                    Summary</span>
-                                <select v-model="currentDayRecord.planType" @change="saveToCloud"
-                                    class="bg-white text-slate-900 text-xs font-black rounded-full px-4 py-1.5 outline-none cursor-pointer shadow-sm">
+                                <span class="px-4 py-1.5 bg-white/20 rounded-full text-xs font-black backdrop-blur-md tracking-wider uppercase">Today Summary</span>
+                                <select v-model="currentDayRecord.planType" @change="saveToCloud" class="bg-white text-slate-900 text-xs font-black rounded-full px-4 py-1.5 outline-none cursor-pointer shadow-sm">
                                     <option value="high">高碳日模式</option>
                                     <option value="med">中碳日模式</option>
                                     <option value="low">低碳日模式</option>
@@ -224,32 +154,28 @@
                                 </select>
                             </div>
                             <div class="grid grid-cols-3 gap-3 md:gap-4">
-                                <div v-for="n in nutrientKeys" :key="n.key"
-                                    class="bg-white/10 rounded-2xl p-4 border border-white/10 relative overflow-hidden">
+                                <div v-for="n in nutrientKeys" :key="n.key" class="bg-white/10 rounded-2xl p-4 border border-white/10 relative overflow-hidden">
                                     <div class="text-[10px] font-black uppercase opacity-70 mb-1">{{ n.label }}</div>
                                     <div class="text-xl md:text-2xl font-black">
-                                        {{ getDailySum(n.key) }}
-                                        <span class="text-[10px] opacity-50 font-medium">/ {{ currentPlan[n.key]
-                                            }}g</span>
+                                        {{ getDailySum(n.key) }} 
+                                        <span class="text-[10px] opacity-50 font-medium">/ {{ currentPlan[n.key] }}g</span>
                                     </div>
                                     <div class="absolute top-2 right-2 text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm"
-                                        :class="getDiffClass(getDailySum(n.key) - currentPlan[n.key])">
-                                        {{ getDailySum(n.key) > currentPlan[n.key] ? '+' : '' }}{{
-                                        Math.round(getDailySum(n.key) - currentPlan[n.key]) }}
+                                         :class="getDiffClass(getDailySum(n.key) - currentPlan[n.key])">
+                                        {{ getDailySum(n.key) > currentPlan[n.key] ? '+' : '' }}{{ Math.round(getDailySum(n.key) - currentPlan[n.key]) }}
                                     </div>
                                 </div>
                             </div>
                         </div>
-
+                        
                         <div class="text-center md:text-right relative">
                             <div class="text-xs font-black opacity-70 uppercase mb-1 tracking-widest">總攝取熱量</div>
                             <div class="text-6xl md:text-7xl font-black mb-2">{{ getDailySum('calories') }}</div>
                             <div class="flex flex-col items-center md:items-end">
                                 <div class="text-xs font-black opacity-70">目標預算: {{ currentPlan.calories }} kcal</div>
                                 <div class="mt-1 text-[10px] font-black px-2 py-0.5 rounded shadow-sm inline-block"
-                                    :class="getDiffClass(getDailySum('calories') - currentPlan.calories)">
-                                    {{ getDailySum('calories') > currentPlan.calories ? '+' : '' }}{{
-                                    Math.round(getDailySum('calories') - currentPlan.calories) }} kcal
+                                     :class="getDiffClass(getDailySum('calories') - currentPlan.calories)">
+                                    {{ getDailySum('calories') > currentPlan.calories ? '+' : '' }}{{ Math.round(getDailySum('calories') - currentPlan.calories) }} kcal
                                 </div>
                             </div>
                         </div>
@@ -262,49 +188,38 @@
                                 <h3 class="text-2xl font-black text-slate-800">餐點明細</h3>
                                 <p class="text-xs text-slate-400 font-bold tracking-widest uppercase">Meal Entries</p>
                             </div>
-                            <button @click="addMeal"
-                                class="bg-indigo-600 text-white px-8 py-3 rounded-2xl text-sm font-black hover:shadow-xl transition-all">＋
-                                新增餐點</button>
+                            <button @click="addMeal" class="bg-indigo-600 text-white px-8 py-3 rounded-2xl text-sm font-black hover:shadow-xl transition-all">＋ 新增餐點</button>
                         </div>
-
+                        
                         <div v-if="currentDayRecord.meals.length === 0" class="py-20 text-center text-slate-300">
                             <div class="text-5xl mb-4">🥗</div>
                             <p class="font-bold">今日尚未有任何紀錄</p>
                         </div>
 
                         <div class="space-y-6">
-                            <div v-for="(meal, index) in currentDayRecord.meals" :key="index"
-                                class="bg-slate-50 p-6 md:p-8 rounded-[2.5rem] border border-slate-100 space-y-6">
-                                <!-- 修正跑版的區塊 -->
-                                <div class="flex flex-col md:flex-row items-start md:items-center gap-3">
-                                    <div class="flex items-center gap-2 w-full md:w-auto">
-                                        <select v-model="meal.type" @change="debouncedSave" class="meal-select bg-white rounded-xl px-4 py-3 text-sm font-black shadow-sm outline-none border border-slate-100 w-full md:w-32">
+                            <div v-for="(meal, index) in currentDayRecord.meals" :key="index" class="bg-slate-50 p-6 md:p-8 rounded-[2.5rem] border border-slate-100 space-y-6">
+                                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                    <div class="flex flex-1 items-center gap-3 w-full">
+                                        <select v-model="meal.type" @change="saveToCloud" class="meal-select bg-white rounded-xl px-4 py-3 text-sm font-black shadow-sm outline-none border border-slate-100 min-w-[110px]">
                                             <option value="breakfast">🌅 早餐</option>
                                             <option value="lunch">☀️ 午餐</option>
                                             <option value="dinner">🌙 晚餐</option>
                                             <option value="snack">🍰 點心</option>
                                         </select>
+                                        <input type="text" v-model="meal.name" @input="saveToCloud" class="flex-1 bg-white rounded-xl px-5 py-3 text-base font-bold shadow-sm outline-none border border-slate-100 focus:ring-2 focus:ring-indigo-100 transition-all" placeholder="輸入餐點名稱...">
                                     </div>
-                                    <div class="flex flex-1 items-center gap-3 w-full">
-                                        <input type="text" v-model="meal.name" @input="debouncedSave" class="flex-1 bg-white rounded-xl px-5 py-3 text-base font-bold shadow-sm outline-none border border-slate-100" placeholder="輸入餐點名稱...">
-                                        <button @click="removeMeal(index)" class="text-slate-300 hover:text-rose-500 p-2 md:hidden">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                        </button>
-                                    </div>
-                                    <button @click="removeMeal(index)" class="hidden md:block text-slate-300 hover:text-rose-500 p-2">
+                                    <button @click="removeMeal(index)" class="text-slate-300 hover:text-rose-500 p-2 self-end md:self-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                     </button>
                                 </div>
-                                
-                                <!-- 營養數據網格：手機 2x2，電腦 1x4 -->
-                                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                                <div class="grid grid-cols-4 gap-3 md:gap-4">
                                     <div class="flex flex-col">
-                                        <span class="text-[10px] text-slate-400 font-black mb-1 text-center">熱量 kcal</span>
-                                        <input type="number" v-model.number="meal.calories" @input="debouncedSave" class="w-full bg-white rounded-xl px-2 py-3 text-base font-black text-center shadow-sm outline-none border border-slate-100">
+                                        <span class="text-[10px] text-slate-400 font-black mb-1 uppercase text-center tracking-tight">Calories</span>
+                                        <input type="number" v-model.number="meal.calories" @input="saveToCloud" class="w-full bg-white rounded-xl px-2 py-3 text-base font-black text-center shadow-sm outline-none border border-slate-100">
                                     </div>
                                     <div v-for="n in nutrientKeys" :key="n.key" class="flex flex-col">
-                                        <span class="text-[10px] text-slate-400 font-black mb-1 text-center">{{ n.label }} (g)</span>
-                                        <input type="number" v-model.number="meal[n.key]" @input="debouncedSave" class="w-full bg-white rounded-xl px-2 py-3 text-base font-black text-center shadow-sm outline-none border border-slate-100">
+                                        <span class="text-[10px] text-slate-400 font-black mb-1 uppercase text-center tracking-tight">{{ n.label }} (g)</span>
+                                        <input type="number" v-model.number="meal[n.key]" @input="saveToCloud" class="w-full bg-white rounded-xl px-2 py-3 text-base font-black text-center shadow-sm outline-none border border-slate-100">
                                     </div>
                                 </div>
                             </div>
@@ -312,9 +227,9 @@
                     </div>
                 </main>
 
+                <!-- 版權宣告區 -->
                 <footer class="mt-12 mb-8 text-center text-slate-400">
-                    <p class="text-xs font-bold uppercase tracking-widest">© 2026 shela1216 . All Rights Reserved.
-                    </p>
+                    <p class="text-xs font-bold uppercase tracking-widest">© 2024 Diet Tracker Pro. All Rights Reserved.</p>
                 </footer>
             </div>
         </div>
@@ -323,8 +238,7 @@
         <transition name="fade">
             <div v-if="showPlans" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
                 <div class="absolute inset-0 modal-overlay" @click="showPlans = false"></div>
-                <div
-                    class="glass-card w-full max-w-4xl h-full max-h-[90vh] rounded-[2.5rem] shadow-2xl relative flex flex-col overflow-hidden">
+                <div class="glass-card w-full max-w-4xl h-full max-h-[90vh] rounded-[2.5rem] shadow-2xl relative flex flex-col overflow-hidden">
                     <div class="flex justify-between items-center p-6 md:p-10 pb-4 border-b">
                         <div>
                             <h2 class="text-2xl font-black text-slate-800">模式目標計畫</h2>
@@ -335,59 +249,40 @@
                     <div class="flex-1 overflow-y-auto custom-scroll px-6 md:px-10 py-6">
                         <!-- TDEE 計算機 -->
                         <div class="mb-8 border rounded-[2rem] bg-white overflow-hidden">
-                            <button @click="calcExpanded = !calcExpanded"
-                                class="w-full flex justify-between items-center p-6 bg-slate-50/50 hover:bg-slate-50 transition">
+                            <button @click="calcExpanded = !calcExpanded" class="w-full flex justify-between items-center p-6 bg-slate-50/50 hover:bg-slate-50 transition">
                                 <div class="flex items-center gap-3">
-                                    <div
-                                        class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs">
-                                        ⚡</div>
+                                    <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs">⚡</div>
                                     <h3 class="font-black text-slate-800">智慧 TDEE 計算機</h3>
                                 </div>
-                                <span class="text-slate-400 transition-transform duration-300"
-                                    :class="calcExpanded ? 'rotate-180' : ''">▼</span>
+                                <span class="text-slate-400 transition-transform duration-300" :class="calcExpanded ? 'rotate-180' : ''">▼</span>
                             </button>
                             <div v-show="calcExpanded" class="p-6 space-y-6 border-t">
                                 <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                                     <div class="space-y-2">
-                                        <label
-                                            class="text-[10px] font-black text-slate-400 uppercase tracking-widest">性別
-                                            Gender</label>
-                                        <select v-model="calc.gender"
-                                            class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-indigo-100 outline-none">
+                                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">性別 Gender</label>
+                                        <select v-model="calc.gender" class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-indigo-100 outline-none">
                                             <option value="male">男性</option>
                                             <option value="female">女性</option>
                                         </select>
                                     </div>
                                     <div class="space-y-2">
-                                        <label
-                                            class="text-[10px] font-black text-slate-400 uppercase tracking-widest">體重
-                                            Weight (kg)</label>
-                                        <input type="number" v-model.number="calc.weight"
-                                            class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-indigo-100 outline-none">
+                                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">體重 Weight (kg)</label>
+                                        <input type="number" v-model.number="calc.weight" class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-indigo-100 outline-none">
                                     </div>
                                     <div class="space-y-2">
-                                        <label
-                                            class="text-[10px] font-black text-slate-400 uppercase tracking-widest">身高
-                                            Height (cm)</label>
-                                        <input type="number" v-model.number="calc.height"
-                                            class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-indigo-100 outline-none">
+                                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">身高 Height (cm)</label>
+                                        <input type="number" v-model.number="calc.height" class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-indigo-100 outline-none">
                                     </div>
                                     <div class="space-y-2">
-                                        <label
-                                            class="text-[10px] font-black text-slate-400 uppercase tracking-widest">年齡
-                                            Age</label>
-                                        <input type="number" v-model.number="calc.age"
-                                            class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-indigo-100 outline-none">
+                                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">年齡 Age</label>
+                                        <input type="number" v-model.number="calc.age" class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-indigo-100 outline-none">
                                     </div>
                                 </div>
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div class="space-y-2">
-                                        <label
-                                            class="text-[10px] font-black text-slate-400 uppercase tracking-widest">活動程度
-                                            Activity Level</label>
-                                        <select v-model="calc.activity"
-                                            class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-indigo-100 outline-none">
+                                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">活動程度 Activity Level</label>
+                                        <select v-model="calc.activity" class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-indigo-100 outline-none">
                                             <option value="1.2">久坐 (辦公室工作、無運動)</option>
                                             <option value="1.375">輕度 (每週運動 1-3 天)</option>
                                             <option value="1.55">中度 (每週運動 3-5 天)</option>
@@ -396,11 +291,8 @@
                                         </select>
                                     </div>
                                     <div class="space-y-2">
-                                        <label
-                                            class="text-[10px] font-black text-slate-400 uppercase tracking-widest">調整目標
-                                            Goal</label>
-                                        <select v-model="calc.goal"
-                                            class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-indigo-100 outline-none">
+                                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">調整目標 Goal</label>
+                                        <select v-model="calc.goal" class="w-full bg-slate-50 border-0 rounded-xl px-4 py-3 font-bold focus:ring-2 focus:ring-indigo-100 outline-none">
                                             <option value="-500">減脂 (-500 kcal)</option>
                                             <option value="-250">輕微減脂 (-250 kcal)</option>
                                             <option value="0">維持體重</option>
@@ -410,8 +302,7 @@
                                     </div>
                                 </div>
 
-                                <button @click="autoCalculatePlans"
-                                    class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">
+                                <button @click="autoCalculatePlans" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">
                                     ✨ 自動更新所有模式數據
                                 </button>
                             </div>
@@ -419,24 +310,16 @@
 
                         <!-- 模式編輯 -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-10">
-                            <div v-for="(plan, key) in plans" :key="key"
-                                class="p-6 bg-slate-50 rounded-[2rem] border-l-8"
-                                :class="'border-' + getPlanColor(key)">
-                                <div class="font-black uppercase mb-2 text-slate-400 text-xs tracking-widest">{{
-                                    getPlanName(key) }}模式</div>
+                            <div v-for="(plan, key) in plans" :key="key" class="p-6 bg-slate-50 rounded-[2rem] border-l-8" :class="'border-' + getPlanColor(key)">
+                                <div class="font-black uppercase mb-2 text-slate-400 text-xs tracking-widest">{{ getPlanName(key) }}模式</div>
                                 <div class="relative mb-4">
-                                    <input type="number" v-model.number="plans[key].calories" @change="saveToCloud"
-                                        class="text-3xl font-black w-full bg-transparent border-b-2 border-slate-200 focus:border-indigo-600 outline-none pb-1 transition-colors">
-                                    <span
-                                        class="absolute right-0 bottom-2 text-xs font-black text-slate-300">KCAL</span>
+                                    <input type="number" v-model.number="plans[key].calories" @change="saveToCloud" class="text-3xl font-black w-full bg-transparent border-b-2 border-slate-200 focus:border-indigo-600 outline-none pb-1 transition-colors">
+                                    <span class="absolute right-0 bottom-2 text-xs font-black text-slate-300">KCAL</span>
                                 </div>
                                 <div class="grid grid-cols-3 gap-4">
                                     <div v-for="n in nutrientKeys" :key="n.key" class="space-y-1">
-                                        <label
-                                            class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{{
-                                            n.label }} (g)</label>
-                                        <input type="number" v-model.number="plans[key][n.key]" @change="saveToCloud"
-                                            class="w-full border-b bg-transparent font-bold focus:border-indigo-600 outline-none">
+                                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{{ n.label }} (g)</span>
+                                        <input type="number" v-model.number="plans[key][n.key]" @change="saveToCloud" class="w-full border-b bg-transparent font-bold focus:border-indigo-600 outline-none">
                                     </div>
                                 </div>
                             </div>
@@ -454,27 +337,19 @@
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-black">{{ currentYear }} / {{ currentMonth + 1 }}</h2>
                         <div class="flex gap-2">
-                            <button @click="changeMonth(-1)"
-                                class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition">◀</button>
-                            <button @click="changeMonth(1)"
-                                class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition">▶</button>
+                            <button @click="changeMonth(-1)" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition">◀</button>
+                            <button @click="changeMonth(1)" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition">▶</button>
                         </div>
                     </div>
                     <div class="calendar-grid gap-2 text-center text-xs font-black text-slate-400 mb-2">
-                        <div>日</div>
-                        <div>一</div>
-                        <div>二</div>
-                        <div>三</div>
-                        <div>四</div>
-                        <div>五</div>
-                        <div>六</div>
+                        <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
                     </div>
                     <div class="calendar-grid gap-2">
                         <div v-for="empty in firstDayOfMonth" :key="'e'+empty"></div>
-                        <div v-for="date in daysInMonth" :key="date"
-                            @click="selectedDate = formatKey(date); showCalendar = false"
-                            class="day-cell border rounded-xl flex items-center justify-center cursor-pointer hover:bg-indigo-50 hover:border-indigo-200 transition"
-                            :class="selectedDate === formatKey(date) ? 'border-indigo-600 bg-indigo-50 font-black text-indigo-600' : 'text-slate-600'">
+                        <div v-for="date in daysInMonth" :key="date" 
+                             @click="selectedDate = formatKey(date); showCalendar = false"
+                             class="day-cell border rounded-xl flex items-center justify-center cursor-pointer hover:bg-indigo-50 hover:border-indigo-200 transition"
+                             :class="selectedDate === formatKey(date) ? 'border-indigo-600 bg-indigo-50 font-black text-indigo-600' : 'text-slate-600'">
                             {{ date }}
                         </div>
                     </div>
@@ -483,15 +358,14 @@
         </transition>
 
         <!-- 儲存狀態 -->
-        <div v-if="saving"
-            class="fixed bottom-8 right-8 bg-slate-900 text-white px-6 py-3 rounded-2xl text-xs font-bold z-50 shadow-2xl animate-bounce">
+        <div v-if="saving" class="fixed bottom-8 right-8 bg-slate-900 text-white px-6 py-3 rounded-2xl text-xs font-bold z-50 shadow-2xl animate-bounce">
             雲端同步中...
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
@@ -510,7 +384,7 @@
                 const showPlans = ref(false);
                 const showCalendar = ref(false);
                 const calcExpanded = ref(false);
-
+                
                 let db, auth, unsubscribeSnapshot = null;
 
                 const nutrientKeys = [
@@ -522,7 +396,7 @@
                 const currentYear = ref(new Date().getFullYear());
                 const currentMonth = ref(new Date().getMonth());
                 const selectedDate = ref(new Date().toISOString().split('T')[0]);
-
+                
                 const calc = reactive({ gender: 'male', weight: 70, height: 170, age: 25, activity: '1.2', goal: '0' });
 
                 const plans = reactive({
@@ -531,7 +405,7 @@
                     low: { calories: 1800, carbs: 80, protein: 180, fat: 85 },
                     rest: { calories: 1600, carbs: 50, protein: 150, fat: 90 }
                 });
-
+                
                 const allData = reactive({});
 
                 const currentDayRecord = computed(() => {
@@ -550,35 +424,56 @@
                 };
 
                 const initFirebase = async () => {
-                    // 改回使用外部路徑載入 Firebase Config
-                    const response = await fetch('firebase-config.json');
-                    const firebaseConfig = await response.json();
+                    try {
+                        let firebaseConfig;
+                        
+                        // 優先從全域變數獲取 Firebase Config
+                        if (typeof __firebase_config !== 'undefined') {
+                            firebaseConfig = JSON.parse(__firebase_config);
+                        } else {
+                            // 備用方案：嘗試 fetch (通常在沙盒環境不穩定)
+                            const response = await fetch('firebase-config.json');
+                            if (!response.ok) throw new Error('無法載入設定檔');
+                            firebaseConfig = await response.json();
+                        }
+                        
+                        const app = initializeApp(firebaseConfig);
+                        auth = getAuth(app);
+                        db = getFirestore(app);
+                        configLoaded.value = true;
 
-                    const app = initializeApp(firebaseConfig);
-                    auth = getAuth(app);
-                    db = getFirestore(app);
-                    configLoaded.value = true;
-
-                    onAuthStateChanged(auth, (u) => {
-                        if (unsubscribeSnapshot) unsubscribeSnapshot();
-                        if (u) {
-                            user.value = u;
-                            const docRef = doc(db, 'artifacts', appId, 'users', u.uid, 'settings', 'dietData');
-                            unsubscribeSnapshot = onSnapshot(docRef, (snap) => {
-                                if (snap.exists()) {
-                                    const d = snap.data();
-                                    if (d.plans) Object.assign(plans, d.plans);
-                                    if (d.allData) {
-                                        Object.keys(d.allData).forEach(key => {
-                                            allData[key] = d.allData[key];
-                                        });
+                        onAuthStateChanged(auth, (u) => {
+                            if (unsubscribeSnapshot) unsubscribeSnapshot();
+                            if (u) {
+                                user.value = u;
+                                const docRef = doc(db, 'artifacts', appId, 'users', u.uid, 'settings', 'dietData');
+                                unsubscribeSnapshot = onSnapshot(docRef, (snap) => {
+                                    if (snap.exists()) {
+                                        const d = snap.data();
+                                        if (d.plans) Object.assign(plans, d.plans);
+                                        if (d.allData) {
+                                            Object.keys(d.allData).forEach(key => {
+                                                allData[key] = d.allData[key];
+                                            });
+                                        }
+                                        if (d.calc) Object.assign(calc, d.calc);
                                     }
-                                    if (d.calc) Object.assign(calc, d.calc);
-                                }
-                            }, (err) => console.error("Snapshot error:", err));
-                        } else { user.value = null; }
+                                }, (err) => console.error("Snapshot error:", err));
+                            } else { user.value = null; }
+                            authInitialized.value = true;
+                        });
+
+                        // 處理自動登入 (如果有初始 Token)
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        }
+
+                    } catch (error) {
+                        console.error("Firebase Initialization Error:", error);
+                        configLoaded.value = true;
                         authInitialized.value = true;
-                    });
+                        authError.value = "系統初始化失敗，請稍後再試。";
+                    }
                 };
 
                 const handleAuth = async (mode) => {
@@ -600,12 +495,12 @@
                     saveTimeout = setTimeout(async () => {
                         try {
                             const docRef = doc(db, 'artifacts', appId, 'users', user.value.uid, 'settings', 'dietData');
-                            await setDoc(docRef, {
-                                plans: JSON.parse(JSON.stringify(plans)),
-                                allData: JSON.parse(JSON.stringify(allData)),
-                                calc: JSON.parse(JSON.stringify(calc))
+                            await setDoc(docRef, { 
+                                plans: JSON.parse(JSON.stringify(plans)), 
+                                allData: JSON.parse(JSON.stringify(allData)), 
+                                calc: JSON.parse(JSON.stringify(calc)) 
                             });
-                        } catch (e) { console.error("Save error:", e); } finally { saving.value = false; }
+                        } catch(e) { console.error("Save error:", e); } finally { saving.value = false; }
                     }, 1000);
                 };
 
@@ -629,7 +524,7 @@
                     plans.high = { calories: highKcal, carbs: highCarbG, protein: proteinG, fat: highFatG };
 
                     const lowKcal = Math.round(medKcal * 0.8);
-                    const lowFatG = Math.round(lowKcal * 0.4 / 9);
+                    const lowFatG = Math.round(lowKcal * 0.4 / 9); 
                     const lowCarbG = Math.round((lowKcal - proteinKcal - (lowFatG * 9)) / 4);
                     plans.low = { calories: lowKcal, carbs: Math.max(20, lowCarbG), protein: proteinG, fat: lowFatG };
 
@@ -692,5 +587,4 @@
         }).mount('#app');
     </script>
 </body>
-
 </html>
