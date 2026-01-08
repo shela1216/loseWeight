@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>健康體態追蹤器</title>
-    
+
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/2424/2424383.png">
     <link rel="icon" type="image/png" sizes="32x32" href="https://cdn-icons-png.flaticon.com/512/2424/2424383.png">
     <link rel="icon" type="image/png" sizes="16x16" href="https://cdn-icons-png.flaticon.com/512/2424/2424383.png">
@@ -15,29 +16,81 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
-        [v-cloak] { display: none; }
-        .dot-high { background-color: #f59e0b; }
-        .dot-med { background-color: #10b981; }
-        .dot-low { background-color: #06b6d4; }
-        .dot-rest { background-color: #6366f1; }
-        .plan-high { background: linear-gradient(135deg, #f59e0b, #d97706); } 
-        .plan-med { background: linear-gradient(135deg, #10b981, #059669); } 
-        .plan-low { background: linear-gradient(135deg, #06b6d4, #0891b2); } 
-        .plan-rest { background: linear-gradient(135deg, #6366f1, #4f46e5); } 
-        .meal-breakfast { border-left: 6px solid #fbbf24; }
-        .meal-lunch { border-left: 6px solid #10b981; }
-        .meal-dinner { border-left: 6px solid #06b6d4; }
-        .meal-snack { border-left: 6px solid #f472b6; }
-        .modal-overlay { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
+        [v-cloak] {
+            display: none;
+        }
+
+        .dot-high {
+            background-color: #f59e0b;
+        }
+
+        .dot-med {
+            background-color: #10b981;
+        }
+
+        .dot-low {
+            background-color: #06b6d4;
+        }
+
+        .dot-rest {
+            background-color: #6366f1;
+        }
+
+        .plan-high {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .plan-med {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .plan-low {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+        }
+
+        .plan-rest {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+        }
+
+        .meal-breakfast {
+            border-left: 6px solid #fbbf24;
+        }
+
+        .meal-lunch {
+            border-left: 6px solid #10b981;
+        }
+
+        .meal-dinner {
+            border-left: 6px solid #06b6d4;
+        }
+
+        .meal-snack {
+            border-left: 6px solid #f472b6;
+        }
+
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
         .date-input-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            width: auto; height: auto; color: transparent; background: transparent; cursor: pointer;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: auto;
+            height: auto;
+            color: transparent;
+            background: transparent;
+            cursor: pointer;
         }
     </style>
 </head>
+
 <body class="bg-[#f8fafc] min-h-screen font-sans text-slate-900">
     <div id="app" v-cloak>
-        
+
         <!-- 載入中狀態 -->
         <div v-if="!initialized" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-[100]">
             <div class="w-12 h-12 border-4 border-emerald-100 border-t-emerald-600 rounded-full animate-spin"></div>
@@ -52,52 +105,92 @@
                     <p class="text-slate-400 mt-2">追蹤您的每日營養與目標</p>
                 </div>
                 <div class="space-y-4">
-                    <input type="email" v-model="loginEmail" class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-emerald-500" placeholder="電子郵件">
-                    <input type="password" v-model="loginPassword" class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-emerald-500" placeholder="密碼">
-                    <button @click="handleAuth('login')" class="w-full bg-emerald-600 text-white py-4 rounded-2xl font-black shadow-lg hover:bg-emerald-700 transition-all">登入</button>
+                    <input type="email" v-model="loginEmail"
+                        class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-emerald-500"
+                        placeholder="電子郵件">
+                    <input type="password" v-model="loginPassword"
+                        class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-emerald-500"
+                        placeholder="密碼">
+                    <button @click="handleAuth('login')"
+                        class="w-full bg-emerald-600 text-white py-4 rounded-2xl font-black shadow-lg hover:bg-emerald-700 transition-all">登入</button>
                     <button @click="handleAuth('signup')" class="w-full text-emerald-600 font-bold py-2">註冊新帳號</button>
-                    <button @click="handleAnonymous" class="w-full text-slate-400 text-xs font-bold underline">直接開始 (不登入)</button>
+                    <button @click="handleAnonymous" class="w-full text-slate-400 text-xs font-bold underline">直接開始
+                        (不登入)</button>
                 </div>
             </div>
         </div>
 
         <!-- 主程式內容 -->
         <div v-else-if="user" class="max-w-4xl mx-auto px-4 py-8 flex flex-col min-h-screen">
-            
+
             <header class="mb-6 space-y-6">
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-2">
                         <div class="bg-emerald-600 p-2 rounded-xl text-white shadow-lg">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                                </path>
+                            </svg>
                         </div>
                         <h1 class="text-xl font-black tracking-tight text-slate-800">體態管家</h1>
                     </div>
                     <div class="flex gap-2 items-center">
-                        <button @click="exportCSV" class="h-10 px-4 flex items-center justify-center bg-white border border-slate-100 rounded-xl shadow-sm text-xs font-black text-slate-500 hover:text-emerald-600 hover:border-emerald-100 transition-all">
-                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        <button @click="exportCSV"
+                            class="h-10 px-4 flex items-center justify-center bg-white border border-slate-100 rounded-xl shadow-sm text-xs font-black text-slate-500 hover:text-emerald-600 hover:border-emerald-100 transition-all">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
                             匯出 CSV
                         </button>
-                        <button @click="showSettings = true" class="w-10 h-10 flex items-center justify-center bg-white border border-slate-100 rounded-xl shadow-sm text-slate-500 hover:text-emerald-600 transition-all"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg></button>
-                        <button @click="handleLogout" class="w-10 h-10 flex items-center justify-center bg-white border border-rose-50 rounded-xl shadow-sm text-slate-400 hover:text-rose-600 transition-all"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg></button>
+                        <button @click="showSettings = true"
+                            class="w-10 h-10 flex items-center justify-center bg-white border border-slate-100 rounded-xl shadow-sm text-slate-500 hover:text-emerald-600 transition-all">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </button>
+                        <button @click="handleLogout"
+                            class="w-10 h-10 flex items-center justify-center bg-white border border-rose-50 rounded-xl shadow-sm text-slate-400 hover:text-rose-600 transition-all"><svg
+                                class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                </path>
+                            </svg></button>
                     </div>
                 </div>
 
                 <!-- 週曆 -->
                 <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100">
                     <div class="flex justify-between items-center px-2 mb-4">
-                        <button @click="changeWeek(-1)" class="p-1 text-slate-400 hover:text-emerald-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+                        <button @click="changeWeek(-1)" class="p-1 text-slate-400 hover:text-emerald-600"><svg
+                                class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 19l-7-7 7-7"></path>
+                            </svg></button>
                         <div class="relative date-input-wrapper cursor-pointer group">
-                            <h2 class="text-sm font-black text-slate-700 group-hover:text-emerald-600 transition-colors">{{ currentMonthYearDisplay }}</h2>
+                            <h2
+                                class="text-sm font-black text-slate-700 group-hover:text-emerald-600 transition-colors">
+                                {{ currentMonthYearDisplay }}</h2>
                             <input type="date" v-model="selectedDate" class="absolute inset-0 opacity-0 cursor-pointer">
                         </div>
-                        <button @click="changeWeek(1)" class="p-1 text-slate-400 hover:text-emerald-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
+                        <button @click="changeWeek(1)" class="p-1 text-slate-400 hover:text-emerald-600"><svg
+                                class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                                </path>
+                            </svg></button>
                     </div>
                     <div class="grid grid-cols-7 gap-1 text-center">
                         <div v-for="day in weekDays" :key="day.date" @click="selectedDate = day.date"
-                             class="flex flex-col items-center py-2 rounded-2xl cursor-pointer transition-all active:scale-90"
-                             :class="selectedDate === day.date ? 'bg-emerald-50 ring-1 ring-emerald-500/20' : 'hover:bg-slate-50'">
+                            class="flex flex-col items-center py-2 rounded-2xl cursor-pointer transition-all active:scale-90"
+                            :class="selectedDate === day.date ? 'bg-emerald-50 ring-1 ring-emerald-500/20' : 'hover:bg-slate-50'">
                             <span class="text-[10px] font-bold text-slate-400 uppercase mb-1">{{ day.label }}</span>
-                            <span class="text-sm font-black" :class="selectedDate === day.date ? 'text-emerald-600' : 'text-slate-700'">{{ day.dayNum }}</span>
+                            <span class="text-sm font-black"
+                                :class="selectedDate === day.date ? 'text-emerald-600' : 'text-slate-700'">{{ day.dayNum
+                                }}</span>
                             <div class="h-1.5 w-1.5 rounded-full mt-1" :class="getDayDotClass(day.date)"></div>
                         </div>
                     </div>
@@ -106,12 +199,15 @@
 
             <main class="space-y-6">
                 <!-- 今日計畫 -->
-                <div class="rounded-[2.5rem] p-8 text-white shadow-2xl transition-all relative overflow-hidden" :class="'plan-' + (currentDayRecord.planType || 'med')">
+                <div class="rounded-[2.5rem] p-8 text-white shadow-2xl transition-all relative overflow-hidden"
+                    :class="'plan-' + (currentDayRecord.planType || 'med')">
                     <div class="relative z-10">
                         <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
                             <div class="space-y-3 w-full md:w-auto">
-                                <span class="px-4 py-1 bg-white/20 rounded-full text-[10px] font-black tracking-widest uppercase">今日選擇計畫</span>
-                                <select v-model="currentDayRecord.planType" @change="saveData" class="block w-full bg-white text-slate-800 text-sm font-black rounded-xl px-4 py-2.5 outline-none border-none cursor-pointer shadow-lg">
+                                <span
+                                    class="px-4 py-1 bg-white/20 rounded-full text-[10px] font-black tracking-widest uppercase">今日選擇計畫</span>
+                                <select v-model="currentDayRecord.planType" @change="saveData"
+                                    class="block w-full bg-white text-slate-800 text-sm font-black rounded-xl px-4 py-2.5 outline-none border-none cursor-pointer shadow-lg">
                                     <option value="high">💪 高能量日 (高碳)</option>
                                     <option value="med">🥗 平衡飲食 (中碳)</option>
                                     <option value="low">🔥 燃脂模式 (低碳)</option>
@@ -119,7 +215,8 @@
                                 </select>
                             </div>
                             <div class="text-center md:text-right">
-                                <div class="text-[10px] font-bold opacity-80 uppercase tracking-widest mb-1">今日剩餘熱量</div>
+                                <div class="text-[10px] font-bold opacity-80 uppercase tracking-widest mb-1">今日剩餘熱量
+                                </div>
                                 <div class="text-5xl font-black leading-none">
                                     {{ getGap('calories') }} <span class="text-xs">kcal</span>
                                 </div>
@@ -129,18 +226,21 @@
                             </div>
                         </div>
                         <div class="grid grid-cols-3 gap-3">
-                            <div v-for="n in nutrientKeys" :key="n.key" class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                            <div v-for="n in nutrientKeys" :key="n.key"
+                                class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
                                 <div class="flex justify-between items-center mb-1">
                                     <span class="text-[9px] font-bold opacity-80 uppercase">{{ n.label }}</span>
                                     <span class="text-[10px] font-black">{{ getDailySum(n.key) }}g</span>
                                 </div>
                                 <div class="h-1.5 bg-white/20 rounded-full overflow-hidden">
-                                    <div class="h-full bg-white transition-all duration-700" :style="{ width: Math.min((getDailySum(n.key)/currentPlan[n.key])*100, 100) + '%' }"></div>
+                                    <div class="h-full bg-white transition-all duration-700"
+                                        :style="{ width: Math.min((getDailySum(n.key)/currentPlan[n.key])*100, 100) + '%' }">
+                                    </div>
                                 </div>
                                 <div class="flex justify-between items-center mt-2">
                                     <div class="text-[8px] opacity-60">目標 {{ currentPlan[n.key] }}g</div>
-                                    <div class="text-[9px] font-black px-1.5 py-0.5 rounded" 
-                                         :class="getGap(n.key) < 0 ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white'">
+                                    <div class="text-[9px] font-black px-1.5 py-0.5 rounded"
+                                        :class="getGap(n.key) < 0 ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white'">
                                         {{ getGap(n.key) > 0 ? '剩 ' + getGap(n.key) : '超 ' + Math.abs(getGap(n.key)) }}
                                     </div>
                                 </div>
@@ -153,52 +253,78 @@
                 <div class="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-100">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-lg font-black text-slate-800">餐點明細</h3>
-                        <button @click="addMeal" class="bg-emerald-600 text-white px-5 py-2.5 rounded-2xl text-xs font-black shadow-lg hover:bg-emerald-700">+ 新增餐點</button>
+                        <button @click="addMeal"
+                            class="bg-emerald-600 text-white px-5 py-2.5 rounded-2xl text-xs font-black shadow-lg hover:bg-emerald-700">+
+                            新增餐點</button>
                     </div>
-                    
+
                     <div class="space-y-4">
-                        <div v-for="(meal, index) in currentDayRecord.meals" :key="index" class="p-4 rounded-3xl border bg-slate-50 transition-all" :class="'meal-' + meal.type">
-                            
+                        <div v-for="(meal, index) in currentDayRecord.meals" :key="index"
+                            class="p-4 rounded-3xl border bg-slate-50 transition-all" :class="'meal-' + meal.type">
+
                             <!-- 顯示模式 -->
                             <div v-if="editingIndex !== index" class="flex justify-between items-start">
                                 <div class="space-y-1">
                                     <div class="flex items-center gap-2">
-                                        <span class="text-[10px] px-2 py-0.5 bg-white rounded-md font-black shadow-sm">{{ getMealLabel(meal.type) }}</span>
-                                        <span class="text-sm font-black text-slate-700">{{ meal.name || '未命名餐點' }}</span>
+                                        <span
+                                            class="text-[10px] px-2 py-0.5 bg-white rounded-md font-black shadow-sm">{{
+                                            getMealLabel(meal.type) }}</span>
+                                        <span class="text-sm font-black text-slate-700">{{ meal.name || '未命名餐點'
+                                            }}</span>
                                     </div>
                                     <div class="text-[10px] text-slate-400 font-bold">
-                                        {{ meal.calories }} kcal | 碳 {{ meal.carbs }}g | 蛋 {{ meal.protein }}g | 脂 {{ meal.fat }}g
+                                        {{ meal.calories }} kcal | 碳 {{ meal.carbs }}g | 蛋 {{ meal.protein }}g | 脂 {{
+                                        meal.fat }}g
                                     </div>
                                 </div>
                                 <div class="flex gap-2">
-                                    <button @click="editingIndex = index" class="p-2 text-slate-400 hover:text-emerald-600 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></button>
-                                    <button @click="confirmDelete(index)" class="p-2 text-slate-300 hover:text-rose-500 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                                    <button @click="editingIndex = index"
+                                        class="p-2 text-slate-400 hover:text-emerald-600 transition-colors"><svg
+                                            class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                                            </path>
+                                        </svg></button>
+                                    <button @click="confirmDelete(index)"
+                                        class="p-2 text-slate-300 hover:text-rose-500 transition-colors"><svg
+                                            class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                            </path>
+                                        </svg></button>
                                 </div>
                             </div>
 
                             <!-- 編輯模式 -->
                             <div v-else class="space-y-4">
                                 <div class="flex flex-col md:flex-row gap-3">
-                                    <select v-model="meal.type" class="bg-white rounded-xl px-3 py-2 text-xs font-black border border-slate-200">
+                                    <select v-model="meal.type"
+                                        class="bg-white rounded-xl px-3 py-2 text-xs font-black border border-slate-200">
                                         <option value="breakfast">🌅 早餐</option>
                                         <option value="lunch">☀️ 午餐</option>
                                         <option value="dinner">🌙 晚餐</option>
                                         <option value="snack">🍰 點心</option>
                                     </select>
-                                    <input v-model="meal.name" class="flex-1 px-4 py-2 bg-white rounded-xl border border-slate-200 text-sm font-bold outline-none" placeholder="餐點名稱">
+                                    <input v-model="meal.name"
+                                        class="flex-1 px-4 py-2 bg-white rounded-xl border border-slate-200 text-sm font-bold outline-none"
+                                        placeholder="餐點名稱">
                                 </div>
                                 <div class="grid grid-cols-4 gap-2">
                                     <div v-for="n in [{key:'calories', label:'熱量'}, ...nutrientKeys]" :key="n.key">
-                                        <label class="text-[8px] text-slate-400 font-black block ml-1 mb-1">{{ n.label }}</label>
-                                        <input type="number" v-model.number="meal[n.key]" class="w-full px-2 py-2 bg-white border border-slate-200 rounded-xl font-black text-center text-sm">
+                                        <label class="text-[8px] text-slate-400 font-black block ml-1 mb-1">{{ n.label
+                                            }}</label>
+                                        <input type="number" v-model.number="meal[n.key]"
+                                            class="w-full px-2 py-2 bg-white border border-slate-200 rounded-xl font-black text-center text-sm">
                                     </div>
                                 </div>
                                 <div class="flex justify-end gap-2 pt-2">
-                                    <button @click="editingIndex = null; saveData()" class="px-4 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-black shadow-md">確定修改</button>
+                                    <button @click="editingIndex = null; saveData()"
+                                        class="px-4 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-black shadow-md">確定修改</button>
                                 </div>
                             </div>
                         </div>
-                        <div v-if="currentDayRecord.meals.length === 0" class="py-12 text-center text-slate-300 font-bold">目前尚無餐點紀錄</div>
+                        <div v-if="currentDayRecord.meals.length === 0"
+                            class="py-12 text-center text-slate-300 font-bold">目前尚無餐點紀錄</div>
                     </div>
                 </div>
             </main>
@@ -206,10 +332,15 @@
             <!-- 彈出視窗：設定與目標計算 -->
             <div v-if="showSettings" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
                 <div class="modal-overlay absolute inset-0" @click="showSettings = false"></div>
-                <div class="bg-white w-full max-w-xl rounded-[2.5rem] p-8 relative z-10 shadow-2xl overflow-y-auto max-h-[90vh]">
+                <div
+                    class="bg-white w-full max-w-xl rounded-[2.5rem] p-8 relative z-10 shadow-2xl overflow-y-auto max-h-[90vh]">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-black">設定與目標</h3>
-                        <button @click="showSettings = false" class="text-slate-400 hover:text-slate-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                        <button @click="showSettings = false" class="text-slate-400 hover:text-slate-600"><svg
+                                class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg></button>
                     </div>
 
                     <!-- TDEE 計算器 -->
@@ -218,26 +349,31 @@
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
                             <div>
                                 <label class="text-[10px] font-bold text-slate-500 block mb-1">性別</label>
-                                <select v-model="profile.gender" class="w-full bg-white p-2 rounded-xl text-xs border-none shadow-sm">
+                                <select v-model="profile.gender"
+                                    class="w-full bg-white p-2 rounded-xl text-xs border-none shadow-sm">
                                     <option value="male">男性</option>
                                     <option value="female">女性</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="text-[10px] font-bold text-slate-500 block mb-1">體重 (kg)</label>
-                                <input type="number" v-model.number="profile.weight" class="w-full bg-white p-2 rounded-xl text-xs border-none shadow-sm">
+                                <input type="number" v-model.number="profile.weight"
+                                    class="w-full bg-white p-2 rounded-xl text-xs border-none shadow-sm">
                             </div>
                             <div>
                                 <label class="text-[10px] font-bold text-slate-500 block mb-1">身高 (cm)</label>
-                                <input type="number" v-model.number="profile.height" class="w-full bg-white p-2 rounded-xl text-xs border-none shadow-sm">
+                                <input type="number" v-model.number="profile.height"
+                                    class="w-full bg-white p-2 rounded-xl text-xs border-none shadow-sm">
                             </div>
                             <div>
                                 <label class="text-[10px] font-bold text-slate-500 block mb-1">年齡</label>
-                                <input type="number" v-model.number="profile.age" class="w-full bg-white p-2 rounded-xl text-xs border-none shadow-sm">
+                                <input type="number" v-model.number="profile.age"
+                                    class="w-full bg-white p-2 rounded-xl text-xs border-none shadow-sm">
                             </div>
                             <div class="col-span-2">
                                 <label class="text-[10px] font-bold text-slate-500 block mb-1">活動程度</label>
-                                <select v-model="profile.activity" class="w-full bg-white p-2 rounded-xl text-xs border-none shadow-sm">
+                                <select v-model="profile.activity"
+                                    class="w-full bg-white p-2 rounded-xl text-xs border-none shadow-sm">
                                     <option :value="1.2">久坐 (無運動)</option>
                                     <option :value="1.375">輕度 (1-3天/週)</option>
                                     <option :value="1.55">中度 (3-5天/週)</option>
@@ -246,7 +382,8 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-4">
-                            <button @click="autoCalculatePlans" class="flex-1 py-3 bg-emerald-600 text-white rounded-2xl font-black text-xs shadow-lg transition-transform active:scale-95">依照數據自動計算</button>
+                            <button @click="autoCalculatePlans"
+                                class="flex-1 py-3 bg-emerald-600 text-white rounded-2xl font-black text-xs shadow-lg transition-transform active:scale-95">依照數據自動計算</button>
                             <div class="text-right">
                                 <span class="text-[9px] font-bold text-emerald-600 block uppercase">預估 TDEE</span>
                                 <span class="text-lg font-black text-emerald-800">{{ calculatedTDEE }}</span>
@@ -262,11 +399,14 @@
                                 <span class="text-[9px] text-slate-400">kcal | 碳 | 蛋 | 脂</span>
                             </div>
                             <div class="grid grid-cols-4 gap-2">
-                                <input v-for="n in ['calories', 'carbs', 'protein', 'fat']" type="number" v-model.number="p[n]" @change="saveData" class="w-full text-center text-xs p-2 rounded-lg border-none shadow-sm font-bold">
+                                <input v-for="n in ['calories', 'carbs', 'protein', 'fat']" type="number"
+                                    v-model.number="p[n]" @change="saveData"
+                                    class="w-full text-center text-xs p-2 rounded-lg border-none shadow-sm font-bold">
                             </div>
                         </div>
                     </div>
-                    <button @click="showSettings = false" class="w-full mt-6 py-4 bg-slate-900 text-white rounded-2xl font-black transition-transform active:scale-95">確定並關閉</button>
+                    <button @click="showSettings = false"
+                        class="w-full mt-6 py-4 bg-slate-900 text-white rounded-2xl font-black transition-transform active:scale-95">確定並關閉</button>
                 </div>
             </div>
 
@@ -274,19 +414,27 @@
             <div v-if="mealToDelete !== null" class="fixed inset-0 z-[70] flex items-center justify-center p-4">
                 <div class="modal-overlay absolute inset-0"></div>
                 <div class="bg-white rounded-[2rem] p-8 relative z-10 w-full max-w-xs text-center shadow-2xl">
-                    <div class="w-16 h-16 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <div
+                        class="w-16 h-16 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                            </path>
+                        </svg>
                     </div>
                     <h4 class="text-lg font-black text-slate-800 mb-2">確定要刪除嗎？</h4>
                     <p class="text-sm text-slate-400 mb-6">此動作無法復原喔！</p>
                     <div class="flex gap-3">
-                        <button @click="mealToDelete = null" class="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold transition-all hover:bg-slate-200">取消</button>
-                        <button @click="executeDelete" class="flex-1 py-3 bg-rose-500 text-white rounded-xl font-bold transition-all hover:bg-rose-600">刪除</button>
+                        <button @click="mealToDelete = null"
+                            class="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold transition-all hover:bg-slate-200">取消</button>
+                        <button @click="executeDelete"
+                            class="flex-1 py-3 bg-rose-500 text-white rounded-xl font-bold transition-all hover:bg-rose-600">刪除</button>
                     </div>
                 </div>
             </div>
 
-            <div v-if="saving" class="fixed bottom-6 right-6 bg-slate-900 text-white px-4 py-2 rounded-full text-[10px] font-black shadow-xl flex items-center gap-2">
+            <div v-if="saving"
+                class="fixed bottom-6 right-6 bg-slate-900 text-white px-4 py-2 rounded-full text-[10px] font-black shadow-xl flex items-center gap-2">
                 <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div> 同步中
             </div>
         </div>
@@ -308,12 +456,12 @@
                 const selectedDate = ref(new Date().toLocaleDateString('sv-SE'));
                 const loginEmail = ref('');
                 const loginPassword = ref('');
-                
+
                 const editingIndex = ref(null);
                 const mealToDelete = ref(null);
 
                 const nutrientKeys = [{ key: 'carbs', label: '碳水' }, { key: 'protein', label: '蛋白質' }, { key: 'fat', label: '脂肪' }];
-                
+
                 const profile = reactive({
                     gender: 'male', weight: 70, height: 175, age: 30, activity: 1.2, goal: 'lose'
                 });
@@ -339,7 +487,7 @@
                 const autoCalculatePlans = () => {
                     const tdee = calculatedTDEE.value;
                     const base = tdee - 300;
-                    const pGrams = Math.round(profile.weight * 2); 
+                    const pGrams = Math.round(profile.weight * 2);
                     plans.high.calories = base + 200; plans.high.protein = pGrams; plans.high.carbs = Math.round((plans.high.calories * 0.5) / 4); plans.high.fat = Math.round((plans.high.calories * 0.2) / 9);
                     plans.med.calories = base; plans.med.protein = pGrams; plans.med.carbs = Math.round((plans.med.calories * 0.3) / 4); plans.med.fat = Math.round((plans.med.calories * 0.3) / 9);
                     plans.low.calories = base - 100; plans.low.protein = pGrams; plans.low.carbs = Math.round((plans.low.calories * 0.15) / 4); plans.low.fat = Math.round((plans.low.calories * 0.4) / 9);
@@ -354,7 +502,7 @@
                     const monday = new Date(current.setDate(diff));
                     const days = [];
                     const labels = ['一', '二', '三', '四', '五', '六', '日'];
-                    for(let i=0; i<7; i++) {
+                    for (let i = 0; i < 7; i++) {
                         const d = new Date(monday);
                         d.setDate(monday.getDate() + i);
                         days.push({ date: d.toLocaleDateString('sv-SE'), dayNum: d.getDate(), label: labels[i] });
@@ -429,10 +577,10 @@
                     window.saveTimer = setTimeout(async () => {
                         try {
                             const docRef = doc(db, 'artifacts', appId, 'users', user.value.uid, 'settings', 'dietData');
-                            await setDoc(docRef, { 
-                                plans: JSON.parse(JSON.stringify(plans)), 
+                            await setDoc(docRef, {
+                                plans: JSON.parse(JSON.stringify(plans)),
                                 profile: JSON.parse(JSON.stringify(profile)),
-                                allData: JSON.parse(JSON.stringify(allData)) 
+                                allData: JSON.parse(JSON.stringify(allData))
                             });
                         } finally { saving.value = false; }
                     }, 800);
@@ -493,7 +641,7 @@
                     autoCalculatePlans, exportCSV, saveData,
                     handleAuth: async (mode) => {
                         try {
-                            mode === 'login' 
+                            mode === 'login'
                                 ? await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value)
                                 : await createUserWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
                         } catch (e) { alert('驗證失敗'); }
@@ -505,4 +653,5 @@
         }).mount('#app');
     </script>
 </body>
+
 </html>
