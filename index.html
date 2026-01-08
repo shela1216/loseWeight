@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>月度飲食追蹤器 - 進階版</title>
+    <title>月度飲食追蹤器 - 私人版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js" type="module"></script>
@@ -40,21 +40,52 @@
             -webkit-appearance: none;
             margin: 0;
         }
+
+        .fade-enter-active,
+        .fade-leave-active {
+            transition: opacity 0.5s;
+        }
+
+        .fade-enter-from,
+        .fade-leave-to {
+            opacity: 0;
+        }
+
+        /* 模式顏色定義 */
+        .plan-high {
+            background-color: #ef4444;
+        }
+
+        /* 紅色 */
+        .plan-med {
+            background-color: #f59e0b;
+        }
+
+        /* 橘色 */
+        .plan-low {
+            background-color: #10b981;
+        }
+
+        /* 綠色 */
+        .plan-rest {
+            background-color: #6366f1;
+        }
+
+        /* 靛藍 */
     </style>
 </head>
 
 <body class="bg-slate-50 min-h-screen font-sans text-slate-900">
     <div id="app" v-cloak>
 
-        <!-- 1. 登入頁面 (根據 user 狀態切換) -->
+        <!-- 1. 登入頁面 -->
         <div v-if="!user && authInitialized" class="min-h-screen auth-bg flex items-center justify-center p-4">
             <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 space-y-6">
                 <div class="text-center">
                     <h1 class="text-3xl font-black text-indigo-600 mb-2">飲食追蹤器 Pro</h1>
-                    <p class="text-slate-400 text-sm">{{ isLoginMode ? '歡迎回來' : '建立新帳號' }}</p>
+                    <p class="text-slate-400 text-sm">{{ isLoginMode ? '歡迎回來' : '建立私人帳號' }}</p>
                 </div>
 
-                <!-- Google 登入按鈕 -->
                 <button @click="handleGoogleLogin" :disabled="loading"
                     class="w-full flex items-center justify-center gap-3 border-2 border-slate-100 py-3 rounded-xl font-bold hover:bg-slate-50 transition text-slate-600">
                     <svg class="w-5 h-5" viewBox="0 0 24 24">
@@ -106,7 +137,7 @@
             <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
                     <h1 class="text-3xl font-black text-indigo-600">飲食追蹤器 Pro</h1>
-                    <p class="text-xs text-slate-500 font-mono">連線身分: {{ user.email || user.uid }}</p>
+                    <p class="text-xs text-slate-500 font-mono">私人空間: {{ user.email || user.uid }}</p>
                 </div>
                 <div class="flex gap-2">
                     <button @click="exportCSV"
@@ -129,19 +160,20 @@
                         </h2>
                         <div class="space-y-4">
                             <div v-for="(plan, key) in plans" :key="key"
-                                class="p-4 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                                class="p-4 bg-white rounded-2xl border-l-8 shadow-sm"
+                                :class="'border-' + getPlanColor(key)">
                                 <div class="flex justify-between items-center mb-2">
-                                    <span class="text-xs font-black text-indigo-600 uppercase">{{ getPlanName(key)
-                                        }}</span>
+                                    <span class="text-xs font-black uppercase" :class="'text-' + getPlanColor(key)">{{
+                                        getPlanName(key) }}</span>
                                     <div class="text-[10px] text-slate-400 font-bold uppercase">目標熱量</div>
                                 </div>
                                 <input type="number" v-model.number="plans[key].calories" @change="saveToCloud"
                                     class="w-full text-2xl font-black outline-none mb-2" placeholder="0">
                                 <div class="grid grid-cols-3 gap-2">
-                                    <div v-for="n in ['carbs','protein','fat']" :key="n">
-                                        <label class="text-[9px] text-slate-400 font-bold uppercase block">{{ n }}
+                                    <div v-for="n in nutrientKeys" :key="n.key">
+                                        <label class="text-[9px] text-slate-400 font-bold uppercase block">{{ n.label }}
                                             (g)</label>
-                                        <input type="number" v-model.number="plans[key][n]" @change="saveToCloud"
+                                        <input type="number" v-model.number="plans[key][n.key]" @change="saveToCloud"
                                             class="w-full text-sm font-bold outline-none border-b border-slate-100 focus:border-indigo-300">
                                     </div>
                                 </div>
@@ -169,8 +201,8 @@
                                 :class="[selectedDate === formatKey(date) ? 'border-indigo-600 bg-white shadow-lg -translate-y-1' : 'border-transparent hover:bg-white hover:border-slate-100', isToday(date) ? 'text-indigo-600 font-bold' : '']">
                                 <span class="text-xs">{{ date }}</span>
                                 <div v-if="allData[formatKey(date)]" class="mt-1 flex gap-0.5">
-                                    <div class="w-1 h-1 rounded-full" :class="getDailyStatusColor(formatKey(date))">
-                                    </div>
+                                    <div class="w-1.5 h-1.5 rounded-full"
+                                        :class="'plan-' + allData[formatKey(date)].planType"></div>
                                 </div>
                             </div>
                         </div>
@@ -181,26 +213,25 @@
                 <div class="lg:col-span-8">
                     <div v-if="selectedDate" class="space-y-6">
                         <!-- 今日看板 -->
-                        <div
-                            class="bg-indigo-600 rounded-[2rem] p-8 text-white shadow-xl flex flex-col md:flex-row justify-between items-center gap-6">
+                        <div class="rounded-[2rem] p-8 text-white shadow-xl flex flex-col md:flex-row justify-between items-center gap-6 transition-colors duration-500"
+                            :class="'plan-' + getRecord(selectedDate).planType">
                             <div class="flex-1 w-full">
                                 <div class="flex items-center gap-3 mb-2">
                                     <h2 class="text-3xl font-black">{{ selectedDate }}</h2>
                                     <select v-model="getRecord(selectedDate).planType" @change="saveToCloud"
-                                        class="bg-white/20 text-white text-xs font-bold rounded-lg px-3 py-1 border-none outline-none">
-                                        <option value="high" class="text-slate-900">高碳日 模式</option>
-                                        <option value="med" class="text-slate-900">中碳日 模式</option>
-                                        <option value="low" class="text-slate-900">低碳日 模式</option>
-                                        <option value="rest" class="text-slate-900">休息日 模式</option>
+                                        class="bg-white/20 text-white text-xs font-bold rounded-lg px-3 py-1 border-none outline-none backdrop-blur-md">
+                                        <option value="high" class="text-slate-900">高碳日 模式 (紅)</option>
+                                        <option value="med" class="text-slate-900">中碳日 模式 (橘)</option>
+                                        <option value="low" class="text-slate-900">低碳日 模式 (綠)</option>
+                                        <option value="rest" class="text-slate-900">休息日 模式 (藍)</option>
                                     </select>
                                 </div>
                                 <div class="grid grid-cols-3 gap-4 mt-4">
-                                    <div v-for="n in ['carbs','protein','fat']" :key="n"
-                                        class="bg-white/10 rounded-xl p-3">
-                                        <div class="text-[10px] font-bold uppercase opacity-60">{{ n }}</div>
-                                        <div class="text-lg font-black">{{ getDailySum(selectedDate, n) }} <span
-                                                class="text-[10px] opacity-60">/ {{ getPlan(selectedDate)[n] }}g</span>
-                                        </div>
+                                    <div v-for="n in nutrientKeys" :key="n.key" class="bg-white/10 rounded-xl p-3">
+                                        <div class="text-[10px] font-bold uppercase opacity-60">{{ n.label }}</div>
+                                        <div class="text-lg font-black">{{ getDailySum(selectedDate, n.key) }} <span
+                                                class="text-[10px] opacity-60">/ {{ getPlan(selectedDate)[n.key]
+                                                }}g</span></div>
                                     </div>
                                 </div>
                             </div>
@@ -224,7 +255,7 @@
                             <div v-if="getRecord(selectedDate).meals.length === 0"
                                 class="text-center py-12 text-slate-300">
                                 <p class="text-4xl mb-4">🍽️</p>
-                                <p class="font-bold">目前沒有紀錄</p>
+                                <p class="font-bold">私人紀錄，僅您可見</p>
                             </div>
 
                             <div class="space-y-3">
@@ -241,14 +272,20 @@
                                         class="flex-1 min-w-[120px] bg-white border-none rounded-lg px-3 py-2 text-sm font-medium"
                                         placeholder="食物品項...">
                                     <div class="grid grid-cols-4 gap-2 w-full md:w-auto">
-                                        <div v-for="m in ['calories', 'carbs','protein','fat']" :key="m"
-                                            class="relative">
-                                            <input type="number" v-model.number="meal[m]" @input="saveToCloud"
+                                        <div class="relative">
+                                            <input type="number" v-model.number="meal.calories" @input="saveToCloud"
                                                 class="w-full bg-white border-none rounded-lg px-2 py-2 text-xs font-bold text-center"
-                                                :placeholder="m === 'calories' ? 'Kcal' : m[0].toUpperCase()">
+                                                placeholder="熱量">
+                                            <span
+                                                class="absolute -top-4 left-0 text-[8px] font-bold text-slate-400 uppercase">熱量</span>
+                                        </div>
+                                        <div v-for="n in nutrientKeys" :key="n.key" class="relative">
+                                            <input type="number" v-model.number="meal[n.key]" @input="saveToCloud"
+                                                class="w-full bg-white border-none rounded-lg px-2 py-2 text-xs font-bold text-center"
+                                                :placeholder="n.label">
                                             <span
                                                 class="absolute -top-4 left-0 text-[8px] font-bold text-slate-400 uppercase">{{
-                                                m === 'calories' ? 'Kcal' : m[0] }}</span>
+                                                n.label[0] }}</span>
                                         </div>
                                     </div>
                                     <button @click="removeMeal(index)"
@@ -268,8 +305,9 @@
 
                     <div v-else class="h-full flex flex-col items-center justify-center py-20 text-slate-300">
                         <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center text-4xl mb-6">
-                            🗓️</div>
-                        <h2 class="text-xl font-black text-slate-400">點擊左側月曆開始紀錄</h2>
+                            🔒</div>
+                        <h2 class="text-xl font-black text-slate-400">私人飲食空間</h2>
+                        <p class="text-sm">點擊月曆開始紀錄</p>
                     </div>
                 </div>
             </div>
@@ -298,7 +336,7 @@
             class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl">
                 <h3 class="text-xl font-black text-slate-800 mb-2">確定要初始化嗎？</h3>
-                <p class="text-slate-500 text-sm mb-6">這將會清除所有紀錄與計畫設定。</p>
+                <p class="text-slate-500 text-sm mb-6">這將會清除您帳號下的所有紀錄。</p>
                 <div class="flex gap-3">
                     <button @click="showConfirm = false"
                         class="flex-1 py-3 font-bold text-slate-500 hover:bg-slate-50 rounded-xl transition">取消</button>
@@ -311,12 +349,11 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const { createApp, ref, reactive, computed, onMounted } = Vue;
 
-        // Firebase 初始化
         const firebaseConfig = {
             apiKey: "AIzaSyC2xMAVAdN3674qtALhqblQncn33TwFPss",
             authDomain: "loseweight-4b745.firebaseapp.com",
@@ -342,7 +379,12 @@
                 const saving = ref(false);
                 const showConfirm = ref(false);
 
-                // 資料狀態
+                const nutrientKeys = [
+                    { key: 'carbs', label: '碳水化合物' },
+                    { key: 'protein', label: '蛋白質' },
+                    { key: 'fat', label: '脂肪' }
+                ];
+
                 const currentYear = ref(new Date().getFullYear());
                 const currentMonth = ref(new Date().getMonth());
                 const selectedDate = ref(null);
@@ -355,12 +397,11 @@
                 });
                 const allData = reactive({});
 
-                // 身份驗證邏輯
-                const handleGoogleLogin = () => {
+                const handleGoogleLogin = async () => {
                     loading.value = true;
-                    signInWithPopup(auth, new GoogleAuthProvider())
-                        .catch(e => authError.value = e.message)
-                        .finally(() => loading.value = false);
+                    try { await signInWithPopup(auth, new GoogleAuthProvider()); }
+                    catch (e) { authError.value = "Google 登入失敗"; }
+                    finally { loading.value = false; }
                 };
 
                 const handleAuth = async () => {
@@ -372,33 +413,41 @@
                         } else {
                             await createUserWithEmailAndPassword(auth, authForm.email, authForm.password);
                         }
+                    } catch (e) { authError.value = "信箱驗證失敗，請檢查格式或密碼"; }
+                    finally { loading.value = false; }
+                };
+
+                const handleLogout = async () => {
+                    try {
+                        await signOut(auth);
+                        user.value = null;
                     } catch (e) {
-                        authError.value = "驗證失敗: " + e.message;
-                    } finally {
-                        loading.value = false;
+                        console.error("登出錯誤:", e);
                     }
                 };
 
-                const handleLogout = () => signOut(auth);
-
-                onMounted(() => {
+                onMounted(async () => {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        try { await signInWithCustomToken(auth, __initial_auth_token); } catch (e) { }
+                    }
                     onAuthStateChanged(auth, (u) => {
                         user.value = u;
                         authInitialized.value = true;
                         if (u) {
-                            const docRef = doc(db, 'artifacts', appId, 'users', u.uid, 'settings', 'main');
+                            const docRef = doc(db, 'artifacts', appId, 'users', u.uid, 'userData', 'main');
                             onSnapshot(docRef, (snap) => {
                                 if (snap.exists()) {
                                     const d = snap.data();
                                     if (d.plans) Object.assign(plans, d.plans);
                                     if (d.allData) Object.assign(allData, d.allData);
                                 }
-                            });
+                            }, (err) => console.error(err));
+                        } else {
+                            Object.assign(allData, {});
                         }
                     });
                 });
 
-                // 資料操作
                 let saveTimeout;
                 const saveToCloud = () => {
                     if (!user.value) return;
@@ -406,27 +455,26 @@
                     clearTimeout(saveTimeout);
                     saveTimeout = setTimeout(async () => {
                         try {
-                            const docRef = doc(db, 'artifacts', appId, 'users', user.value.uid, 'settings', 'main');
+                            const docRef = doc(db, 'artifacts', appId, 'users', user.value.uid, 'userData', 'main');
                             await setDoc(docRef, {
                                 plans: JSON.parse(JSON.stringify(plans)),
-                                allData: JSON.parse(JSON.stringify(allData))
+                                allData: JSON.parse(JSON.stringify(allData)),
+                                lastUpdated: new Date().toISOString()
                             });
-                        } catch (e) {
-                            console.error(e);
-                        } finally {
-                            saving.value = false;
-                        }
+                        } catch (e) { console.error(e); }
+                        finally { saving.value = false; }
                     }, 800);
                 };
 
                 const initializeTracker = async () => {
                     if (!user.value) return;
-                    await deleteDoc(doc(db, 'artifacts', appId, 'users', user.value.uid, 'settings', 'main'));
+                    await deleteDoc(doc(db, 'artifacts', appId, 'users', user.value.uid, 'userData', 'main'));
                     location.reload();
                 };
 
-                // 工具
                 const getPlanName = (k) => ({ high: '高碳日', med: '中碳日', low: '低碳日', rest: '休息日' }[k]);
+                const getPlanColor = (k) => ({ high: 'rose-500', med: 'amber-500', low: 'emerald-500', rest: 'indigo-500' }[k]);
+
                 const formatKey = (d) => `${currentYear.value}-${String(currentMonth.value + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
                 const isToday = (d) => formatKey(d) === new Date().toISOString().split('T')[0];
                 const getRecord = (key) => {
@@ -446,10 +494,10 @@
                     user, authInitialized, isLoginMode, loading, authError, authForm,
                     handleGoogleLogin, handleAuth, handleLogout,
                     selectedDate, plans, allData, saving, showConfirm,
-                    currentYear, currentMonth,
+                    currentYear, currentMonth, nutrientKeys,
                     daysInMonth: computed(() => new Date(currentYear.value, currentMonth.value + 1, 0).getDate()),
                     firstDayOfMonth: computed(() => new Date(currentYear.value, currentMonth.value, 1).getDay()),
-                    getPlanName, formatKey, isToday, getRecord, getPlan, getDailySum, getDailyStatusColor,
+                    getPlanName, getPlanColor, formatKey, isToday, getRecord, getPlan, getDailySum, getDailyStatusColor,
                     addMeal: () => {
                         getRecord(selectedDate.value).meals.push({ type: 'breakfast', name: '', calories: 0, carbs: 0, protein: 0, fat: 0 });
                         saveToCloud();
@@ -457,14 +505,15 @@
                     removeMeal: (idx) => { getRecord(selectedDate.value).meals.splice(idx, 1); saveToCloud(); },
                     saveToCloud, confirmInitialize: () => showConfirm.value = true, initializeTracker,
                     exportCSV: () => {
-                        let csv = "日期,餐點類型,品項,熱量(kcal),碳水(g),蛋白質(g),脂肪(g)\n";
+                        let csv = "日期,模式,餐點類型,品項,熱量(kcal),碳水化合物(g),蛋白質(g),脂肪(g)\n";
                         Object.keys(allData).sort().forEach(date => {
-                            (allData[date].meals || []).forEach(m => csv += `${date},${m.type},${m.name},${m.calories},${m.carbs},${m.protein},${m.fat}\n`);
+                            const pName = getPlanName(allData[date].planType);
+                            (allData[date].meals || []).forEach(m => csv += `${date},${pName},${m.type},${m.name},${m.calories},${m.carbs},${m.protein},${m.fat}\n`);
                         });
                         const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
                         const link = document.createElement("a");
                         link.href = URL.createObjectURL(blob);
-                        link.download = `飲食追蹤報告_${new Date().toLocaleDateString()}.csv`;
+                        link.download = `私人飲食報告_${new Date().toLocaleDateString()}.csv`;
                         link.click();
                     },
                     changeMonth: (v) => {
