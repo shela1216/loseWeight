@@ -384,7 +384,7 @@
                 const initApp = async () => {
                     let firebaseConfig;
                     try {
-                        const response = await fetch('/config.json');
+                        const response = await fetch('/firebase-config.json');
                         if (response.ok) {
                             firebaseConfig = await response.json();
                         } else {
