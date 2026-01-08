@@ -89,6 +89,14 @@
         .meal-border-snack {
             border-left-color: #d946ef;
         }
+
+        /* 自動調整高度的 textarea */
+        .auto-height-textarea {
+            resize: none;
+            min-height: 48px;
+            line-height: 1.6;
+            overflow: hidden;
+        }
     </style>
 </head>
 
@@ -201,8 +209,8 @@
                     <div class="flex-1 w-full">
                         <div class="flex items-center gap-4 mb-6">
                             <span
-                                class="px-4 py-1.5 bg-white/20 rounded-full text-xs font-black backdrop-blur-md tracking-wider">TODAY
-                                SUMMARY</span>
+                                class="px-4 py-1.5 bg-white/20 rounded-full text-xs font-black backdrop-blur-md tracking-wider uppercase">Today
+                                Summary</span>
                             <select v-model="getRecord(selectedDate).planType" @change="saveToCloud"
                                 class="bg-white text-slate-900 text-xs font-black rounded-full px-4 py-1.5 outline-none cursor-pointer shadow-sm">
                                 <option value="high">高碳日模式</option>
@@ -211,8 +219,7 @@
                                 <option value="rest">休息日模式</option>
                             </select>
                         </div>
-                        <div class="grid grid-cols-3 gap-4">
-                            <!-- 碳水、蛋白、脂肪各欄位 -->
+                        <div class="grid grid-cols-3 gap-3 md:gap-4">
                             <div v-for="n in nutrientKeys" :key="n.key"
                                 class="bg-white/10 rounded-2xl p-4 border border-white/10 relative overflow-hidden">
                                 <div class="text-[10px] font-black uppercase opacity-70 mb-1">{{ n.label }}</div>
@@ -221,7 +228,6 @@
                                     <span class="text-[10px] opacity-50 font-medium">/ {{ getPlan(selectedDate)[n.key]
                                         }}g</span>
                                 </div>
-                                <!-- 差距標籤 (營養素) -->
                                 <div v-if="getRecord(selectedDate).meals.length > 0"
                                     class="absolute top-2 right-2 text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm transition-colors duration-300"
                                     :class="getDiffClass(getDailySum(selectedDate, n.key) - getPlan(selectedDate)[n.key])">
@@ -232,7 +238,6 @@
                         </div>
                     </div>
 
-                    <!-- 總熱量區域 -->
                     <div class="text-center md:text-right relative">
                         <div class="text-xs font-black opacity-70 uppercase mb-1 tracking-widest">總攝取熱量</div>
                         <div class="text-6xl md:text-7xl font-black mb-2">{{ getDailySum(selectedDate, 'calories') }}
@@ -240,7 +245,6 @@
                         <div class="flex flex-col items-center md:items-end">
                             <div class="text-xs font-black opacity-70">目標預算: {{ getPlan(selectedDate).calories }} kcal
                             </div>
-                            <!-- 差距標籤 (熱量) -->
                             <div v-if="getRecord(selectedDate).meals.length > 0"
                                 class="mt-3 text-xs font-black px-3 py-1.5 rounded-full inline-flex items-center gap-1 shadow-lg"
                                 :class="getDiffClass(getDailySum(selectedDate, 'calories') - getPlan(selectedDate).calories)">
@@ -254,11 +258,11 @@
                 </div>
 
                 <!-- 餐點清單區 -->
-                <div class="glass-card rounded-[2.5rem] p-8 md:p-10 shadow-sm">
+                <div class="glass-card rounded-[2.5rem] p-6 md:p-10 shadow-sm">
                     <div class="flex justify-between items-center mb-8">
                         <div>
                             <h3 class="text-2xl font-black text-slate-800">餐點明細</h3>
-                            <p class="text-xs text-slate-400 font-bold">MEAL ENTRIES</p>
+                            <p class="text-xs text-slate-400 font-bold tracking-widest uppercase">Meal Entries</p>
                         </div>
                         <button @click="addMeal"
                             class="bg-indigo-600 text-white px-8 py-3 rounded-2xl text-sm font-black hover:shadow-xl hover:-translate-y-0.5 transition-all">＋
@@ -270,53 +274,61 @@
                         <p class="font-bold">今日尚未有任何紀錄</p>
                     </div>
 
-                    <div class="space-y-4">
+                    <div class="space-y-6">
                         <div v-for="(meal, index) in getRecord(selectedDate).meals" :key="index"
-                            class="flex flex-wrap md:flex-nowrap items-center gap-4 bg-slate-50 p-6 rounded-[2rem] border-l-[6px] border-y border-r border-slate-100 group transition-all hover:bg-white hover:shadow-md"
+                            class="flex flex-col gap-4 bg-slate-50 p-6 md:p-8 rounded-[2.5rem] border-l-[6px] border-y border-r border-slate-100 group transition-all hover:bg-white hover:shadow-md"
                             :class="'meal-border-' + meal.type">
 
-                            <div class="flex items-center gap-3 w-full md:w-40 shrink-0">
-                                <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-                                    :class="getMealColorClass(meal.type)">
-                                    <span v-html="getMealIcon(meal.type)"></span>
+                            <!-- 第一行：類型與刪除 -->
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                                        :class="getMealColorClass(meal.type)">
+                                        <span v-html="getMealIcon(meal.type)"></span>
+                                    </div>
+                                    <select v-model="meal.type" @change="saveToCloud"
+                                        class="bg-white rounded-xl px-4 py-2 text-sm font-black border-none shadow-sm focus:ring-2 focus:ring-indigo-100 outline-none">
+                                        <option value="breakfast">早餐</option>
+                                        <option value="lunch">午餐</option>
+                                        <option value="dinner">晚餐</option>
+                                        <option value="snack">點心</option>
+                                    </select>
                                 </div>
-                                <select v-model="meal.type" @change="saveToCloud"
-                                    class="bg-white rounded-xl px-3 py-2 text-sm font-black w-full border-none shadow-sm focus:ring-2 focus:ring-indigo-100 outline-none">
-                                    <option value="breakfast">早餐</option>
-                                    <option value="lunch">午餐</option>
-                                    <option value="dinner">晚餐</option>
-                                    <option value="snack">點心</option>
-                                </select>
+                                <button @click="removeMeal(index)"
+                                    class="text-slate-300 hover:text-rose-500 p-2 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
                             </div>
 
-                            <input type="text" v-model="meal.name" @input="saveToCloud"
-                                class="flex-1 min-w-[180px] bg-white rounded-xl px-6 py-3 text-base font-bold shadow-sm border-none focus:ring-2 focus:ring-indigo-100 outline-none"
-                                placeholder="輸入餐點名稱...">
+                            <!-- 第二行：餐點名稱 (單獨一行) -->
+                            <div class="w-full">
+                                <textarea v-model="meal.name" @input="autoGrow($event); saveToCloud()"
+                                    class="auto-height-textarea w-full bg-white rounded-2xl px-6 py-4 text-base font-bold shadow-sm border-none focus:ring-2 focus:ring-indigo-100 outline-none"
+                                    placeholder="輸入餐點名稱、備註或食譜內容..." rows="1"></textarea>
+                            </div>
 
-                            <div class="grid grid-cols-4 gap-3 w-full md:w-auto">
+                            <!-- 第三行：數值輸入 (網格) -->
+                            <div class="grid grid-cols-4 gap-3 md:gap-4">
                                 <div class="flex flex-col">
-                                    <span class="text-[9px] text-slate-400 font-black mb-1 ml-1">KCAL</span>
+                                    <span
+                                        class="text-[10px] text-slate-400 font-black mb-1.5 ml-1 uppercase text-center">Calories</span>
                                     <input type="number" v-model.number="meal.calories" @input="saveToCloud"
-                                        class="w-full bg-white rounded-xl px-2 py-3 text-sm font-black text-center shadow-sm border-none"
+                                        class="w-full bg-white rounded-xl px-2 py-3.5 text-sm font-black text-center shadow-sm border-none focus:ring-2 focus:ring-indigo-100 outline-none"
                                         placeholder="0">
                                 </div>
                                 <div v-for="n in nutrientKeys" :key="n.key" class="flex flex-col">
-                                    <span class="text-[9px] text-slate-400 font-black mb-1 ml-1 uppercase">{{ n.label
-                                        }}</span>
+                                    <span
+                                        class="text-[10px] text-slate-400 font-black mb-1.5 ml-1 uppercase text-center">{{
+                                        n.label }} (g)</span>
                                     <input type="number" v-model.number="meal[n.key]" @input="saveToCloud"
-                                        class="w-full bg-white rounded-xl px-2 py-3 text-sm font-black text-center shadow-sm border-none"
+                                        class="w-full bg-white rounded-xl px-2 py-3.5 text-sm font-black text-center shadow-sm border-none focus:ring-2 focus:ring-indigo-100 outline-none"
                                         placeholder="0">
                                 </div>
                             </div>
-
-                            <button @click="removeMeal(index)"
-                                class="text-slate-300 hover:text-rose-500 p-2 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -332,7 +344,8 @@
                     <div class="flex justify-between items-center mb-8">
                         <div>
                             <h2 class="text-2xl font-black text-slate-800">模式目標計畫</h2>
-                            <p class="text-xs text-slate-400 font-bold uppercase">Target Nutrition Settings</p>
+                            <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">Target Nutrition
+                                Settings</p>
                         </div>
                         <button @click="showPlans = false"
                             class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400">✕</button>
@@ -344,7 +357,7 @@
                             <div class="flex justify-between items-center mb-4">
                                 <span class="text-sm font-black uppercase tracking-widest"
                                     :class="'text-' + getPlanColor(key)">{{ getPlanName(key) }}模式</span>
-                                <div class="text-[10px] text-slate-400 font-black">目標熱量 (KCAL)</div>
+                                <div class="text-[10px] text-slate-400 font-black uppercase">Goal KCAL</div>
                             </div>
                             <input type="number" v-model.number="plans[key].calories" @change="saveToCloud"
                                 class="w-full text-3xl font-black outline-none mb-4 bg-transparent border-b-2 border-slate-100 focus:border-indigo-300">
@@ -405,7 +418,7 @@
             <div v-if="saving"
                 class="fixed bottom-8 right-8 bg-slate-900 text-white px-6 py-3 rounded-2xl text-xs font-bold shadow-2xl flex items-center gap-3 z-50">
                 <span class="w-2 h-2 bg-indigo-400 rounded-full animate-ping"></span>
-                雲端已同步
+                雲端同步中
             </div>
         </transition>
 
@@ -425,7 +438,7 @@
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const { createApp, ref, reactive, computed, onMounted } = Vue;
+        const { createApp, ref, reactive, computed, onMounted, nextTick } = Vue;
 
         const firebaseConfig = {
             apiKey: "AIzaSyC2xMAVAdN3674qtALhqblQncn33TwFPss",
@@ -436,7 +449,6 @@
             appId: "1:76431868318:web:98e0267325ea1fd9f8d68f",
             measurementId: "G-V3ZXWD5HP7"
         };
-
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -516,6 +528,16 @@
                     password.value = '';
                 };
 
+                const autoGrowAll = () => {
+                    nextTick(() => {
+                        const textareas = document.querySelectorAll('.auto-height-textarea');
+                        textareas.forEach(el => {
+                            el.style.height = 'auto';
+                            el.style.height = (el.scrollHeight) + 'px';
+                        });
+                    });
+                };
+
                 onMounted(() => {
                     onAuthStateChanged(auth, (u) => {
                         if (unsubscribeSnapshot) unsubscribeSnapshot();
@@ -528,8 +550,9 @@
                                     const d = snap.data();
                                     if (d.plans) Object.assign(plans, d.plans);
                                     if (d.allData) Object.assign(allData, d.allData);
+                                    autoGrowAll();
                                 }
-                            });
+                            }, (err) => console.error(err));
                         } else {
                             user.value = null;
                         }
@@ -551,7 +574,7 @@
                                 syncAt: new Date().toISOString()
                             });
                         } finally { saving.value = false; }
-                    }, 800);
+                    }, 1000);
                 };
 
                 const downloadCSV = () => {
@@ -561,17 +584,17 @@
                         const record = allData[date];
                         if (record.meals && record.meals.length > 0) {
                             record.meals.forEach(meal => {
-                                rows.push([date, record.planType, meal.type, meal.name || '-', meal.calories || 0, meal.carbs || 0, meal.protein || 0, meal.fat || 0]);
+                                rows.push([date, record.planType, meal.type, `"${(meal.name || '').replace(/"/g, '""')}"`, meal.calories || 0, meal.carbs || 0, meal.protein || 0, meal.fat || 0]);
                             });
                         }
                     });
-                    if (rows.length === 0) { return; }
+                    if (rows.length === 0) return;
                     const csvContent = "\uFEFF" + [headers, ...rows].map(e => e.join(",")).join("\n");
                     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                     const link = document.createElement("a");
                     const url = URL.createObjectURL(blob);
                     link.setAttribute("href", url);
-                    link.setAttribute("download", `飲食追蹤紀錄匯出_${new Date().toISOString().split('T')[0]}.csv`);
+                    link.setAttribute("download", `飲食紀錄_${new Date().toISOString().split('T')[0]}.csv`);
                     link.style.visibility = 'hidden';
                     document.body.appendChild(link);
                     link.click();
@@ -588,15 +611,8 @@
                 };
                 const getPlan = (key) => plans[getRecord(key).planType] || plans.med;
                 const getDailySum = (key, type) => (getRecord(key).meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0);
-
-                // 差距顯示顏色邏輯：
-                // 正數 (攝取超過目標) -> 紅色
-                // 負數或 0 (攝取未過目標) -> 綠色
-                const getDiffClass = (val) => {
-                    return val > 0 ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white';
-                };
-
-                const getDiffPrefix = (val) => (val > 0 ? '+' : '');
+                const getDiffClass = (val) => val > 0 ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white';
+                const getDiffPrefix = (val) => val > 0 ? '+' : '';
 
                 const getMealIcon = (type) => {
                     const icons = {
@@ -618,18 +634,25 @@
                     return colors[type] || colors.snack;
                 };
 
+                const autoGrow = (event) => {
+                    const el = event.target;
+                    el.style.height = 'auto';
+                    el.style.height = (el.scrollHeight) + 'px';
+                };
+
                 return {
                     user, authInitialized, loading, authError, email, password,
                     handleAuth, handleAnonymousLogin, handleLogout,
                     selectedDate, plans, allData, saving, currentYear, currentMonth, nutrientKeys,
                     showPlans, showCalendar, downloadCSV, getMealIcon, getMealColorClass,
-                    getDiffClass, getDiffPrefix,
+                    getDiffClass, getDiffPrefix, autoGrow,
                     daysInMonth: computed(() => new Date(currentYear.value, currentMonth.value + 1, 0).getDate()),
                     firstDayOfMonth: computed(() => new Date(currentYear.value, currentMonth.value, 1).getDay()),
                     getPlanName, getPlanColor, formatKey, isToday, getRecord, getPlan, getDailySum,
                     addMeal: () => {
                         getRecord(selectedDate.value).meals.push({ type: 'breakfast', name: '', calories: 0, carbs: 0, protein: 0, fat: 0 });
                         saveToCloud();
+                        nextTick(() => autoGrowAll());
                     },
                     removeMeal: (idx) => { getRecord(selectedDate.value).meals.splice(idx, 1); saveToCloud(); },
                     saveToCloud,
