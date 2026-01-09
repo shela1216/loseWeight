@@ -6,8 +6,9 @@ const urlsToCache = [
     'index.html',
     'manifest.json',
     'https://cdn.tailwindcss.com',
+    'https://unpkg.com/vue@3/dist/vue.global.js',
     'https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap', // Google Font CSS
-    'https://unpkg.com/lucide@latest' // Icon library
+    'https://img.icons8.com/fluent@latest' // Icon library
 ];
 
 // 監聽 'install' 事件：安裝 Service Worker 時，快取所有核心資源
