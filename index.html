@@ -15,6 +15,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="manifest" href='manifest.json'>
     <style>
         [v-cloak] {
             display: none;
@@ -439,6 +440,42 @@
             </div>
         </div>
     </div>
+    <script>
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // 使用 Data URI 動態產生 Service Worker 腳本以符合單一文件架構
+                const swCode = `
+                    const CACHE_NAME = 'diet-tracker-v1';
+                    const ASSETS = [
+                        '/',
+                        'https://cdn.tailwindcss.com',
+                        'https://unpkg.com/vue@3/dist/vue.global.js'
+                    ];
+
+                    self.addEventListener('install', (event) => {
+                        event.waitUntil(
+                            caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+                        );
+                    });
+
+                    self.addEventListener('fetch', (event) => {
+                        event.respondWith(
+                            caches.match(event.request).then((response) => {
+                                return response || fetch(event.request);
+                            })
+                        );
+                    });
+                `;
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+
+                navigator.serviceWorker.register(swUrl)
+                    .then(() => console.log('Service Worker 已啟動'))
+                    .catch((err) => console.log('Service Worker 啟動失敗', err));
+            });
+        }
+    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";

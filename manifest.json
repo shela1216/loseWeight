@@ -1,21 +1,20 @@
 {
-    "name": "一週飲食追蹤器",
-    "short_name": "飲食追蹤",
-    "description": "本地儲存的巨量營養素與飲食追蹤應用程式。",
-    "start_url": "/index_pwa.html",
+    "name": "健康體態追蹤器",
+    "short_name": "體態管家",
+    "start_url": ".",
     "display": "standalone",
     "background_color": "#ffffff",
-    "theme_color": "#4f46e5",
+    "theme_color": "#34d399",
     "icons": [
         {
-            "src": "https://img.icons8.com/fluent/180/000000/healthy-food.png",
+            "src": "data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><rect width=\"100\" height=\"100\" rx=\"20\" fill=\"%2334d399\"/><path d=\"M30 40h40v30H30z\" fill=\"white\"/><path d=\"M40 25h20v10H40z\" fill=\"white\" opacity=\"0.8\"/><path d=\"M50 45v20M42 53l8 8 8-8\" stroke=\"%2334d399\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/svg+xml"
         },
         {
-            "src": "https://img.icons8.com/fluent/180/000000/healthy-food.png",
+            "src": "data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><rect width=\"100\" height=\"100\" rx=\"20\" fill=\"%2334d399\"/><path d=\"M30 40h40v30H30z\" fill=\"white\"/><path d=\"M40 25h20v10H40z\" fill=\"white\" opacity=\"0.8\"/><path d=\"M50 45v20M42 53l8 8 8-8\" stroke=\"%2334d399\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/svg+xml"
         }
     ]
 }
