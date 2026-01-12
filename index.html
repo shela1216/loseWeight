@@ -50,7 +50,7 @@
         }
 
         .plan-rest {
-            background: linear-gradient(135deg, #3db1ff,  #086aac);
+            background: linear-gradient(135deg, #3db1ff, #086aac);
         }
 
         .meal-breakfast {
@@ -85,6 +85,20 @@
             color: transparent;
             background: transparent;
             cursor: pointer;
+        }
+
+        .shadow-md {
+            --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+            box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #34d399 0%, #3b82f6 100%);
+        }
+
+        .rounded-xl {
+            border-radius: 0.75rem;
         }
     </style>
 </head>
@@ -200,43 +214,52 @@
 
             <main class="space-y-4">
                 <!-- 今日計畫：解決營養素區塊跑版 -->
-                <div class="rounded-[2rem] p-5 md:p-8 text-white shadow-xl relative overflow-hidden" :class="'plan-' + (currentDayRecord.planType || 'med')">
+                <div class="rounded-[2rem] p-5 md:p-8 text-white shadow-xl relative overflow-hidden"
+                    :class="'plan-' + (currentDayRecord.planType || 'med')">
                     <div class="relative z-10">
                         <div class="flex flex-col gap-4 mb-6">
                             <div class="flex justify-between items-start">
                                 <div class="space-y-1">
-                                    <span class="px-2 py-0.5 bg-white/20 rounded text-[9px] font-black uppercase tracking-wider">模式切換</span>
-                                    <select v-model="currentDayRecord.planType" @change="saveData" class="block bg-white text-slate-800 text-xs font-black rounded-lg px-2 py-1.5 outline-none shadow-md">
+                                    <span
+                                        class="px-2 py-0.5 bg-white/20 rounded text-[9px] font-black uppercase tracking-wider">模式切換</span>
+                                    <select v-model="currentDayRecord.planType" @change="saveData"
+                                        class="block bg-white text-slate-800 text-xs font-black rounded-lg px-2 py-1.5 outline-none shadow-md">
                                         <option value="high">💪 高碳</option>
                                         <option value="med">🥗 中碳</option>
                                         <option value="low">🔥 低碳</option>
-                                        <option value="rest">🧘 休息</option>
+                                        <option value="rest">🧘 自由</option>
                                     </select>
                                 </div>
                                 <div class="text-right">
                                     <div class="text-[9px] font-bold opacity-80 uppercase mb-0.5">剩餘熱量</div>
-                                    <div class="text-3xl md:text-4xl font-black">{{ getGap('calories') }} <span class="text-[10px]">kcal</span></div>
+                                    <div class="text-3xl md:text-4xl font-black">{{ getGap('calories') }} <span
+                                            class="text-[10px]">kcal</span></div>
                                 </div>
                             </div>
                             <div class="text-[10px] font-bold text-center bg-white/10 py-1 rounded-lg">
                                 今日攝取: {{ getDailySum('calories') }} / 目標: {{ currentPlan.calories }}
                             </div>
                         </div>
-                        
+
                         <!-- 營養素 Grid 響應式優化 -->
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                            <div v-for="n in nutrientKeys" :key="n.key" class="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 flex sm:flex-col justify-between items-center sm:items-stretch gap-2">
+                            <div v-for="n in nutrientKeys" :key="n.key"
+                                class="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 flex sm:flex-col justify-between items-center sm:items-stretch gap-2">
                                 <div class="flex flex-col">
                                     <span class="text-[9px] font-bold opacity-80 uppercase">{{ n.label }}</span>
-                                    <span class="text-xs font-black">{{ getDailySum(n.key) }} / {{ currentPlan[n.key] }}g</span>
+                                    <span class="text-xs font-black">{{ getDailySum(n.key) }} / {{ currentPlan[n.key]
+                                        }}g</span>
                                 </div>
                                 <div class="flex-1 sm:flex-none">
                                     <div class="h-1 w-20 sm:w-full bg-white/20 rounded-full overflow-hidden my-1">
-                                        <div class="h-full bg-white" :style="{ width: Math.min((getDailySum(n.key)/currentPlan[n.key])*100, 100) + '%' }"></div>
+                                        <div class="h-full bg-white"
+                                            :style="{ width: Math.min((getDailySum(n.key)/currentPlan[n.key])*100, 100) + '%' }">
+                                        </div>
                                     </div>
-                                    <div class="text-[9px] font-black px-1.5 py-0.5 rounded text-center inline-block sm:block" 
-                                         :class="getGap(n.key) < 0 ? 'bg-rose-500' : 'bg-emerald-500'">
-                                        {{ getGap(n.key) >= 0 ? '剩 ' + getGap(n.key) : '超 ' + Math.abs(getGap(n.key)) }}g
+                                    <div class="text-[9px] font-black px-1.5 py-0.5 rounded text-center inline-block sm:block"
+                                        :class="getGap(n.key) < 0 ? 'bg-rose-500' : 'bg-emerald-500'">
+                                        {{ getGap(n.key) >= 0 ? '剩 ' + getGap(n.key) : '超 ' + Math.abs(getGap(n.key))
+                                        }}g
                                     </div>
                                 </div>
                             </div>
@@ -248,52 +271,76 @@
                 <div class="bg-white rounded-[2rem] p-5 md:p-8 shadow-sm border border-slate-100">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-base font-black text-slate-800">餐點紀錄</h3>
-                        <button @click="addMeal" class="btn-gradient text-white px-4 py-2 rounded-xl text-xs font-black shadow-md">+ 新增</button>
+                        <button @click="addMeal"
+                            class="btn-gradient text-white px-4 py-2 rounded-xl text-xs font-black shadow-md">+
+                            新增</button>
                     </div>
-                    
+
                     <div class="space-y-3">
-                        <div v-for="(meal, index) in currentDayRecord.meals" :key="index" class="p-3 rounded-2xl border bg-slate-50 relative" :class="'meal-' + meal.type">
-                            
+                        <div v-for="(meal, index) in currentDayRecord.meals" :key="index"
+                            class="p-3 rounded-2xl border bg-slate-50 relative" :class="'meal-' + meal.type">
+
                             <!-- 顯示模式 -->
                             <div v-if="editingIndex !== index" class="flex justify-between items-center">
                                 <div class="min-w-0 flex-1">
                                     <div class="flex items-center gap-1.5 mb-0.5">
-                                        <span class="text-[9px] px-1.5 py-0.5 bg-white rounded border font-bold">{{ getMealLabel(meal.type).split(' ')[1] }}</span>
-                                        <span class="text-sm font-black text-slate-700 truncate">{{ meal.name || '未命名' }}</span>
+                                        <span class="text-[9px] px-1.5 py-0.5 bg-white rounded border font-bold">{{
+                                            getMealLabel(meal.type).split(' ')[1] }}</span>
+                                        <span class="text-sm font-black text-slate-700 truncate">{{ meal.name || '未命名'
+                                            }}</span>
                                     </div>
                                     <div class="text-[10px] text-slate-400 font-bold truncate">
                                         {{ meal.calories }}kcal | 碳{{ meal.carbs }} 蛋{{ meal.protein }} 脂{{ meal.fat }}
                                     </div>
                                 </div>
                                 <div class="flex gap-1 ml-2">
-                                    <button @click="editingIndex = index" class="p-2 text-slate-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></button>
-                                    <button @click="confirmDelete(index)" class="p-2 text-slate-300 hover:text-rose-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                                    <button @click="editingIndex = index" class="p-2 text-slate-400"><svg
+                                            class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                                            </path>
+                                        </svg></button>
+                                    <button @click="confirmDelete(index)"
+                                        class="p-2 text-slate-300 hover:text-rose-500"><svg class="w-4 h-4" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                            </path>
+                                        </svg></button>
                                 </div>
                             </div>
 
                             <!-- 編輯模式：解決排版跑版 -->
                             <div v-else class="space-y-3">
                                 <div class="flex flex-col sm:flex-row gap-2">
-                                    <select v-model="meal.type" class="w-full sm:w-auto bg-white rounded-lg px-2 py-2 text-xs font-black border border-slate-200">
+                                    <select v-model="meal.type"
+                                        class="w-full sm:w-auto bg-white rounded-lg px-2 py-2 text-xs font-black border border-slate-200">
                                         <option value="breakfast">🌅 早餐</option>
                                         <option value="lunch">☀️ 午餐</option>
                                         <option value="dinner">🌙 晚餐</option>
                                         <option value="snack">🍰 點心</option>
                                     </select>
-                                    <input v-model="meal.name" class="flex-1 px-3 py-2 bg-white rounded-lg border border-slate-200 text-xs font-bold outline-none" placeholder="餐點名稱">
+                                    <input v-model="meal.name"
+                                        class="flex-1 px-3 py-2 bg-white rounded-lg border border-slate-200 text-xs font-bold outline-none"
+                                        placeholder="餐點名稱">
                                 </div>
                                 <div class="grid grid-cols-2 xs:grid-cols-4 gap-2">
-                                    <div v-for="n in [{key:'calories', label:'熱量(kcal)'}, {key:'carbs', label:'碳水(g)'}, {key:'protein', label:'蛋白(g)'}, {key:'fat', label:'脂肪(g)'}]" :key="n.key" class="space-y-1">
-                                        <label class="text-[8px] text-slate-400 font-black block pl-1">{{ n.label }}</label>
-                                        <input type="number" v-model.number="meal[n.key]" class="w-full px-2 py-2 bg-white border border-slate-200 rounded-lg font-black text-center text-xs">
+                                    <div v-for="n in [{key:'calories', label:'熱量(kcal)'}, {key:'carbs', label:'碳水(g)'}, {key:'protein', label:'蛋白(g)'}, {key:'fat', label:'脂肪(g)'}]"
+                                        :key="n.key" class="space-y-1">
+                                        <label class="text-[8px] text-slate-400 font-black block pl-1">{{ n.label
+                                            }}</label>
+                                        <input type="number" v-model.number="meal[n.key]"
+                                            class="w-full px-2 py-2 bg-white border border-slate-200 rounded-lg font-black text-center text-xs">
                                     </div>
                                 </div>
                                 <div class="flex justify-end gap-2 pt-1">
-                                    <button @click="editingIndex = null; saveData()" class="w-full py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-black shadow-md">儲存</button>
+                                    <button @click="editingIndex = null; saveData()"
+                                        class="w-full py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-black shadow-md">儲存</button>
                                 </div>
                             </div>
                         </div>
-                        <div v-if="currentDayRecord.meals.length === 0" class="py-10 text-center text-slate-300 text-xs font-bold">尚無餐點紀錄</div>
+                        <div v-if="currentDayRecord.meals.length === 0"
+                            class="py-10 text-center text-slate-300 text-xs font-bold">尚無餐點紀錄</div>
                     </div>
                 </div>
             </main>
@@ -508,7 +555,7 @@
                 };
 
                 const getPlanLabel = (key) => {
-                    const map = { high: '💪 高碳日', med: '🥗 中碳日', low: '🔥 低碳日', rest: '🧘 休息日' };
+                    const map = { high: '💪 高碳日', med: '🥗 中碳日', low: '🔥 低碳日', rest: '🧘 自由日' };
                     return map[key];
                 };
 
