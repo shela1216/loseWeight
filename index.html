@@ -232,12 +232,12 @@
                                 </div>
                                 <div class="text-right">
                                     <div class="text-[9px] font-bold opacity-80 uppercase mb-0.5">剩餘熱量</div>
-                                    <div class="text-3xl md:text-4xl font-black">{{ getGap('calories') }} <span
+                                    <div class="text-3xl md:text-4xl font-black">{{ formatNum(getGap('calories'))  }} <span
                                             class="text-[10px]">kcal</span></div>
                                 </div>
                             </div>
                             <div class="text-[10px] font-bold text-center bg-white/10 py-1 rounded-lg">
-                                今日攝取: {{ getDailySum('calories') }} / 目標: {{ currentPlan.calories }}
+                                今日攝取: {{ formatNum(getDailySum('calories')) }} / 目標: {{ currentPlan.calories }}
                             </div>
                         </div>
 
@@ -247,7 +247,7 @@
                                 class="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 flex sm:flex-col justify-between items-center sm:items-stretch gap-2">
                                 <div class="flex flex-col">
                                     <span class="text-[9px] font-bold opacity-80 uppercase">{{ n.label }}</span>
-                                    <span class="text-xs font-black">{{ getDailySum(n.key) }} / {{ currentPlan[n.key]
+                                    <span class="text-xs font-black">{{ formatNum(getDailySum(n.key)) }} / {{ currentPlan[n.key]
                                         }}g</span>
                                 </div>
                                 <div class="flex-1 sm:flex-none">
@@ -258,7 +258,7 @@
                                     </div>
                                     <div class="text-[9px] font-black px-1.5 py-0.5 rounded text-center inline-block sm:block"
                                         :class="getGap(n.key) < 0 ? 'bg-rose-500' : 'bg-emerald-500'">
-                                        {{ getGap(n.key) >= 0 ? '剩 ' + getGap(n.key) : '超 ' + Math.abs(getGap(n.key))
+                                        {{ getGap(n.key) >= 0 ? '剩 ' + formatNum(getGap(n.key)) : '超 ' + formatNum(Math.abs(getGap(n.key)))
                                         }}g
                                     </div>
                                 </div>
@@ -297,9 +297,9 @@
                                     </div>
                                     <!-- 營養數據 -->
                                     <div class="text-[10px] text-slate-500 font-bold">
-                                        <span class="text-emerald-600">熱量: {{ meal.calories }}kcal</span>
+                                        <span class="text-emerald-600">熱量: {{ formatNum(meal.calories) }}kcal</span>
                                         <span class="mx-1 opacity-20">|</span>
-                                        <span class="text-slate-400">碳水:{{ meal.carbs }}<span class="mx-1 opacity-20">|</span> 蛋白質:{{ meal.protein }}<span class="mx-1 opacity-20">|</span> 脂肪:{{ meal.fat }}</span>
+                                        <span class="text-slate-400">碳水:{{ formatNum(meal.carbs) }}<span class="mx-1 opacity-20">|</span> 蛋白質:{{formatNum(meal.protein)   }}<span class="mx-1 opacity-20">|</span> 脂肪:{{ formatNum(meal.fat) }}</span>
                                     </div>
                                 </div>
 
@@ -511,6 +511,14 @@
                 let db, auth, unsubscribe = null;
                 const appId = typeof __app_id !== 'undefined' ? __app_id : 'diet-tracker-v2';
 
+
+                // 數值格式化：處理 JavaScript 浮點數問題，四捨五入至小數點後 1 位
+                const formatNum = (val) => {
+                    if (val === undefined || val === null || isNaN(val)) return 0;
+                    const n = Number(val);
+                    // 如果是整數直接回傳，否則保留一位小數並四捨五入
+                    return Number(n.toFixed(1));
+                };
                 const calculatedTDEE = computed(() => {
                     const { gender, weight, height, age, activity } = profile;
                     let bmr = (10 * weight) + (6.25 * height) - (5 * age);
@@ -519,13 +527,16 @@
                 });
 
                 const autoCalculatePlans = () => {
-                    const tdee = calculatedTDEE.value;
+                    const { gender, weight, height, age, activity } = profile;
+                    let bmr = (10 * weight) + (6.25 * height) - (5 * age);
+                    bmr = gender === 'male' ? bmr + 5 : bmr - 161;
+                    const tdee = Math.round(bmr * activity);
                     const base = tdee - 300;
-                    const pGrams = Math.round(profile.weight * 2);
-                    plans.high.calories = base + 200; plans.high.protein = pGrams; plans.high.carbs = Math.round((plans.high.calories * 0.5) / 4); plans.high.fat = Math.round((plans.high.calories * 0.2) / 9);
-                    plans.med.calories = base; plans.med.protein = pGrams; plans.med.carbs = Math.round((plans.med.calories * 0.3) / 4); plans.med.fat = Math.round((plans.med.calories * 0.3) / 9);
-                    plans.low.calories = base - 100; plans.low.protein = pGrams; plans.low.carbs = Math.round((plans.low.calories * 0.15) / 4); plans.low.fat = Math.round((plans.low.calories * 0.4) / 9);
-                    plans.rest.calories = base - 300; plans.rest.protein = pGrams; plans.rest.carbs = Math.round((plans.rest.calories * 0.05) / 4); plans.rest.fat = Math.round((plans.rest.calories * 0.5) / 9);
+                    const pGrams = formatNum(weight * 2); 
+                    plans.high = { calories: base + 200, protein: pGrams, carbs: formatNum((base+200)*0.5/4), fat: formatNum((base+200)*0.2/9) };
+                    plans.med = { calories: base, protein: pGrams, carbs: formatNum(base*0.3/4), fat: formatNum(base*0.3/9) };
+                    plans.low = { calories: base - 100, protein: pGrams, carbs: formatNum((base-100)*0.15/4), fat: formatNum((base-100)*0.4/9) };
+                    plans.rest = { calories: base - 300, protein: pGrams, carbs: formatNum((base-300)*0.05/4), fat: formatNum((base-300)*0.5/9) };
                     saveData();
                 };
 
@@ -644,7 +655,7 @@
                 return {
                     initialized, user, saving, showSettings, selectedDate, loginEmail, loginPassword,
                     editingIndex, mealToDelete, nutrientKeys, profile, plans, allData,
-                    weekDays, currentMonthYearDisplay, calculatedTDEE,
+                    weekDays, currentMonthYearDisplay, calculatedTDEE,formatNum,
                     currentDayRecord: computed(() => {
                         if (!allData[selectedDate.value]) { allData[selectedDate.value] = { planType: 'med', meals: [] }; }
                         return allData[selectedDate.value];
