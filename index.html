@@ -280,33 +280,37 @@
                         <div v-for="(meal, index) in currentDayRecord.meals" :key="index"
                             class="p-3 rounded-2xl border bg-slate-50 relative" :class="'meal-' + meal.type">
 
-                            <!-- 顯示模式 -->
-                            <div v-if="editingIndex !== index" class="flex justify-between items-center">
-                                <div class="min-w-0 flex-1">
-                                    <div class="flex items-center gap-1.5 mb-0.5">
-                                        <span class="text-[9px] px-1.5 py-0.5 bg-white rounded border font-bold">{{
-                                            getMealLabel(meal.type) }}</span>
-                                        <span class="text-sm font-black text-slate-700 truncate">{{ meal.name || '未命名'
-                                            }}</span>
+                            <!-- 顯示模式：行動裝置優化標籤與名稱排版 -->
+                            <div v-if="editingIndex !== index" class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pr-12 sm:pr-0">
+                                <div class="min-w-0 w-full">
+                                    <div class="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 mb-1.5">
+                                        <!-- 標籤 -->
+                                        <div class="w-fit">
+                                            <span class="text-[9px] px-2 py-0.5 bg-white rounded-full border border-slate-200 font-bold whitespace-nowrap shadow-sm">
+                                                {{ getMealLabel(meal.type) }}
+                                            </span>
+                                        </div>
+                                        <!-- 餐點名稱：行動端獨立一行 -->
+                                        <span class="text-sm font-black text-slate-800 truncate block">
+                                            {{ meal.name || '未命名餐點' }}
+                                        </span>
                                     </div>
-                                    <div class="text-[10px] text-slate-400 font-bold truncate">
-                                        {{ meal.calories }}kcal | 碳{{ meal.carbs }} 蛋{{ meal.protein }} 脂{{ meal.fat }}
+                                    <!-- 營養數據 -->
+                                    <div class="text-[10px] text-slate-500 font-bold">
+                                        <span class="text-emerald-600">🔥 {{ meal.calories }}kcal</span>
+                                        <span class="mx-1 opacity-20">|</span>
+                                        <span class="text-slate-400">🍞{{ meal.carbs }} 🥩{{ meal.protein }} 🥑{{ meal.fat }}</span>
                                     </div>
                                 </div>
-                                <div class="flex gap-1 ml-2">
-                                    <button @click="editingIndex = index" class="p-2 text-slate-400"><svg
-                                            class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path
-                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
-                                            </path>
-                                        </svg></button>
-                                    <button @click="confirmDelete(index)"
-                                        class="p-2 text-slate-300 hover:text-rose-500"><svg class="w-4 h-4" fill="none"
-                                            stroke="currentColor" viewBox="0 0 24 24">
-                                            <path
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                            </path>
-                                        </svg></button>
+
+                                <!-- 操作按鈕：行動端固定右上方 -->
+                                <div class="absolute top-3 right-3 flex sm:relative sm:top-0 sm:right-0 gap-1 bg-slate-50/80 backdrop-blur-sm sm:bg-transparent rounded-lg p-1">
+                                    <button @click="editingIndex = index" class="p-1.5 text-slate-400 hover:text-emerald-500 active:scale-90 transition-transform">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                    </button>
+                                    <button @click="confirmDelete(index)" class="p-1.5 text-slate-300 hover:text-rose-500 active:scale-90 transition-transform">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
                                 </div>
                             </div>
 
