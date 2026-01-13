@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>健康體態追蹤器</title>
     <link rel="shortcut icon" href="https://img.icons8.com/fluent/48/leaf.png" type="image/x-icon">
     <link rel="apple-touch-icon" sizes="180x180" href="https://img.icons8.com/fluent/180/leaf.png">
@@ -232,8 +232,8 @@
                                 </div>
                                 <div class="text-right">
                                     <div class="text-[9px] font-bold opacity-80 uppercase mb-0.5">剩餘熱量</div>
-                                    <div class="text-3xl md:text-4xl font-black">{{ formatNum(getGap('calories'))  }} <span
-                                            class="text-[10px]">kcal</span></div>
+                                    <div class="text-3xl md:text-4xl font-black">{{ formatNum(getGap('calories')) }}
+                                        <span class="text-[10px]">kcal</span></div>
                                 </div>
                             </div>
                             <div class="text-[10px] font-bold text-center bg-white/10 py-1 rounded-lg">
@@ -247,7 +247,8 @@
                                 class="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 flex sm:flex-col justify-between items-center sm:items-stretch gap-2">
                                 <div class="flex flex-col">
                                     <span class="text-[9px] font-bold opacity-80 uppercase">{{ n.label }}</span>
-                                    <span class="text-xs font-black">{{ formatNum(getDailySum(n.key)) }} / {{ currentPlan[n.key]
+                                    <span class="text-xs font-black">{{ formatNum(getDailySum(n.key)) }} / {{
+                                        currentPlan[n.key]
                                         }}g</span>
                                 </div>
                                 <div class="flex-1 sm:flex-none">
@@ -258,7 +259,8 @@
                                     </div>
                                     <div class="text-[9px] font-black px-1.5 py-0.5 rounded text-center inline-block sm:block"
                                         :class="getGap(n.key) < 0 ? 'bg-rose-500' : 'bg-emerald-500'">
-                                        {{ getGap(n.key) >= 0 ? '剩 ' + formatNum(getGap(n.key)) : '超 ' + formatNum(Math.abs(getGap(n.key)))
+                                        {{ getGap(n.key) >= 0 ? '剩 ' + formatNum(getGap(n.key)) : '超 ' +
+                                        formatNum(Math.abs(getGap(n.key)))
                                         }}g
                                     </div>
                                 </div>
@@ -281,12 +283,14 @@
                             class="p-3 rounded-2xl border bg-slate-50 relative" :class="'meal-' + meal.type">
 
                             <!-- 顯示模式：行動裝置優化標籤與名稱排版 -->
-                            <div v-if="editingIndex !== index" class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pr-12 sm:pr-0">
+                            <div v-if="editingIndex !== index"
+                                class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pr-12 sm:pr-0">
                                 <div class="min-w-0 w-full">
                                     <div class="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 mb-1.5">
                                         <!-- 標籤 -->
                                         <div class="w-fit">
-                                            <span class="text-[9px] px-2 py-0.5 bg-white rounded-full border border-slate-200 font-bold whitespace-nowrap shadow-sm">
+                                            <span
+                                                class="text-[9px] px-2 py-0.5 bg-white rounded-full border border-slate-200 font-bold whitespace-nowrap shadow-sm">
                                                 {{ getMealLabel(meal.type) }}
                                             </span>
                                         </div>
@@ -299,17 +303,32 @@
                                     <div class="text-[10px] text-slate-500 font-bold">
                                         <span class="text-emerald-600">熱量: {{ formatNum(meal.calories) }}kcal</span>
                                         <span class="mx-1 opacity-20">|</span>
-                                        <span class="text-slate-400">碳水:{{ formatNum(meal.carbs) }}<span class="mx-1 opacity-20">|</span> 蛋白質:{{formatNum(meal.protein)   }}<span class="mx-1 opacity-20">|</span> 脂肪:{{ formatNum(meal.fat) }}</span>
+                                        <span class="text-slate-400">碳水:{{ formatNum(meal.carbs) }}<span
+                                                class="mx-1 opacity-20">|</span> 蛋白質:{{formatNum(meal.protein) }}<span
+                                                class="mx-1 opacity-20">|</span> 脂肪:{{ formatNum(meal.fat) }}</span>
                                     </div>
                                 </div>
 
                                 <!-- 操作按鈕：行動端固定右上方 -->
-                                <div class="absolute top-3 right-3 flex sm:relative sm:top-0 sm:right-0 gap-1 bg-slate-50/80 backdrop-blur-sm sm:bg-transparent rounded-lg p-1">
-                                    <button @click="editingIndex = index" class="p-1.5 text-slate-400 hover:text-emerald-500 active:scale-90 transition-transform">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                <div
+                                    class="absolute top-3 right-3 flex sm:relative sm:top-0 sm:right-0 gap-1 bg-slate-50/80 backdrop-blur-sm sm:bg-transparent rounded-lg p-1">
+                                    <button @click="editingIndex = index"
+                                        class="p-1.5 text-slate-400 hover:text-emerald-500 active:scale-90 transition-transform">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
+                                            viewBox="0 0 24 24">
+                                            <path
+                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                                            </path>
+                                        </svg>
                                     </button>
-                                    <button @click="confirmDelete(index)" class="p-1.5 text-slate-300 hover:text-rose-500 active:scale-90 transition-transform">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    <button @click="confirmDelete(index)"
+                                        class="p-1.5 text-slate-300 hover:text-rose-500 active:scale-90 transition-transform">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
+                                            viewBox="0 0 24 24">
+                                            <path
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                            </path>
+                                        </svg>
                                     </button>
                                 </div>
                             </div>
@@ -532,11 +551,11 @@
                     bmr = gender === 'male' ? bmr + 5 : bmr - 161;
                     const tdee = Math.round(bmr * activity);
                     const base = tdee - 300;
-                    const pGrams = formatNum(weight * 2); 
-                    plans.high = { calories: base + 200, protein: pGrams, carbs: formatNum((base+200)*0.5/4), fat: formatNum((base+200)*0.2/9) };
-                    plans.med = { calories: base, protein: pGrams, carbs: formatNum(base*0.3/4), fat: formatNum(base*0.3/9) };
-                    plans.low = { calories: base - 100, protein: pGrams, carbs: formatNum((base-100)*0.15/4), fat: formatNum((base-100)*0.4/9) };
-                    plans.rest = { calories: base - 300, protein: pGrams, carbs: formatNum((base-300)*0.05/4), fat: formatNum((base-300)*0.5/9) };
+                    const pGrams = formatNum(weight * 2);
+                    plans.high = { calories: base + 200, protein: pGrams, carbs: formatNum((base + 200) * 0.5 / 4), fat: formatNum((base + 200) * 0.2 / 9) };
+                    plans.med = { calories: base, protein: pGrams, carbs: formatNum(base * 0.3 / 4), fat: formatNum(base * 0.3 / 9) };
+                    plans.low = { calories: base - 100, protein: pGrams, carbs: formatNum((base - 100) * 0.15 / 4), fat: formatNum((base - 100) * 0.4 / 9) };
+                    plans.rest = { calories: base - 300, protein: pGrams, carbs: formatNum((base - 300) * 0.05 / 4), fat: formatNum((base - 300) * 0.5 / 9) };
                     saveData();
                 };
 
@@ -655,7 +674,7 @@
                 return {
                     initialized, user, saving, showSettings, selectedDate, loginEmail, loginPassword,
                     editingIndex, mealToDelete, nutrientKeys, profile, plans, allData,
-                    weekDays, currentMonthYearDisplay, calculatedTDEE,formatNum,
+                    weekDays, currentMonthYearDisplay, calculatedTDEE, formatNum,
                     currentDayRecord: computed(() => {
                         if (!allData[selectedDate.value]) { allData[selectedDate.value] = { planType: 'med', meals: [] }; }
                         return allData[selectedDate.value];
