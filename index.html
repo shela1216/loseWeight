@@ -769,7 +769,7 @@
 
                 return {
                     initialized, user, saving, showSettings, showHistory, historySearch, selectedDate, loginEmail, loginPassword,
-                    editingIndex, mealToDelete, nutrientKeys, profile, plans, allData,
+                    editingIndex, mealToDelete, nutrientKeys, profile, plans, allData, mealHistory,
                     weekDays, currentMonthYearDisplay, calculatedTDEE, formatNum,
                     currentDayRecord: computed(() => {
                         if (!allData[selectedDate.value]) { allData[selectedDate.value] = { planType: 'med', meals: [] }; }
