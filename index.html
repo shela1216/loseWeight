@@ -630,9 +630,10 @@
                     // 複製並加入，避免參照問題
                     const newMeal = { ...meal, type: 'lunch' }; // 預設午餐，可調整
                     allData[selectedDate.value].meals.push(newMeal);
+                    const order = { breakfast: 1, lunch: 2, dinner: 3, snack: 4 };
+                    allData[selectedDate.value].meals.sort((a, b) => (order[a.type] || 99) - (order[b.type] || 99));
                     saveData();
                     showHistory.value = false;
-                    nextTick(adjustAllTextareas);
                 };
 
                 const autoCalculatePlans = () => {
@@ -714,7 +715,15 @@
                                     const data = snap.data();
                                     if (data.plans) Object.assign(plans, data.plans);
                                     if (data.profile) Object.assign(profile, data.profile);
-                                    if (data.allData) Object.assign(allData, data.allData);
+                                    if (data.allData) {
+                                        const order = { breakfast: 1, lunch: 2, dinner: 3, snack: 4 };
+                                        Object.values(data.allData).forEach(day => {
+                                            if (day.meals) {
+                                                day.meals.sort((a, b) => (order[a.type] || 99) - (order[b.type] || 99));
+                                            }
+                                        });
+                                        Object.assign(allData, data.allData);
+                                    }
                                 }
                                 initialized.value = true;
                             }, () => { initialized.value = true; });
@@ -828,10 +837,7 @@
                         d.setDate(d.getDate() + (dir * 7));
                         selectedDate.value = d.toLocaleDateString('sv-SE');
                     },
-                    addMeal: () => {
-                        const newIndex = allData[selectedDate.value].meals.push({ type: 'lunch', name: '', calories: 0, carbs: 0, protein: 0, fat: 0 }) - 1;
-                        editingIndex.value = newIndex;
-                    },
+                    addMeal, startEdit, cancelEdit, saveMeal,
                     addFromHistory,
                     confirmDelete: (i) => { mealToDelete.value = i; },
                     executeDelete: () => {
