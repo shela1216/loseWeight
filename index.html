@@ -21,6 +21,13 @@
             display: none;
         }
 
+        /* === 全域字型設定：標準清晰黑體組合 === */
+        body {
+            font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang TC", "Apple LiGothic Medium", "Noto Sans TC", "Microsoft JhengHei", "sans-serif";
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
         /* === 顏色點 === */
         .dot-high { background-color: #f59e0b; }
         .dot-med  { background-color: #0d9488; }
@@ -219,7 +226,18 @@
                 <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 transition-all duration-300 overflow-hidden"
                      :class="isCalendarExpanded ? 'max-h-[300px]' : 'max-h-[80px]'">
                     <div class="flex justify-between items-center px-1 mb-3">
-                        <button @click="changeWeek(-1); resetCalendarTimer()" class="w-8 h-8 flex items-center justify-center rounded-xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg></button>
+                        <div class="flex gap-1">
+                            <button @click="changeWeek(-1); resetCalendarTimer()" 
+                                class="w-8 h-8 flex items-center justify-center rounded-xl text-slate-300 hover:text-emerald-600 hover:bg-emerald-50 transition-all"
+                                title="上週">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path></svg>
+                            </button>
+                            <button @click="changeDay(-1); resetCalendarTimer()" 
+                                class="w-8 h-8 flex items-center justify-center rounded-xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all"
+                                title="前一天">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                            </button>
+                        </div>
                         
                         <div class="flex items-center gap-2">
                             <div class="relative date-input-wrapper cursor-pointer group" @click="openMonthPicker(); resetCalendarTimer()">
@@ -251,7 +269,18 @@
                             </button>
                         </div>
 
-                        <button @click="changeWeek(1); resetCalendarTimer()" class="w-8 h-8 flex items-center justify-center rounded-xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg></button>
+                        <div class="flex gap-1">
+                            <button @click="changeDay(1); resetCalendarTimer()" 
+                                class="w-8 h-8 flex items-center justify-center rounded-xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all"
+                                title="後一天">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                            </button>
+                            <button @click="changeWeek(1); resetCalendarTimer()" 
+                                class="w-8 h-8 flex items-center justify-center rounded-xl text-slate-300 hover:text-emerald-600 hover:bg-emerald-50 transition-all"
+                                title="下週">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 5l7 7-7 7m-8-14l7 7-7 7"></path></svg>
+                            </button>
+                        </div>
                     </div>
                     
                     <div v-if="isCalendarExpanded" class="animate-in fade-in slide-in-from-top-2 duration-300">
@@ -1212,6 +1241,11 @@
                     changeWeek: (dir) => {
                         const d = new Date(selectedDate.value);
                         d.setDate(d.getDate() + (dir * 7));
+                        selectedDate.value = d.toLocaleDateString('sv-SE');
+                    },
+                    changeDay: (dir) => {
+                        const d = new Date(selectedDate.value);
+                        d.setDate(d.getDate() + dir);
                         selectedDate.value = d.toLocaleDateString('sv-SE');
                     },
                     goToToday,
