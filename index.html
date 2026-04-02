@@ -258,16 +258,14 @@
                     :class="'plan-' + (currentDayRecord.planType || 'med')">
                     <div class="relative z-10">
 
-                        <!-- 頂部：計畫模式選擇 + 日期 -->
-                        <div class="flex justify-between items-center mb-5">
-                            <div class="flex gap-1.5 flex-wrap">
-                                <button v-for="(p, key) in {high:'💪 高碳', med:'🥗 中碳', low:'🔥 低碳', rest:'🧘 自由'}" :key="key"
-                                    @click="currentDayRecord.planType = key; saveData()"
-                                    class="px-3 py-1.5 rounded-full text-xs font-black transition-all"
-                                    :class="currentDayRecord.planType === key ? 'bg-white text-slate-800 shadow-md' : 'bg-white/20 text-white hover:bg-white/30'">
-                                    {{ p }}
-                                </button>
-                            </div>
+                        <!-- 頂部：計畫模式選擇 -->
+                        <div class="grid grid-cols-4 gap-1.5 mb-5">
+                            <button v-for="(p, key) in {high:'💪 高碳', med:'🥗 中碳', low:'🔥 低碳', rest:'🧘 自由'}" :key="key"
+                                @click="currentDayRecord.planType = key; saveData()"
+                                class="py-1.5 rounded-full text-[11px] font-black transition-all text-center truncate px-1"
+                                :class="currentDayRecord.planType === key ? 'bg-white text-slate-800 shadow-md' : 'bg-white/20 text-white hover:bg-white/30'">
+                                {{ p }}
+                            </button>
                         </div>
 
                         <!-- 熱量主顯示 -->
@@ -293,16 +291,18 @@
                         <!-- 三大營養素 -->
                         <div class="grid grid-cols-3 gap-2">
                             <div v-for="n in nutrientKeys" :key="n.key"
-                                class="bg-white/15 backdrop-blur-sm rounded-2xl p-3 border border-white/10">
-                                <div class="nutrient-label text-white/80 mb-1">{{ n.label }}</div>
-                                <div class="nutrient-value text-white">{{ formatNum(getDailySum(n.key)) }}<span class="text-xs font-bold opacity-60"> /{{ currentPlan[n.key] }}g</span></div>
+                                class="bg-white/15 backdrop-blur-sm rounded-2xl p-2.5 border border-white/10 min-w-0">
+                                <div class="nutrient-label text-white/80 mb-1.5">{{ n.label }}</div>
+                                <!-- 當前值獨立一行，目標值換行以防溢出 -->
+                                <div class="font-black text-white leading-tight" style="font-size:clamp(0.8rem,3.5vw,0.875rem)">{{ formatNum(getDailySum(n.key)) }}</div>
+                                <div class="text-[10px] font-bold opacity-55 text-white">/{{ currentPlan[n.key] }}g</div>
                                 <div class="bg-white/20 rounded-full overflow-hidden h-1.5 mt-2">
                                     <div class="h-full bg-white/80 rounded-full transition-all duration-500"
                                         :style="{ width: Math.min((getDailySum(n.key) / currentPlan[n.key]) * 100, 100) + '%' }"></div>
                                 </div>
-                                <div class="mt-1.5 text-[10px] font-black px-2 py-0.5 rounded-full text-center inline-block w-full"
+                                <div class="mt-1.5 text-[10px] font-black px-1 py-0.5 rounded-full text-center w-full truncate"
                                     :class="getGap(n.key) < 0 ? 'bg-rose-500/80 text-white' : 'bg-emerald-500/60 text-white'">
-                                    {{ getGap(n.key) >= 0 ? '剩 ' + formatNum(getGap(n.key)) : '超 ' + formatNum(Math.abs(getGap(n.key))) }}g
+                                    {{ getGap(n.key) >= 0 ? '剩' + formatNum(getGap(n.key)) : '超' + formatNum(Math.abs(getGap(n.key))) }}g
                                 </div>
                             </div>
                         </div>
@@ -335,24 +335,27 @@
                             class="meal-card rounded-2xl border bg-slate-50/80 relative overflow-hidden" :class="'meal-' + meal.type">
 
                             <!-- 顯示模式 -->
-                            <div v-if="editingIndex !== index" class="p-3.5 pr-[5.5rem]">
+                            <div v-if="editingIndex !== index" class="p-3.5 pr-[4.75rem]">
                                 <!-- 標籤 + 名稱列 -->
-                                <div class="flex items-center gap-2 mb-2">
-                                    <span class="text-[10px] font-black px-2.5 py-1 rounded-full whitespace-nowrap shrink-0"
+                                <div class="flex items-center gap-2 mb-2 min-w-0">
+                                    <span class="text-[10px] font-black px-2.5 py-0.5 rounded-full whitespace-nowrap shrink-0"
                                         :class="'badge-' + meal.type">
                                         {{ getMealLabel(meal.type) }}
                                     </span>
-                                    <span class="text-sm font-black text-slate-800 truncate">
+                                    <span class="text-sm font-black text-slate-800 truncate min-w-0">
                                         {{ meal.name || '未命名餐點' }}
                                     </span>
                                 </div>
-                                <!-- 營養數據列 -->
-                                <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                                <!-- 第一行：熱量 + 份量（各佔兩端，不換行） -->
+                                <div class="flex items-center justify-between mb-1">
                                     <span class="text-xs font-black text-emerald-600">{{ formatNum(meal.calories) }} <span class="font-bold opacity-70">kcal</span></span>
+                                    <span class="text-[11px] font-bold text-blue-500 shrink-0">{{ meal.amount }}{{ meal.unit || '份' }}</span>
+                                </div>
+                                <!-- 第二行：三大營養素 -->
+                                <div class="flex items-center gap-2.5">
                                     <span class="text-[11px] font-bold text-slate-400">碳 {{ formatNum(meal.carbs) }}g</span>
                                     <span class="text-[11px] font-bold text-slate-400">蛋 {{ formatNum(meal.protein) }}g</span>
                                     <span class="text-[11px] font-bold text-slate-400">脂 {{ formatNum(meal.fat) }}g</span>
-                                    <span class="text-[11px] font-bold text-blue-500 ml-auto">{{ meal.amount }}{{ meal.unit || '份' }}</span>
                                 </div>
                             </div>
                             <!-- 操作按鈕 -->
