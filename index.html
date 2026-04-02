@@ -310,6 +310,7 @@
                                         <!-- 餐點名稱：行動端獨立一行 -->
                                         <span class="text-sm font-black text-slate-800 truncate block">
                                             {{ meal.name || '未命名餐點' }}
+                                            <span v-if="meal.amount && meal.amount !== 1" class="text-xs text-slate-500 font-bold ml-1">({{ meal.amount }})</span>
                                         </span>
                                     </div>
                                     <!-- 營養數據 -->
@@ -359,6 +360,11 @@
                                     <input v-model="meal.name"
                                         class="flex-1 px-3 py-2 bg-white rounded-lg border border-slate-200 text-xs font-bold outline-none"
                                         placeholder="餐點名稱">
+                                    <div class="flex items-center gap-1 bg-white rounded-lg border border-slate-200 px-2 min-w-[100px]">
+                                        <span class="text-[10px] font-black text-slate-400">份量</span>
+                                        <input type="number" v-model.number="meal.amount" @focus="lastAmount = meal.amount" @input="scaleNutrients(meal)"
+                                            class="w-full py-2 text-xs font-black outline-none text-center" step="any">
+                                    </div>
                                 </div>
                                 <div class="grid grid-cols-2 xs:grid-cols-4 gap-2">
                                     <div v-for="n in [{key:'calories', label:'熱量(kcal)'}, {key:'carbs', label:'碳水(g)'}, {key:'protein', label:'蛋白(g)'}, {key:'fat', label:'脂肪(g)'}]"
@@ -403,6 +409,7 @@
                             <div class="flex-1 mr-4">
                                 <div class="flex items-center gap-2 mb-1">
                                     <span class="font-black text-slate-700 text-sm">{{ item.name }}</span>
+                                    <span v-if="item.amount && item.amount !== 1" class="text-[9px] text-slate-400 font-bold">({{ item.amount }})</span>
                                     <span class="text-[9px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full font-bold whitespace-nowrap">{{ item.count }}次</span>
                                 </div>
                                 <p class="text-[10px] text-slate-400 font-bold">
@@ -567,6 +574,7 @@
                 const isAddingMeal = ref(false);
                 const tempMealBackup = ref(null);
                 const mealToDelete = ref(null);
+                const lastAmount = ref(1);
 
                 const nutrientKeys = [{ key: 'carbs', label: '碳水' }, { key: 'protein', label: '蛋白質' }, { key: 'fat', label: '脂肪' }];
 
@@ -593,6 +601,19 @@
                     // 如果是整數直接回傳，否則保留一位小數並四捨五入
                     return Number(n.toFixed(1));
                 };
+
+                const scaleNutrients = (meal) => {
+                    const newAmount = meal.amount || 0;
+                    if (lastAmount.value > 0 && newAmount > 0) {
+                        const ratio = newAmount / lastAmount.value;
+                        meal.calories = formatNum(meal.calories * ratio);
+                        meal.carbs = formatNum(meal.carbs * ratio);
+                        meal.protein = formatNum(meal.protein * ratio);
+                        meal.fat = formatNum(meal.fat * ratio);
+                    }
+                    lastAmount.value = newAmount;
+                };
+
                 const calculatedTDEE = computed(() => {
                     const { gender, weight, height, age, activity } = profile;
                     let bmr = (10 * weight) + (6.25 * height) - (5 * age);
@@ -629,6 +650,7 @@
                 const addFromHistory = (meal) => {
                     // 複製並加入，避免參照問題
                     const newMeal = { ...meal, type: 'lunch' }; // 預設午餐，可調整
+                    if (newMeal.amount === undefined) newMeal.amount = 1;
                     allData[selectedDate.value].meals.push(newMeal);
                     const order = { breakfast: 1, lunch: 2, dinner: 3, snack: 4 };
                     allData[selectedDate.value].meals.sort((a, b) => (order[a.type] || 99) - (order[b.type] || 99));
@@ -762,7 +784,10 @@
                     editingIndex.value = index;
                     isAddingMeal.value = false;
                     if (allData[selectedDate.value]?.meals[index]) {
-                        tempMealBackup.value = JSON.parse(JSON.stringify(allData[selectedDate.value].meals[index]));
+                        const meal = allData[selectedDate.value].meals[index];
+                        if (meal.amount === undefined) meal.amount = 1;
+                        lastAmount.value = meal.amount;
+                        tempMealBackup.value = JSON.parse(JSON.stringify(meal));
                     }
                 };
 
@@ -770,9 +795,11 @@
                     if (!allData[selectedDate.value]) {
                         allData[selectedDate.value] = { planType: 'med', meals: [] };
                     }
-                    const newIndex = allData[selectedDate.value].meals.push({ type: 'lunch', name: '', calories: 0, carbs: 0, protein: 0, fat: 0 }) - 1;
+                    const newMeal = { type: 'lunch', name: '', amount: 1, calories: 0, carbs: 0, protein: 0, fat: 0 };
+                    const newIndex = allData[selectedDate.value].meals.push(newMeal) - 1;
                     editingIndex.value = newIndex;
                     isAddingMeal.value = true;
+                    lastAmount.value = 1;
                     tempMealBackup.value = null;
                 };
 
@@ -819,7 +846,7 @@
                 return {
                     initialized, user, saving, showSettings, showHistory, historySearch, selectedDate, loginEmail, loginPassword,
                     editingIndex, mealToDelete, nutrientKeys, profile, plans, allData, mealHistory,
-                    weekDays, currentMonthYearDisplay, calculatedTDEE, formatNum,
+                    weekDays, currentMonthYearDisplay, calculatedTDEE, formatNum, scaleNutrients, lastAmount,
                     currentDayRecord: computed(() => {
                         if (!allData[selectedDate.value]) { allData[selectedDate.value] = { planType: 'med', meals: [] }; }
                         return allData[selectedDate.value];
