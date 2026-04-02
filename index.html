@@ -21,85 +21,106 @@
             display: none;
         }
 
-        .dot-high {
-            background-color: #f59e0b;
-        }
+        /* === 顏色點 === */
+        .dot-high { background-color: #f59e0b; }
+        .dot-med  { background-color: #0d9488; }
+        .dot-low  { background-color: #8b5cf6; }
+        .dot-rest { background-color: #3db1ff; }
 
-        .dot-med {
-            background-color: #0d9488;
-        }
+        /* === 計畫卡漸層 === */
+        .plan-high { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .plan-med  { background: linear-gradient(135deg, #0d9488 0%, #065f46 100%); }
+        .plan-low  { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); }
+        .plan-rest { background: linear-gradient(135deg, #3db1ff 0%, #0369a1 100%); }
 
-        .dot-low {
-            background-color: #8b5cf6;
-        }
-
-        .dot-rest {
-            background-color: #3db1ff;
-        }
-
-        .plan-high {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-        }
-
-        .plan-med {
-            background: linear-gradient(135deg, #0d9488, #115e59);
-        }
-
-        .plan-low {
-            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
-        }
-
-        .plan-rest {
-            background: linear-gradient(135deg, #3db1ff, #086aac);
-        }
-
-        .meal-breakfast {
-            border-left: 6px solid #fbbf24;
-        }
-
-        .meal-lunch {
-            border-left: 6px solid #10b981;
-        }
-
-        .meal-dinner {
-            border-left: 6px solid #06b6d4;
-        }
-
-        .meal-snack {
-            border-left: 6px solid #f472b6;
-        }
-
-        .modal-overlay {
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-        }
-
-        .date-input-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
+        /* === 計畫噪點紋理 === */
+        .plan-high::before, .plan-med::before, .plan-low::before, .plan-rest::before {
+            content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            width: auto;
-            height: auto;
-            color: transparent;
-            background: transparent;
-            cursor: pointer;
+            inset: 0;
+            background-image: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.15) 0%, transparent 60%);
+            pointer-events: none;
         }
 
+        /* === 餐點類型邊框 === */
+        .meal-breakfast { border-left: 4px solid #fbbf24; }
+        .meal-lunch     { border-left: 4px solid #10b981; }
+        .meal-dinner    { border-left: 4px solid #06b6d4; }
+        .meal-snack     { border-left: 4px solid #f472b6; }
+
+        /* === 餐點類型標籤顏色 === */
+        .badge-breakfast { background: #fef9c3; color: #92400e; }
+        .badge-lunch     { background: #d1fae5; color: #065f46; }
+        .badge-dinner    { background: #cffafe; color: #164e63; }
+        .badge-snack     { background: #fce7f3; color: #9d174d; }
+
+        /* === Modal === */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(6px);
+        }
+
+        /* === 自定義捲軸 === */
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 999px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
+        /* === 日期 picker === */
+        .date-input-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            width: auto; height: auto; color: transparent; background: transparent; cursor: pointer;
+        }
+
+        /* === 按鈕漸層 === */
+        .btn-gradient { background: linear-gradient(135deg, #34d399 0%, #3b82f6 100%); }
+
+        /* === 陰影覆寫 === */
         .shadow-md {
             --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
             box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
         }
+        .rounded-xl { border-radius: 0.75rem; }
 
-        .btn-gradient {
-            background: linear-gradient(135deg, #34d399 0%, #3b82f6 100%);
+        /* === 今天日期圈 === */
+        .today-badge {
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            color: #fff;
+            border-radius: 9999px;
+            box-shadow: 0 2px 8px rgba(16,185,129,0.35);
         }
 
-        .rounded-xl {
-            border-radius: 0.75rem;
+        /* === 進度條動畫 === */
+        @keyframes progressIn {
+            from { width: 0%; }
         }
+        .progress-bar-animated { animation: progressIn 0.6s ease-out forwards; }
+
+        /* === 卡片 hover === */
+        .meal-card { transition: box-shadow 0.2s, transform 0.15s; }
+        .meal-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.08); transform: translateY(-1px); }
+
+        /* === 登入頁背景 === */
+        .login-bg {
+            background: linear-gradient(160deg, #ecfdf5 0%, #eff6ff 50%, #f5f3ff 100%);
+        }
+
+        /* === 週曆圖例 === */
+        .legend-dot {
+            width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0;
+        }
+
+        /* === 熱量大數字 === */
+        .calorie-num {
+            font-size: clamp(2rem, 8vw, 3rem);
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -0.02em;
+        }
+
+        /* === 營養素標籤文字 === */
+        .nutrient-label { font-size: 0.6875rem; font-weight: 700; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.05em; }
+        .nutrient-value { font-size: 0.875rem; font-weight: 900; }
     </style>
 </head>
 
@@ -113,24 +134,40 @@
         </div>
 
         <!-- 登入頁面 -->
-        <div v-if="!user && initialized" class="min-h-screen flex items-center justify-center p-4 bg-emerald-50">
-            <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-xl p-8 space-y-8">
-                <div class="text-center">
+        <div v-if="!user && initialized" class="min-h-screen flex items-center justify-center p-4 login-bg">
+            <div class="w-full max-w-md space-y-5">
+                <!-- 品牌 Header -->
+                <div class="text-center pb-2">
+                    <div class="w-16 h-16 bg-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-200">
+                        <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                    </div>
                     <h1 class="text-3xl font-black text-slate-800 tracking-tight">輕盈飲食紀錄</h1>
-                    <p class="text-slate-400 mt-2">追蹤您的每日營養與目標</p>
+                    <p class="text-slate-400 mt-1.5 text-sm">追蹤每日營養，邁向健康體態</p>
                 </div>
-                <div class="space-y-4">
-                    <input type="email" v-model="loginEmail"
-                        class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-emerald-500"
-                        placeholder="電子郵件">
-                    <input type="password" v-model="loginPassword"
-                        class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-emerald-500"
-                        placeholder="密碼">
+                <!-- 表單卡片 -->
+                <div class="bg-white rounded-[2rem] shadow-xl shadow-slate-200/60 p-8 space-y-4">
+                    <div class="space-y-3">
+                        <div class="relative">
+                            <svg class="w-5 h-5 text-slate-300 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/></svg>
+                            <input type="email" v-model="loginEmail"
+                                class="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 border border-slate-100 outline-none focus:ring-2 focus:ring-emerald-400 text-sm font-bold transition-all"
+                                placeholder="電子郵件">
+                        </div>
+                        <div class="relative">
+                            <svg class="w-5 h-5 text-slate-300 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                            <input type="password" v-model="loginPassword"
+                                class="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 border border-slate-100 outline-none focus:ring-2 focus:ring-emerald-400 text-sm font-bold transition-all"
+                                placeholder="密碼">
+                        </div>
+                    </div>
                     <button @click="handleAuth('login')"
-                        class="w-full bg-emerald-600 text-white py-4 rounded-2xl font-black shadow-lg hover:bg-emerald-700 transition-all">登入</button>
-                    <button @click="handleAuth('signup')" class="w-full text-emerald-600 font-bold py-2">註冊新帳號</button>
-                    <button @click="handleAnonymous" class="w-full text-slate-400 text-xs font-bold underline">直接開始
-                        (不登入)</button>
+                        class="w-full bg-emerald-600 text-white py-4 rounded-2xl font-black text-sm shadow-lg shadow-emerald-200 hover:bg-emerald-700 active:scale-[0.98] transition-all">登入</button>
+                    <button @click="handleAuth('signup')" class="w-full border border-emerald-200 text-emerald-600 font-bold py-3.5 rounded-2xl text-sm hover:bg-emerald-50 transition-all">註冊新帳號</button>
+                </div>
+                <div class="text-center">
+                    <button @click="handleAnonymous" class="text-slate-400 text-xs font-bold hover:text-slate-600 transition-colors underline underline-offset-2">直接開始（不登入）</button>
                 </div>
             </div>
         </div>
@@ -180,222 +217,208 @@
 
                 <!-- 週曆 -->
                 <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100">
-                    <div class="flex justify-between items-center px-2 mb-4">
-                        <button @click="changeWeek(-1)" class="p-1 text-slate-400 hover:text-emerald-600"><svg
-                                class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 19l-7-7 7-7"></path>
-                            </svg></button>
+                    <div class="flex justify-between items-center px-1 mb-3">
+                        <button @click="changeWeek(-1)" class="w-8 h-8 flex items-center justify-center rounded-xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg></button>
                         <div class="relative date-input-wrapper cursor-pointer group" @click="openMonthPicker">
-                            <h2
-                                class="text-sm font-black text-slate-700 group-hover:text-emerald-600 transition-colors">
-                                {{ currentMonthYearDisplay }}</h2>
+                            <div class="flex items-center gap-1.5">
+                                <h2 class="text-sm font-black text-slate-700 group-hover:text-emerald-600 transition-colors">{{ currentMonthYearDisplay }}</h2>
+                                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
                         </div>
-                        <button @click="changeWeek(1)" class="p-1 text-slate-400 hover:text-emerald-600"><svg
-                                class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                                </path>
-                            </svg></button>
+                        <button @click="changeWeek(1)" class="w-8 h-8 flex items-center justify-center rounded-xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg></button>
                     </div>
                     <div class="grid grid-cols-7 gap-1 text-center">
                         <div v-for="day in weekDays" :key="day.date" @click="selectedDate = day.date"
-                            class="flex flex-col items-center py-2 rounded-2xl cursor-pointer transition-all active:scale-90"
-                            :class="selectedDate === day.date ? 'bg-emerald-50 ring-1 ring-emerald-500/20' : 'hover:bg-slate-50'">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase mb-1">{{ day.label }}</span>
-                            <span class="text-sm font-black"
-                                :class="selectedDate === day.date ? 'text-emerald-600' : 'text-slate-700'">{{ day.dayNum
-                                }}</span>
-                            <div class="h-1.5 w-1.5 rounded-full mt-1" :class="getDayDotClass(day.date)"></div>
+                            class="flex flex-col items-center py-2 rounded-2xl cursor-pointer transition-all active:scale-90 relative"
+                            :class="selectedDate === day.date ? 'bg-emerald-50 ring-1 ring-emerald-400/30' : 'hover:bg-slate-50'">
+                            <span class="text-[10px] font-bold uppercase mb-1.5"
+                                :class="selectedDate === day.date ? 'text-emerald-500' : 'text-slate-400'">{{ day.label }}</span>
+                            <!-- 今天的日期用漸層圓背景 -->
+                            <div class="w-7 h-7 flex items-center justify-center rounded-full"
+                                :class="day.date === new Date().toLocaleDateString('sv-SE') ? 'today-badge' : ''">
+                                <span class="text-sm font-black leading-none"
+                                    :class="day.date === new Date().toLocaleDateString('sv-SE') ? 'text-white' : selectedDate === day.date ? 'text-emerald-600' : 'text-slate-700'">{{ day.dayNum }}</span>
+                            </div>
+                            <div class="h-1.5 w-1.5 rounded-full mt-1.5" :class="getDayDotClass(day.date)"></div>
                         </div>
+                    </div>
+                    <!-- 顏色圖例 -->
+                    <div class="flex items-center justify-center gap-3 mt-3 pt-3 border-t border-slate-50 flex-wrap">
+                        <span class="flex items-center gap-1 text-[10px] font-bold text-slate-400"><span class="legend-dot" style="background:#f59e0b"></span>高碳</span>
+                        <span class="flex items-center gap-1 text-[10px] font-bold text-slate-400"><span class="legend-dot" style="background:#0d9488"></span>中碳</span>
+                        <span class="flex items-center gap-1 text-[10px] font-bold text-slate-400"><span class="legend-dot" style="background:#8b5cf6"></span>低碳</span>
+                        <span class="flex items-center gap-1 text-[10px] font-bold text-slate-400"><span class="legend-dot" style="background:#3db1ff"></span>自由</span>
                     </div>
                 </div>
             </header>
 
             <main class="space-y-4">
-                <!-- 今日計畫：解決營養素區塊跑版 -->
-                <div class="rounded-[2rem] p-5 md:p-8 text-white shadow-xl relative overflow-hidden"
+                <!-- 今日計畫卡 -->
+                <div class="rounded-[2rem] p-5 md:p-7 text-white shadow-xl relative overflow-hidden"
                     :class="'plan-' + (currentDayRecord.planType || 'med')">
                     <div class="relative z-10">
-                        <div class="flex flex-col gap-4 mb-6">
-                            <div class="flex justify-between items-start">
-                                <div class="space-y-1">
-                                    <span
-                                        class="px-2 py-0.5 bg-white/20 rounded text-[9px] font-black uppercase tracking-wider">模式切換</span>
-                                    <select v-model="currentDayRecord.planType" @change="saveData"
-                                        class="block bg-white text-slate-800 text-xs font-black rounded-lg px-2 py-1.5 outline-none shadow-md">
-                                        <option value="high">💪 高碳</option>
-                                        <option value="med">🥗 中碳</option>
-                                        <option value="low">🔥 低碳</option>
-                                        <option value="rest">🧘 自由</option>
-                                    </select>
-                                </div>
-                                <div class="text-right">
-                                    <div class="text-[9px] font-bold opacity-80 uppercase mb-0.5">剩餘熱量</div>
-                                    <div class="text-3xl md:text-4xl font-black">{{ formatNum(getGap('calories')) }}
-                                        <span class="text-[10px]">kcal</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="text-[10px] font-bold text-center bg-white/10 py-1 rounded-lg">
-                                今日攝取: {{ formatNum(getDailySum('calories')) }} / 目標: {{ currentPlan.calories }}
+
+                        <!-- 頂部：計畫模式選擇 + 日期 -->
+                        <div class="flex justify-between items-center mb-5">
+                            <div class="flex gap-1.5 flex-wrap">
+                                <button v-for="(p, key) in {high:'💪 高碳', med:'🥗 中碳', low:'🔥 低碳', rest:'🧘 自由'}" :key="key"
+                                    @click="currentDayRecord.planType = key; saveData()"
+                                    class="px-3 py-1.5 rounded-full text-xs font-black transition-all"
+                                    :class="currentDayRecord.planType === key ? 'bg-white text-slate-800 shadow-md' : 'bg-white/20 text-white hover:bg-white/30'">
+                                    {{ p }}
+                                </button>
                             </div>
                         </div>
 
-                        <!-- 營養素 Grid 響應式優化 -->
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                            <div v-for="n in nutrientKeys" :key="n.key"
-                                class="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 flex sm:flex-col justify-between items-center sm:items-stretch gap-2">
-                                <div class="flex flex-col">
-                                    <span class="text-[9px] font-bold opacity-80 uppercase">{{ n.label }}</span>
-                                    <span class="text-xs font-black">{{ formatNum(getDailySum(n.key)) }} / {{
-                                        currentPlan[n.key]
-                                        }}g</span>
+                        <!-- 熱量主顯示 -->
+                        <div class="mb-5">
+                            <div class="text-xs font-bold opacity-75 uppercase tracking-wider mb-1">剩餘熱量</div>
+                            <div class="flex items-end gap-2">
+                                <div class="calorie-num" :class="getGap('calories') < 0 ? 'text-rose-200' : 'text-white'">
+                                    {{ formatNum(getGap('calories')) }}
                                 </div>
-                                <div class="flex-1 sm:flex-none">
-                                    <div class="h-1 w-20 sm:w-full bg-white/20 rounded-full overflow-hidden my-1">
-                                        <div class="h-full bg-white"
-                                            :style="{ width: Math.min((getDailySum(n.key)/currentPlan[n.key])*100, 100) + '%' }">
-                                        </div>
-                                    </div>
-                                    <div class="text-[9px] font-black px-1.5 py-0.5 rounded text-center inline-block sm:block"
-                                        :class="getGap(n.key) < 0 ? 'bg-rose-500' : 'bg-emerald-500'">
-                                        {{ getGap(n.key) >= 0 ? '剩 ' + formatNum(getGap(n.key)) : '超 ' +
-                                        formatNum(Math.abs(getGap(n.key)))
-                                        }}g
-                                    </div>
+                                <span class="text-sm font-bold opacity-75 mb-1">kcal</span>
+                            </div>
+                            <!-- 熱量進度條 -->
+                            <div class="mt-2.5 bg-white/20 rounded-full overflow-hidden h-2.5">
+                                <div class="h-full bg-white/80 rounded-full transition-all duration-500"
+                                    :style="{ width: Math.min((getDailySum('calories') / currentPlan.calories) * 100, 100) + '%' }"></div>
+                            </div>
+                            <div class="flex justify-between mt-1.5 text-xs font-bold opacity-70">
+                                <span>攝取 {{ formatNum(getDailySum('calories')) }}</span>
+                                <span>目標 {{ currentPlan.calories }}</span>
+                            </div>
+                        </div>
+
+                        <!-- 三大營養素 -->
+                        <div class="grid grid-cols-3 gap-2">
+                            <div v-for="n in nutrientKeys" :key="n.key"
+                                class="bg-white/15 backdrop-blur-sm rounded-2xl p-3 border border-white/10">
+                                <div class="nutrient-label text-white/80 mb-1">{{ n.label }}</div>
+                                <div class="nutrient-value text-white">{{ formatNum(getDailySum(n.key)) }}<span class="text-xs font-bold opacity-60"> /{{ currentPlan[n.key] }}g</span></div>
+                                <div class="bg-white/20 rounded-full overflow-hidden h-1.5 mt-2">
+                                    <div class="h-full bg-white/80 rounded-full transition-all duration-500"
+                                        :style="{ width: Math.min((getDailySum(n.key) / currentPlan[n.key]) * 100, 100) + '%' }"></div>
+                                </div>
+                                <div class="mt-1.5 text-[10px] font-black px-2 py-0.5 rounded-full text-center inline-block w-full"
+                                    :class="getGap(n.key) < 0 ? 'bg-rose-500/80 text-white' : 'bg-emerald-500/60 text-white'">
+                                    {{ getGap(n.key) >= 0 ? '剩 ' + formatNum(getGap(n.key)) : '超 ' + formatNum(Math.abs(getGap(n.key))) }}g
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 餐點紀錄：解決行動端編輯跑版 -->
-                <div class="bg-white rounded-[2rem] p-5 md:p-8 shadow-sm border border-slate-100">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-base font-black text-slate-800">餐點紀錄</h3>
+                <!-- 餐點紀錄 -->
+                <div class="bg-white rounded-[2rem] p-5 md:p-7 shadow-sm border border-slate-100">
+                    <div class="flex justify-between items-center mb-5">
+                        <div>
+                            <h3 class="text-base font-black text-slate-800">餐點紀錄</h3>
+                            <p class="text-xs text-slate-400 font-bold mt-0.5" v-if="currentDayRecord.meals.length > 0">共 {{ currentDayRecord.meals.length }} 筆</p>
+                        </div>
                         <div class="flex gap-2">
-                            <!-- 新增「歷史紀錄」按鈕 -->
                             <button @click="showHistory = true"
-                                class="bg-slate-100 text-slate-600 px-4 py-2.5 rounded-2xl text-xs font-black shadow-sm hover:bg-slate-200 transition-all flex items-center gap-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
+                                class="h-9 px-3.5 bg-slate-100 text-slate-600 rounded-xl text-xs font-black hover:bg-slate-200 transition-all flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 歷史
                             </button>
                             <button @click="addMeal"
-                                class="btn-gradient text-white px-4 py-2 rounded-xl text-xs font-black shadow-md">+
-                                新增</button>
+                                class="h-9 px-4 btn-gradient text-white rounded-xl text-xs font-black shadow-md hover:opacity-90 transition-all flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                                新增
+                            </button>
                         </div>
-
                     </div>
 
-                    <div class="space-y-3">
+                    <div class="space-y-2.5">
                         <div v-for="(meal, index) in currentDayRecord.meals" :key="index"
-                            class="p-3 rounded-2xl border bg-slate-50 relative" :class="'meal-' + meal.type">
+                            class="meal-card rounded-2xl border bg-slate-50/80 relative overflow-hidden" :class="'meal-' + meal.type">
 
-                            <!-- 顯示模式：行動裝置優化標籤與名稱排版 -->
-                            <div v-if="editingIndex !== index"
-                                class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pr-12 sm:pr-0">
-                                <div class="min-w-0 w-full">
-                                    <div class="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 mb-1.5">
-                                        <!-- 標籤 -->
-                                        <div class="w-fit">
-                                            <span
-                                                class="text-[9px] px-2 py-0.5 bg-white rounded-full border border-slate-200 font-bold whitespace-nowrap shadow-sm">
-                                                {{ getMealLabel(meal.type) }}
-                                            </span>
-                                        </div>
-                                        <!-- 餐點名稱：行動端獨立一行 -->
-                                        <span class="text-sm font-black text-slate-800 truncate block">
-                                            {{ meal.name || '未命名餐點' }}
-                                        </span>
-                                    </div>
-                                    <!-- 營養數據 -->
-                                    <div class="text-[10px] font-bold flex flex-wrap items-center gap-y-1">
-                                        <span class="text-blue-600">{{ meal.amount }}{{ meal.unit || '份' }}</span>
-                                        <span class="mx-1 text-slate-300">|</span>
-                                        <span class="text-emerald-600">熱量: {{ formatNum(meal.calories) }}kcal</span>
-                                        <span class="mx-1 text-slate-300">|</span>
-                                        <span class="text-slate-400">碳水:{{ formatNum(meal.carbs) }}</span>
-                                        <span class="mx-1 text-slate-300">|</span>
-                                        <span class="text-slate-400">蛋白質:{{formatNum(meal.protein) }}</span>
-                                        <span class="mx-1 text-slate-300">|</span>
-                                        <span class="text-slate-400">脂肪:{{ formatNum(meal.fat) }}</span>
-                                    </div>
+                            <!-- 顯示模式 -->
+                            <div v-if="editingIndex !== index" class="p-3.5 pr-[5.5rem]">
+                                <!-- 標籤 + 名稱列 -->
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="text-[10px] font-black px-2.5 py-1 rounded-full whitespace-nowrap shrink-0"
+                                        :class="'badge-' + meal.type">
+                                        {{ getMealLabel(meal.type) }}
+                                    </span>
+                                    <span class="text-sm font-black text-slate-800 truncate">
+                                        {{ meal.name || '未命名餐點' }}
+                                    </span>
                                 </div>
-
-                                <!-- 操作按鈕：行動端固定右上方 -->
-                                <div
-                                    class="absolute top-3 right-3 flex sm:relative sm:top-0 sm:right-0 gap-1 bg-slate-50/80 backdrop-blur-sm sm:bg-transparent rounded-lg p-1">
-                                    <button @click="startEdit(index)"
-                                        class="p-1.5 text-slate-400 hover:text-emerald-500 active:scale-90 transition-transform">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
-                                            viewBox="0 0 24 24">
-                                            <path
-                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
-                                            </path>
-                                        </svg>
-                                    </button>
-                                    <button @click="confirmDelete(index)"
-                                        class="p-1.5 text-slate-300 hover:text-rose-500 active:scale-90 transition-transform">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
-                                            viewBox="0 0 24 24">
-                                            <path
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                            </path>
-                                        </svg>
-                                    </button>
+                                <!-- 營養數據列 -->
+                                <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                                    <span class="text-xs font-black text-emerald-600">{{ formatNum(meal.calories) }} <span class="font-bold opacity-70">kcal</span></span>
+                                    <span class="text-[11px] font-bold text-slate-400">碳 {{ formatNum(meal.carbs) }}g</span>
+                                    <span class="text-[11px] font-bold text-slate-400">蛋 {{ formatNum(meal.protein) }}g</span>
+                                    <span class="text-[11px] font-bold text-slate-400">脂 {{ formatNum(meal.fat) }}g</span>
+                                    <span class="text-[11px] font-bold text-blue-500 ml-auto">{{ meal.amount }}{{ meal.unit || '份' }}</span>
                                 </div>
                             </div>
+                            <!-- 操作按鈕 -->
+                            <div v-if="editingIndex !== index" class="absolute top-3 right-3 flex gap-0.5">
+                                <button @click="startEdit(index)"
+                                    class="w-8 h-8 flex items-center justify-center rounded-xl text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 active:scale-90 transition-all">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                </button>
+                                <button @click="confirmDelete(index)"
+                                    class="w-8 h-8 flex items-center justify-center rounded-xl text-slate-300 hover:text-rose-500 hover:bg-rose-50 active:scale-90 transition-all">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            </div>
 
-                            <!-- 編輯模式：解決排版跑版 -->
-                            <div v-else class="space-y-3">
-                                <div class="flex flex-col sm:flex-row gap-2">
+                            <!-- 編輯模式 -->
+                            <div v-if="editingIndex === index" class="p-4 space-y-3">
+                                <div class="flex gap-2">
                                     <select v-model="meal.type"
-                                        class="w-full sm:w-auto bg-white rounded-lg px-2 py-2 text-xs font-black border border-slate-200">
+                                        class="bg-white rounded-xl px-3 py-2.5 text-xs font-black border border-slate-200 outline-none focus:ring-2 focus:ring-emerald-400">
                                         <option value="breakfast">🌅 早餐</option>
                                         <option value="lunch">☀️ 午餐</option>
                                         <option value="dinner">🌙 晚餐</option>
                                         <option value="snack">🍰 點心</option>
                                     </select>
                                     <input v-model="meal.name"
-                                        class="flex-1 px-3 py-2 bg-white rounded-lg border border-slate-200 text-xs font-bold outline-none"
+                                        class="flex-1 px-3 py-2.5 bg-white rounded-xl border border-slate-200 text-sm font-bold outline-none focus:ring-2 focus:ring-emerald-400"
                                         placeholder="餐點名稱">
                                 </div>
-                                <!-- 份量與單位：獨立一行 -->
                                 <div class="flex items-center gap-2">
-                                    <div class="flex-1 flex items-center gap-1 bg-white rounded-lg border border-slate-200 px-3 py-2">
-                                        <span class="text-[10px] font-black text-slate-400 whitespace-nowrap">調整份量</span>
+                                    <div class="flex-1 flex items-center gap-2 bg-white rounded-xl border border-slate-200 px-3 py-2.5">
+                                        <span class="text-xs font-black text-slate-400 whitespace-nowrap shrink-0">份量</span>
                                         <input type="number" v-model.number="meal.amount" @focus="lastAmount = meal.amount" @input="scaleNutrients(meal)"
-                                            class="w-full text-xs font-black outline-none text-right" step="any">
+                                            class="w-full text-sm font-black outline-none text-right" step="any">
                                     </div>
                                     <select v-model="meal.unit"
-                                        class="bg-white rounded-lg px-3 py-2 text-xs font-black border border-slate-200 outline-none">
+                                        class="bg-white rounded-xl px-3 py-2.5 text-xs font-black border border-slate-200 outline-none">
                                         <option value="份">份</option>
                                         <option value="g">g</option>
                                         <option value="ml">ml</option>
                                     </select>
                                 </div>
-                                <div class="grid grid-cols-2 xs:grid-cols-4 gap-2">
-                                    <div v-for="n in [{key:'calories', label:'熱量(kcal)'}, {key:'carbs', label:'碳水(g)'}, {key:'protein', label:'蛋白(g)'}, {key:'fat', label:'脂肪(g)'}]"
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div v-for="n in [{key:'calories', label:'熱量 (kcal)'}, {key:'carbs', label:'碳水 (g)'}, {key:'protein', label:'蛋白質 (g)'}, {key:'fat', label:'脂肪 (g)'}]"
                                         :key="n.key" class="space-y-1">
-                                        <label class="text-[8px] text-slate-400 font-black block pl-1">{{ n.label
-                                            }}</label>
+                                        <label class="text-[10px] text-slate-400 font-black block pl-1">{{ n.label }}</label>
                                         <input type="number" v-model.number="meal[n.key]"
-                                            class="w-full px-2 py-2 bg-white border border-slate-200 rounded-lg font-black text-center text-xs">
+                                            class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl font-black text-center text-sm outline-none focus:ring-2 focus:ring-emerald-400">
                                     </div>
                                 </div>
-                                <div class="flex justify-end gap-2 pt-1">
+                                <div class="flex gap-2 pt-1">
                                     <button @click="cancelEdit"
-                                        class="w-1/3 py-2.5 bg-slate-100 text-slate-500 rounded-xl text-xs font-black shadow-sm hover:bg-slate-200">取消</button>
+                                        class="w-1/3 py-3 bg-slate-100 text-slate-600 rounded-xl text-sm font-black hover:bg-slate-200 transition-all">取消</button>
                                     <button @click="saveMeal"
-                                        class="flex-1 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-black shadow-md">儲存</button>
+                                        class="flex-1 py-3 bg-emerald-600 text-white rounded-xl text-sm font-black shadow-md hover:bg-emerald-700 transition-all">儲存</button>
                                 </div>
                             </div>
                         </div>
-                        <div v-if="currentDayRecord.meals.length === 0"
-                            class="py-10 text-center text-slate-300 text-xs font-bold">尚無餐點紀錄</div>
+
+                        <!-- 空白狀態 -->
+                        <div v-if="currentDayRecord.meals.length === 0" class="py-12 text-center">
+                            <div class="w-16 h-16 bg-slate-100 rounded-3xl flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                            </div>
+                            <p class="text-sm font-black text-slate-400">今天還沒有餐點紀錄</p>
+                            <p class="text-xs text-slate-300 font-bold mt-1">點擊「新增」開始記錄</p>
+                        </div>
                     </div>
                 </div>
             </main>
