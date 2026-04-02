@@ -343,86 +343,93 @@
                         </div>
                     </div>
 
-                    <div class="space-y-2.5">
-                        <div v-for="(meal, index) in currentDayRecord.meals" :key="index"
-                            class="meal-card rounded-2xl border bg-slate-50/80 relative overflow-hidden" :class="'meal-' + meal.type">
+                    <div class="space-y-6">
+                        <div v-for="typeObj in mealTypes" :key="typeObj.key">
+                            <div v-if="getMealsByType(typeObj.key).length > 0">
+                                <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-2 mb-2 flex items-center gap-2">
+                                    {{ typeObj.label }}
+                                    <div class="h-px flex-1 bg-slate-100"></div>
+                                </h4>
+                                <div class="space-y-2.5">
+                                    <div v-for="meal in getMealsByType(typeObj.key)" :key="meal.originalIndex"
+                                        class="meal-card rounded-2xl border bg-slate-50/80 relative overflow-hidden" :class="'meal-' + meal.type">
 
-                            <!-- 顯示模式 -->
-                            <div v-if="editingIndex !== index" class="p-3.5 pr-[4.75rem]">
-                                <!-- 標籤 + 名稱列 -->
-                                <div class="flex items-center gap-2 mb-2 min-w-0">
-                                    <span class="text-[10px] font-black px-2.5 py-0.5 rounded-full whitespace-nowrap shrink-0"
-                                        :class="'badge-' + meal.type">
-                                        {{ getMealLabel(meal.type) }}
-                                    </span>
-                                    <span class="text-sm font-black text-slate-800 truncate min-w-0">
-                                        {{ meal.name || '未命名餐點' }}
-                                    </span>
-                                </div>
-                                <!-- 第一行：熱量 + 份量（各佔兩端，不換行） -->
-                                <div class="flex items-center justify-between mb-1">
-                                    <span class="text-xs font-black text-emerald-600">{{ formatNum(meal.calories) }} <span class="font-bold opacity-70">kcal</span></span>
-                                    <span class="text-[11px] font-bold text-blue-500 shrink-0">{{ meal.amount }}{{ meal.unit || '份' }}</span>
-                                </div>
-                                <!-- 第二行：三大營養素 -->
-                                <div class="flex items-center gap-2.5">
-                                    <span class="text-[11px] font-bold text-slate-400">碳 {{ formatNum(meal.carbs) }}g</span>
-                                    <span class="text-[11px] font-bold text-slate-400">蛋 {{ formatNum(meal.protein) }}g</span>
-                                    <span class="text-[11px] font-bold text-slate-400">脂 {{ formatNum(meal.fat) }}g</span>
-                                </div>
-                            </div>
-                            <!-- 操作按鈕 -->
-                            <div v-if="editingIndex !== index" class="absolute top-3 right-3 flex gap-0.5">
-                                <button @click="startEdit(index)"
-                                    class="w-8 h-8 flex items-center justify-center rounded-xl text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 active:scale-90 transition-all">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                </button>
-                                <button @click="confirmDelete(index)"
-                                    class="w-8 h-8 flex items-center justify-center rounded-xl text-slate-300 hover:text-rose-500 hover:bg-rose-50 active:scale-90 transition-all">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                </button>
-                            </div>
+                                        <!-- 顯示模式 -->
+                                        <div v-if="editingIndex !== meal.originalIndex" class="p-3.5 pr-[4.75rem]">
+                                            <div class="flex items-center gap-2 mb-2 min-w-0">
+                                                <span class="text-sm font-black text-slate-800 truncate min-w-0">
+                                                    {{ meal.name || '未命名餐點' }}
+                                                </span>
+                                            </div>
+                                            <!-- 第一行：份量 | 熱量: xxx Kcal -->
+                                            <div class="flex items-center text-xs font-black mb-1.5">
+                                                <span class="text-blue-500">{{ meal.amount }}{{ meal.unit || '份' }}</span>
+                                                <span class="mx-2 text-slate-300">|</span>
+                                                <span class="text-emerald-600">熱量: {{ formatNum(meal.calories) }} Kcal</span>
+                                            </div>
+                                            <!-- 第二行：三大營養素 -->
+                                            <div class="flex items-center gap-2.5">
+                                                <span class="text-[11px] font-bold text-slate-400">碳 {{ formatNum(meal.carbs) }}g</span>
+                                                <span class="text-[11px] font-bold text-slate-400">蛋 {{ formatNum(meal.protein) }}g</span>
+                                                <span class="text-[11px] font-bold text-slate-400">脂 {{ formatNum(meal.fat) }}g</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- 操作按鈕 -->
+                                        <div v-if="editingIndex !== meal.originalIndex" class="absolute top-3 right-3 flex gap-0.5">
+                                            <button @click="startEdit(meal.originalIndex)"
+                                                class="w-8 h-8 flex items-center justify-center rounded-xl text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 active:scale-90 transition-all">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                            </button>
+                                            <button @click="confirmDelete(meal.originalIndex)"
+                                                class="w-8 h-8 flex items-center justify-center rounded-xl text-slate-300 hover:text-rose-500 hover:bg-rose-50 active:scale-90 transition-all">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            </button>
+                                        </div>
 
-                            <!-- 編輯模式 -->
-                            <div v-if="editingIndex === index" class="p-4 space-y-3">
-                                <div class="flex gap-2">
-                                    <select v-model="meal.type"
-                                        class="bg-white rounded-xl px-3 py-2.5 text-xs font-black border border-slate-200 outline-none focus:ring-2 focus:ring-emerald-400">
-                                        <option value="breakfast">🌅 早餐</option>
-                                        <option value="lunch">☀️ 午餐</option>
-                                        <option value="dinner">🌙 晚餐</option>
-                                        <option value="snack">🍰 點心</option>
-                                    </select>
-                                    <input v-model="meal.name"
-                                        class="flex-1 px-3 py-2.5 bg-white rounded-xl border border-slate-200 text-sm font-bold outline-none focus:ring-2 focus:ring-emerald-400"
-                                        placeholder="餐點名稱">
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <div class="flex-1 flex items-center gap-2 bg-white rounded-xl border border-slate-200 px-3 py-2.5">
-                                        <span class="text-xs font-black text-slate-400 whitespace-nowrap shrink-0">份量</span>
-                                        <input type="number" v-model.number="meal.amount" @focus="lastAmount = meal.amount" @input="scaleNutrients(meal)"
-                                            class="w-full text-sm font-black outline-none text-right" step="any">
+                                        <!-- 編輯模式 -->
+                                        <div v-if="editingIndex === meal.originalIndex" class="p-4 space-y-3">
+                                            <div class="flex gap-2">
+                                                <select v-model="allData[selectedDate].meals[meal.originalIndex].type"
+                                                    class="bg-white rounded-xl px-3 py-2.5 text-xs font-black border border-slate-200 outline-none focus:ring-2 focus:ring-emerald-400">
+                                                    <option value="breakfast">🌅 早餐</option>
+                                                    <option value="lunch">☀️ 午餐</option>
+                                                    <option value="dinner">🌙 晚餐</option>
+                                                    <option value="snack">🍰 點心</option>
+                                                </select>
+                                                <input v-model="allData[selectedDate].meals[meal.originalIndex].name"
+                                                    class="flex-1 px-3 py-2.5 bg-white rounded-xl border border-slate-200 text-sm font-bold outline-none focus:ring-2 focus:ring-emerald-400"
+                                                    placeholder="餐點名稱">
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <div class="flex-1 flex items-center gap-2 bg-white rounded-xl border border-slate-200 px-3 py-2.5">
+                                                    <span class="text-xs font-black text-slate-400 whitespace-nowrap shrink-0">份量</span>
+                                                    <input type="number" v-model.number="allData[selectedDate].meals[meal.originalIndex].amount" @focus="lastAmount = allData[selectedDate].meals[meal.originalIndex].amount" @input="scaleNutrients(allData[selectedDate].meals[meal.originalIndex])"
+                                                        class="w-full text-sm font-black outline-none text-right" step="any">
+                                                </div>
+                                                <select v-model="allData[selectedDate].meals[meal.originalIndex].unit"
+                                                    class="bg-white rounded-xl px-3 py-2.5 text-xs font-black border border-slate-200 outline-none">
+                                                    <option value="份">份</option>
+                                                    <option value="g">g</option>
+                                                    <option value="ml">ml</option>
+                                                </select>
+                                            </div>
+                                            <div class="grid grid-cols-2 gap-2">
+                                                <div v-for="n in [{key:'calories', label:'熱量 (kcal)'}, {key:'carbs', label:'碳水 (g)'}, {key:'protein', label:'蛋白質 (g)'}, {key:'fat', label:'脂肪 (g)'}]"
+                                                    :key="n.key" class="space-y-1">
+                                                    <label class="text-[10px] text-slate-400 font-black block pl-1">{{ n.label }}</label>
+                                                    <input type="number" v-model.number="allData[selectedDate].meals[meal.originalIndex][n.key]"
+                                                        class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl font-black text-center text-sm outline-none focus:ring-2 focus:ring-emerald-400">
+                                                </div>
+                                            </div>
+                                            <div class="flex gap-2 pt-1">
+                                                <button @click="cancelEdit"
+                                                    class="w-1/3 py-3 bg-slate-100 text-slate-600 rounded-xl text-sm font-black hover:bg-slate-200 transition-all">取消</button>
+                                                <button @click="saveMeal"
+                                                    class="flex-1 py-3 bg-emerald-600 text-white rounded-xl text-sm font-black shadow-md hover:bg-emerald-700 transition-all">儲存</button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <select v-model="meal.unit"
-                                        class="bg-white rounded-xl px-3 py-2.5 text-xs font-black border border-slate-200 outline-none">
-                                        <option value="份">份</option>
-                                        <option value="g">g</option>
-                                        <option value="ml">ml</option>
-                                    </select>
-                                </div>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <div v-for="n in [{key:'calories', label:'熱量 (kcal)'}, {key:'carbs', label:'碳水 (g)'}, {key:'protein', label:'蛋白質 (g)'}, {key:'fat', label:'脂肪 (g)'}]"
-                                        :key="n.key" class="space-y-1">
-                                        <label class="text-[10px] text-slate-400 font-black block pl-1">{{ n.label }}</label>
-                                        <input type="number" v-model.number="meal[n.key]"
-                                            class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl font-black text-center text-sm outline-none focus:ring-2 focus:ring-emerald-400">
-                                    </div>
-                                </div>
-                                <div class="flex gap-2 pt-1">
-                                    <button @click="cancelEdit"
-                                        class="w-1/3 py-3 bg-slate-100 text-slate-600 rounded-xl text-sm font-black hover:bg-slate-200 transition-all">取消</button>
-                                    <button @click="saveMeal"
-                                        class="flex-1 py-3 bg-emerald-600 text-white rounded-xl text-sm font-black shadow-md hover:bg-emerald-700 transition-all">儲存</button>
                                 </div>
                             </div>
                         </div>
@@ -797,6 +804,19 @@
                 const getPlanLabel = (key) => {
                     const map = { high: '💪 高碳日', med: '🥗 中碳日', low: '🔥 低碳日', rest: '🧘 自由日' };
                     return map[key];
+                };
+
+                const mealTypes = [
+                    { key: 'breakfast', label: '🌅 早餐' },
+                    { key: 'lunch', label: '☀️ 午餐' },
+                    { key: 'dinner', label: '🌙 晚餐' },
+                    { key: 'snack', label: '🍰 點心' }
+                ];
+
+                const getMealsByType = (type) => {
+                    return (allData[selectedDate.value]?.meals || [])
+                        .map((meal, index) => ({ ...meal, originalIndex: index }))
+                        .filter(m => m.type === type);
                 };
 
                 const calendarDays = computed(() => {
