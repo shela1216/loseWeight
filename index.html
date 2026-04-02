@@ -1021,6 +1021,7 @@
                         d.setDate(d.getDate() + (dir * 7));
                         selectedDate.value = d.toLocaleDateString('sv-SE');
                     },
+                    mealTypes, getMealsByType,
                     addMeal, startEdit, cancelEdit, saveMeal,
                     addFromHistory,
                     confirmDelete: (i) => { mealToDelete.value = i; },
