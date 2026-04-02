@@ -330,29 +330,10 @@
                         </button>
                     </div>
 
-                    <!-- 熱量主區塊：左(目標) + 中(彩色圓環) + 右(已攝取) -->
-                    <div class="flex items-center justify-between gap-2 mb-5">
-
-                        <!-- 左：目標熱量 -->
-                        <div class="flex-1 text-center">
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-2"
-                                :class="{
-                                    'bg-amber-100 text-amber-500':  currentDayRecord.planType === 'high',
-                                    'bg-teal-100 text-teal-600':    currentDayRecord.planType === 'med',
-                                    'bg-violet-100 text-violet-500':currentDayRecord.planType === 'low',
-                                    'bg-sky-100 text-sky-500':      currentDayRecord.planType === 'rest'
-                                }">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm0-4a6 6 0 100-12 6 6 0 000 12zm0-2a2 2 0 100-4 2 2 0 000 4z"></path>
-                                </svg>
-                            </div>
-                            <div class="text-xs font-bold text-slate-400 mb-1">目標值</div>
-                            <div class="text-2xl sm:text-3xl font-black text-slate-800 leading-none">{{ currentPlan.calories }}</div>
-                            <div class="text-xs font-bold text-slate-400 mt-1">kcal</div>
-                        </div>
-
-                        <!-- 中：計畫顏色圓環 -->
-                        <div class="relative shrink-0 w-[120px] h-[120px] sm:w-[140px] sm:h-[140px]">
+                    <!-- 熱量主區塊：左(放大圓環) + 右(上下並排 目標/已攝取) -->
+                    <div class="flex items-center gap-6 mb-6">
+                        <!-- 左：計畫顏色大圓環 -->
+                        <div class="relative shrink-0 w-[140px] h-[140px] sm:w-[160px] sm:h-[160px]">
                             <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
                                 <!-- 底部軌道（淡色） -->
                                 <circle cx="50" cy="50" r="38" fill="none" stroke-width="7"
@@ -368,29 +349,58 @@
                             <!-- 圓環中央文字 -->
                             <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
                                 <div class="text-xs font-bold text-slate-400 leading-tight">{{ getGap('calories') >= 0 ? '還可以吃' : '已超出' }}</div>
-                                <div class="font-black leading-none my-1 text-slate-800" style="font-size:clamp(1.4rem,6vw,1.8rem)">
+                                <div class="font-black leading-none my-1 text-slate-800" style="font-size:clamp(1.6rem,7vw,2rem)">
                                     {{ formatNum(Math.abs(getGap('calories'))) }}
                                 </div>
                                 <div class="text-xs font-bold text-slate-400">kcal</div>
                             </div>
                         </div>
 
-                        <!-- 右：已攝取 -->
-                        <div class="flex-1 text-center">
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-2"
-                                :class="{
-                                    'bg-amber-100 text-amber-500':  currentDayRecord.planType === 'high',
-                                    'bg-teal-100 text-teal-600':    currentDayRecord.planType === 'med',
-                                    'bg-violet-100 text-violet-500':currentDayRecord.planType === 'low',
-                                    'bg-sky-100 text-sky-500':      currentDayRecord.planType === 'rest'
-                                }">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                                    <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path>
-                                </svg>
+                        <!-- 右：目標值 與 已攝取 (上下疊放) -->
+                        <div class="flex-1 flex flex-col justify-center gap-4">
+                            <!-- 目標值 -->
+                            <div class="flex flex-col">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                                        :class="{
+                                            'bg-amber-100 text-amber-500':  currentDayRecord.planType === 'high',
+                                            'bg-teal-100 text-teal-600':    currentDayRecord.planType === 'med',
+                                            'bg-violet-100 text-violet-500':currentDayRecord.planType === 'low',
+                                            'bg-sky-100 text-sky-500':      currentDayRecord.planType === 'rest'
+                                        }">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm0-4a6 6 0 100-12 6 6 0 000 12zm0-2a2 2 0 100-4 2 2 0 000 4z"></path>
+                                        </svg>
+                                    </div>
+                                    <span class="text-xs font-bold text-slate-400">目標值</span>
+                                </div>
+                                <div class="flex items-baseline gap-1 pl-9">
+                                    <span class="text-xl font-black text-slate-800 leading-none">{{ currentPlan.calories }}</span>
+                                    <span class="text-[10px] font-bold text-slate-400">kcal</span>
+                                </div>
                             </div>
-                            <div class="text-xs font-bold text-slate-400 mb-1">已攝取</div>
-                            <div class="text-2xl sm:text-3xl font-black text-slate-800 leading-none">{{ formatNum(getDailySum('calories')) }}</div>
-                            <div class="text-xs font-bold text-slate-400 mt-1">kcal</div>
+
+                            <!-- 已攝取 -->
+                            <div class="flex flex-col">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                                        :class="{
+                                            'bg-amber-100 text-amber-500':  currentDayRecord.planType === 'high',
+                                            'bg-teal-100 text-teal-600':    currentDayRecord.planType === 'med',
+                                            'bg-violet-100 text-violet-500':currentDayRecord.planType === 'low',
+                                            'bg-sky-100 text-sky-500':      currentDayRecord.planType === 'rest'
+                                        }">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                            <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path>
+                                        </svg>
+                                    </div>
+                                    <span class="text-xs font-bold text-slate-400">已攝取</span>
+                                </div>
+                                <div class="flex items-baseline gap-1 pl-9">
+                                    <span class="text-xl font-black text-slate-800 leading-none">{{ formatNum(getDailySum('calories')) }}</span>
+                                    <span class="text-[10px] font-bold text-slate-400">kcal</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
