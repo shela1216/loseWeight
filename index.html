@@ -312,12 +312,16 @@
                                         </span>
                                     </div>
                                     <!-- 營養數據 -->
-                                    <div class="text-[10px] text-slate-500 font-bold">
-                                        <span class="text-emerald-600">熱量: {{ formatNum(meal.calories) }}kcal ({{ meal.amount }}{{ meal.unit || '份' }})</span>
-                                        <span class="mx-1 opacity-20">|</span>
-                                        <span class="text-slate-400">碳水:{{ formatNum(meal.carbs) }}<span
-                                                class="mx-1 opacity-20">|</span> 蛋白質:{{formatNum(meal.protein) }}<span
-                                                class="mx-1 opacity-20">|</span> 脂肪:{{ formatNum(meal.fat) }}</span>
+                                    <div class="text-[10px] font-bold flex flex-wrap items-center gap-y-1">
+                                        <span class="text-blue-600">{{ meal.amount }}{{ meal.unit || '份' }}</span>
+                                        <span class="mx-1 text-slate-300">|</span>
+                                        <span class="text-emerald-600">熱量: {{ formatNum(meal.calories) }}kcal</span>
+                                        <span class="mx-1 text-slate-300">|</span>
+                                        <span class="text-slate-400">碳水:{{ formatNum(meal.carbs) }}</span>
+                                        <span class="mx-1 text-slate-300">|</span>
+                                        <span class="text-slate-400">蛋白質:{{formatNum(meal.protein) }}</span>
+                                        <span class="mx-1 text-slate-300">|</span>
+                                        <span class="text-slate-400">脂肪:{{ formatNum(meal.fat) }}</span>
                                     </div>
                                 </div>
 
@@ -418,8 +422,12 @@
                                     <span class="font-black text-slate-700 text-sm">{{ item.name }}</span>
                                     <span class="text-[9px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full font-bold whitespace-nowrap">{{ item.count }}次</span>
                                 </div>
-                                <p class="text-[10px] text-slate-400 font-bold">
-                                    {{ formatNum(item.calories) }}kcal ({{ item.amount }}{{ item.unit || '份' }}) | C:{{ formatNum(item.carbs) }} P:{{ formatNum(item.protein) }} F:{{ formatNum(item.fat) }}
+                                <p class="text-[10px] font-bold flex items-center gap-1">
+                                    <span class="text-blue-600">{{ item.amount }}{{ item.unit || '份' }}</span>
+                                    <span class="text-slate-300">|</span>
+                                    <span class="text-emerald-600">熱量: {{ formatNum(item.calories) }}kcal</span>
+                                    <span class="text-slate-300">|</span>
+                                    <span class="text-slate-400">C:{{ formatNum(item.carbs) }} P:{{ formatNum(item.protein) }} F:{{ formatNum(item.fat) }}</span>
                                 </p>
                             </div>
                             <div class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
