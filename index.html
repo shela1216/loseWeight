@@ -330,9 +330,9 @@
                         </button>
                     </div>
 
-                    <!-- 熱量主區塊：左(放大圓環) + 右(上下並排 目標/已攝取) -->
-                    <div class="flex items-center gap-6 mb-6">
-                        <!-- 左：計畫顏色大圓環 -->
+                    <!-- 熱量主區塊：上(進度圈) + 下(目標/已攝取並排) @小螢幕 | 左(進度圈) + 右(目標/已攝取垂直) @大螢幕 -->
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-12 mb-8">
+                        <!-- 進度圈 -->
                         <div class="relative shrink-0 w-[140px] h-[140px] sm:w-[160px] sm:h-[160px]">
                             <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
                                 <!-- 底部軌道（淡色） -->
@@ -356,11 +356,11 @@
                             </div>
                         </div>
 
-                        <!-- 右：目標值 與 已攝取 (上下疊放) -->
-                        <div class="flex-1 flex flex-col justify-center gap-4">
+                        <!-- 目標值 與 已攝取 -->
+                        <div class="flex flex-row sm:flex-col justify-center gap-8 sm:gap-5 w-full sm:w-auto">
                             <!-- 目標值 -->
-                            <div class="flex flex-col">
-                                <div class="flex items-center gap-2 mb-1">
+                            <div class="flex flex-col items-center sm:items-start">
+                                <div class="flex items-center gap-2 mb-1.5">
                                     <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
                                         :class="{
                                             'bg-amber-100 text-amber-500':  currentDayRecord.planType === 'high',
@@ -374,15 +374,15 @@
                                     </div>
                                     <span class="text-xs font-bold text-slate-400">目標值</span>
                                 </div>
-                                <div class="flex items-baseline gap-1 pl-9">
-                                    <span class="text-xl font-black text-slate-800 leading-none">{{ currentPlan.calories }}</span>
-                                    <span class="text-[10px] font-bold text-slate-400">kcal</span>
+                                <div class="flex items-baseline gap-1">
+                                    <span class="text-2xl font-black text-slate-800 leading-none">{{ currentPlan.calories }}</span>
+                                    <span class="text-xs font-bold text-slate-400">kcal</span>
                                 </div>
                             </div>
 
                             <!-- 已攝取 -->
-                            <div class="flex flex-col">
-                                <div class="flex items-center gap-2 mb-1">
+                            <div class="flex flex-col items-center sm:items-start">
+                                <div class="flex items-center gap-2 mb-1.5">
                                     <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
                                         :class="{
                                             'bg-amber-100 text-amber-500':  currentDayRecord.planType === 'high',
@@ -396,9 +396,9 @@
                                     </div>
                                     <span class="text-xs font-bold text-slate-400">已攝取</span>
                                 </div>
-                                <div class="flex items-baseline gap-1 pl-9">
-                                    <span class="text-xl font-black text-slate-800 leading-none">{{ formatNum(getDailySum('calories')) }}</span>
-                                    <span class="text-[10px] font-bold text-slate-400">kcal</span>
+                                <div class="flex items-baseline gap-1">
+                                    <span class="text-2xl font-black text-slate-800 leading-none">{{ formatNum(getDailySum('calories')) }}</span>
+                                    <span class="text-xs font-bold text-slate-400">kcal</span>
                                 </div>
                             </div>
                         </div>
