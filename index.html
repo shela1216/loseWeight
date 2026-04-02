@@ -334,18 +334,41 @@
 
                     <!-- 三大營養素 -->
                     <div class="grid grid-cols-3 gap-4 pt-4 border-t border-slate-100">
-                        <div v-for="n in nutrientKeys" :key="n.key" class="text-center min-w-0">
-                            <div class="text-[11px] font-bold text-slate-400 mb-2 truncate">{{ n.label }}</div>
+                        <div v-for="n in nutrientKeys" :key="n.key" class="min-w-0">
+                            <!-- 標題 -->
+                            <div class="text-[11px] font-bold text-slate-400 mb-2 truncate text-center">{{ n.label }}</div>
+                            
+                            <!-- 數值顯示 (已攝取與目標) -->
+                            <div class="flex flex-col items-center gap-1 mb-2">
+                                <div class="flex items-center gap-1">
+                                    <svg class="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                        <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path>
+                                    </svg>
+                                    <span class="text-[11px] font-black text-slate-700">{{ formatNum(getDailySum(n.key)) }}<span class="ml-0.5 text-[9px] text-slate-400 font-bold">g</span></span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <svg class="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm0-4a6 6 0 100-12 6 6 0 000 12zm0-2a2 2 0 100-4 2 2 0 000 4z"></path>
+                                    </svg>
+                                    <span class="text-[11px] font-bold text-slate-400">{{ currentPlan[n.key] }}<span class="ml-0.5 text-[9px] opacity-70">g</span></span>
+                                </div>
+                            </div>
+
+                            <!-- 進度條 -->
                             <div class="bg-slate-100 rounded-full overflow-hidden h-1.5 mb-2.5">
                                 <div class="h-full rounded-full transition-all duration-500"
                                     :class="n.key === 'carbs' ? 'bg-amber-400' : n.key === 'protein' ? 'bg-sky-400' : 'bg-emerald-400'"
                                     :style="{ width: Math.min((getDailySum(n.key) / (currentPlan[n.key] || 1)) * 100, 100) + '%' }">
                                 </div>
                             </div>
-                            <div class="text-[11px] font-bold text-slate-500 leading-none">{{ getGap(n.key) >= 0 ? '還差' : '超出' }}</div>
-                            <div class="text-sm font-black mt-0.5"
-                                :class="getGap(n.key) < 0 ? 'text-rose-500' : 'text-slate-700'">
-                                {{ formatNum(Math.abs(getGap(n.key))) }}<span class="text-[10px] font-bold text-slate-400"> g</span>
+
+                            <!-- 剩/超 徽章 -->
+                            <div class="text-center">
+                                <div class="text-[10px] font-bold text-slate-400 leading-none mb-1">{{ getGap(n.key) >= 0 ? '還差' : '超出' }}</div>
+                                <div class="text-xs font-black"
+                                    :class="getGap(n.key) < 0 ? 'text-rose-500' : 'text-slate-700'">
+                                    {{ formatNum(Math.abs(getGap(n.key))) }}<span class="text-[9px] font-bold text-slate-400"> g</span>
+                                </div>
                             </div>
                         </div>
                     </div>
