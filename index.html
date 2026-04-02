@@ -288,19 +288,32 @@
                             </div>
                         </div>
 
-                        <!-- 三大營養素 -->
-                        <div class="grid grid-cols-3 gap-2">
+                        <!-- 三大營養素：小螢幕一行一欄，桌機三欄 -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                             <div v-for="n in nutrientKeys" :key="n.key"
-                                class="bg-white/15 backdrop-blur-sm rounded-2xl p-2.5 border border-white/10 min-w-0">
-                                <div class="nutrient-label text-white/80 mb-1.5">{{ n.label }}</div>
-                                <!-- 當前值獨立一行，目標值換行以防溢出 -->
-                                <div class="font-black text-white leading-tight" style="font-size:clamp(0.8rem,3.5vw,0.875rem)">{{ formatNum(getDailySum(n.key)) }}</div>
-                                <div class="text-[10px] font-bold opacity-55 text-white">/{{ currentPlan[n.key] }}g</div>
-                                <div class="bg-white/20 rounded-full overflow-hidden h-1.5 mt-2">
-                                    <div class="h-full bg-white/80 rounded-full transition-all duration-500"
-                                        :style="{ width: Math.min((getDailySum(n.key) / currentPlan[n.key]) * 100, 100) + '%' }"></div>
+                                class="bg-white/15 backdrop-blur-sm rounded-2xl border border-white/10 min-w-0
+                                       flex items-center gap-2.5 px-3 py-2.5
+                                       sm:flex-col sm:items-stretch sm:px-2.5 sm:py-2.5">
+
+                                <!-- 標籤：手機固定寬度靠左，桌機全寬 -->
+                                <span class="nutrient-label text-white/80 shrink-0 w-12 sm:w-auto sm:mb-1">{{ n.label }}</span>
+
+                                <!-- 數值 + 目標：手機同行，桌機兩行 -->
+                                <div class="shrink-0">
+                                    <span class="font-black text-white" style="font-size:clamp(0.8rem,4vw,0.9rem)">{{ formatNum(getDailySum(n.key)) }}</span><span class="text-[10px] font-bold opacity-55 text-white sm:hidden"> /{{ currentPlan[n.key] }}g</span>
+                                    <div class="text-[10px] font-bold opacity-55 text-white hidden sm:block">/{{ currentPlan[n.key] }}g</div>
                                 </div>
-                                <div class="mt-1.5 text-[10px] font-black px-1 py-0.5 rounded-full text-center w-full truncate"
+
+                                <!-- 進度條：手機 flex-1 佔剩餘空間，桌機全寬 -->
+                                <div class="flex-1 min-w-0 sm:flex-none sm:mt-2">
+                                    <div class="bg-white/20 rounded-full overflow-hidden h-1.5">
+                                        <div class="h-full bg-white/80 rounded-full transition-all duration-500"
+                                            :style="{ width: Math.min((getDailySum(n.key) / currentPlan[n.key]) * 100, 100) + '%' }"></div>
+                                    </div>
+                                </div>
+
+                                <!-- 剩/超 徽章：手機靠右固定，桌機全寬置中 -->
+                                <div class="text-[10px] font-black px-2 py-0.5 rounded-full shrink-0 whitespace-nowrap sm:mt-1.5 sm:text-center sm:w-full"
                                     :class="getGap(n.key) < 0 ? 'bg-rose-500/80 text-white' : 'bg-emerald-500/60 text-white'">
                                     {{ getGap(n.key) >= 0 ? '剩' + formatNum(getGap(n.key)) : '超' + formatNum(Math.abs(getGap(n.key))) }}g
                                 </div>
