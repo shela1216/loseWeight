@@ -186,11 +186,10 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M15 19l-7-7 7-7"></path>
                             </svg></button>
-                        <div class="relative date-input-wrapper cursor-pointer group">
+                        <div class="relative date-input-wrapper cursor-pointer group" @click="openMonthPicker">
                             <h2
                                 class="text-sm font-black text-slate-700 group-hover:text-emerald-600 transition-colors">
                                 {{ currentMonthYearDisplay }}</h2>
-                            <input type="date" v-model="selectedDate" class="absolute inset-0 opacity-0 cursor-pointer">
                         </div>
                         <button @click="changeWeek(1)" class="p-1 text-slate-400 hover:text-emerald-600"><svg
                                 class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -310,12 +309,11 @@
                                         <!-- 餐點名稱：行動端獨立一行 -->
                                         <span class="text-sm font-black text-slate-800 truncate block">
                                             {{ meal.name || '未命名餐點' }}
-                                            <span class="text-xs text-slate-500 font-bold ml-1">({{ meal.amount }}{{ meal.unit || '份' }})</span>
                                         </span>
                                     </div>
                                     <!-- 營養數據 -->
                                     <div class="text-[10px] text-slate-500 font-bold">
-                                        <span class="text-emerald-600">熱量: {{ formatNum(meal.calories) }}kcal</span>
+                                        <span class="text-emerald-600">熱量: {{ formatNum(meal.calories) }}kcal ({{ meal.amount }}{{ meal.unit || '份' }})</span>
                                         <span class="mx-1 opacity-20">|</span>
                                         <span class="text-slate-400">碳水:{{ formatNum(meal.carbs) }}<span
                                                 class="mx-1 opacity-20">|</span> 蛋白質:{{formatNum(meal.protein) }}<span
@@ -418,11 +416,10 @@
                             <div class="flex-1 mr-4">
                                 <div class="flex items-center gap-2 mb-1">
                                     <span class="font-black text-slate-700 text-sm">{{ item.name }}</span>
-                                    <span v-if="item.amount && item.amount !== 1" class="text-[9px] text-slate-400 font-bold">({{ item.amount }})</span>
                                     <span class="text-[9px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full font-bold whitespace-nowrap">{{ item.count }}次</span>
                                 </div>
                                 <p class="text-[10px] text-slate-400 font-bold">
-                                    {{ formatNum(item.calories) }}kcal | C:{{ formatNum(item.carbs) }} P:{{ formatNum(item.protein) }} F:{{ formatNum(item.fat) }}
+                                    {{ formatNum(item.calories) }}kcal ({{ item.amount }}{{ item.unit || '份' }}) | C:{{ formatNum(item.carbs) }} P:{{ formatNum(item.protein) }} F:{{ formatNum(item.fat) }}
                                 </p>
                             </div>
                             <div class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -544,6 +541,43 @@
                 <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div> 同步中
             </div>
         </div>
+
+        <!-- 月份選擇 Modal -->
+        <div v-if="showMonthPicker" class="fixed inset-0 z-[80] flex items-center justify-center p-4">
+            <div class="modal-overlay absolute inset-0" @click="showMonthPicker = false"></div>
+            <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-6 relative z-10 shadow-2xl">
+                <div class="flex justify-between items-center mb-6">
+                    <button @click="changePickerMonth(-1)" class="p-2 text-slate-400 hover:text-emerald-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <h3 class="text-base font-black text-slate-800">
+                        {{ pickerMonth.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long' }) }}
+                    </h3>
+                    <button @click="changePickerMonth(1)" class="p-2 text-slate-400 hover:text-emerald-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-7 gap-1 mb-2">
+                    <div v-for="d in ['一','二','三','四','五','六','日']" class="text-[10px] font-black text-slate-300 text-center py-2">{{ d }}</div>
+                </div>
+
+                <div class="grid grid-cols-7 gap-1">
+                    <div v-for="day in calendarDays" :key="day.date" 
+                         @click="selectDateFromPicker(day.date)"
+                         class="aspect-square flex flex-col items-center justify-center rounded-xl cursor-pointer transition-all relative"
+                         :class="[
+                            day.currentMonth ? 'text-slate-700' : 'text-slate-300',
+                            selectedDate === day.date ? 'bg-emerald-50 ring-1 ring-emerald-500/20' : 'hover:bg-slate-50'
+                         ]">
+                        <span class="text-xs font-black">{{ day.dayNum }}</span>
+                        <div class="h-1 w-1 rounded-full mt-1" :class="getDayDotClass(day.date)"></div>
+                    </div>
+                </div>
+
+                <button @click="showMonthPicker = false" class="w-full mt-6 py-3 bg-slate-100 text-slate-500 rounded-2xl font-black text-xs">關閉</button>
+            </div>
+        </div>
     </div>
     <script>
 
@@ -574,8 +608,10 @@
                 const saving = ref(false);
                 const showSettings = ref(false);
                 const showHistory = ref(false);
+                const showMonthPicker = ref(false);
                 const historySearch = ref('');
                 const selectedDate = ref(new Date().toLocaleDateString('sv-SE'));
+                const pickerMonth = ref(new Date()); // 用於月份選擇器的顯示月份
                 const loginEmail = ref('');
                 const loginPassword = ref('');
 
@@ -714,6 +750,48 @@
                 const getPlanLabel = (key) => {
                     const map = { high: '💪 高碳日', med: '🥗 中碳日', low: '🔥 低碳日', rest: '🧘 自由日' };
                     return map[key];
+                };
+
+                const calendarDays = computed(() => {
+                    const year = pickerMonth.value.getFullYear();
+                    const month = pickerMonth.value.getMonth();
+                    const firstDay = new Date(year, month, 1);
+                    const lastDay = new Date(year, month + 1, 0);
+                    
+                    let startDay = firstDay.getDay();
+                    if (startDay === 0) startDay = 7; 
+                    startDay -= 1;
+
+                    const days = [];
+                    const prevMonthLastDay = new Date(year, month, 0).getDate();
+                    for (let i = startDay - 1; i >= 0; i--) {
+                        const d = new Date(year, month - 1, prevMonthLastDay - i);
+                        days.push({ date: d.toLocaleDateString('sv-SE'), dayNum: d.getDate(), currentMonth: false });
+                    }
+                    for (let i = 1; i <= lastDay.getDate(); i++) {
+                        const d = new Date(year, month, i);
+                        days.push({ date: d.toLocaleDateString('sv-SE'), dayNum: i, currentMonth: true });
+                    }
+                    const remaining = 42 - days.length;
+                    for (let i = 1; i <= remaining; i++) {
+                        const d = new Date(year, month + 1, i);
+                        days.push({ date: d.toLocaleDateString('sv-SE'), dayNum: i, currentMonth: false });
+                    }
+                    return days;
+                });
+
+                const changePickerMonth = (dir) => {
+                    pickerMonth.value = new Date(pickerMonth.value.getFullYear(), pickerMonth.value.getMonth() + dir, 1);
+                };
+
+                const selectDateFromPicker = (date) => {
+                    selectedDate.value = date;
+                    showMonthPicker.value = false;
+                };
+
+                const openMonthPicker = () => {
+                    pickerMonth.value = new Date(selectedDate.value);
+                    showMonthPicker.value = true;
                 };
 
                 const initApp = async () => {
@@ -855,51 +933,14 @@
                 onMounted(initApp);
 
                 return {
-                    initialized, user, saving, showSettings, showHistory, historySearch, selectedDate, loginEmail, loginPassword,
+                    initialized, user, saving, showSettings, showHistory, showMonthPicker, historySearch, selectedDate, pickerMonth, loginEmail, loginPassword,
                     editingIndex, mealToDelete, nutrientKeys, profile, plans, allData, mealHistory,
                     weekDays, currentMonthYearDisplay, calculatedTDEE, formatNum, scaleNutrients, lastAmount,
+                    calendarDays, changePickerMonth, selectDateFromPicker, openMonthPicker,
                     currentDayRecord: computed(() => {
                         if (!allData[selectedDate.value]) { allData[selectedDate.value] = { planType: 'med', meals: [] }; }
                         return allData[selectedDate.value];
                     }),
-                    currentPlan: computed(() => plans[allData[selectedDate.value]?.planType] || plans.med),
-                    getDayDotClass, getMealLabel, getPlanLabel,
-                    getDailySum: (type) => (allData[selectedDate.value]?.meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0),
-                    getGap: (type) => {
-                        const plan = plans[allData[selectedDate.value]?.planType] || plans.med;
-                        const sum = (allData[selectedDate.value]?.meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0);
-                        return Math.round(plan[type] - sum);
-                    },
-                    changeWeek: (dir) => {
-                        const d = new Date(selectedDate.value);
-                        d.setDate(d.getDate() + (dir * 7));
-                        selectedDate.value = d.toLocaleDateString('sv-SE');
-                    },
-                    addMeal, startEdit, cancelEdit, saveMeal,
-                    addFromHistory,
-                    confirmDelete: (i) => { mealToDelete.value = i; },
-                    executeDelete: () => {
-                        allData[selectedDate.value].meals.splice(mealToDelete.value, 1);
-                        mealToDelete.value = null;
-                        saveData();
-                    },
-                    autoCalculatePlans, exportCSV, saveData,
-                    handleAuth: async (mode) => {
-                        try {
-                            mode === 'login'
-                                ? await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value)
-                                : await createUserWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
-                        } catch (e) { alert('驗證失敗'); }
-                    },
-                    handleAnonymous: () => signInAnonymously(auth),
-                    handleLogout: () => signOut(auth)
-                };
-            }
-        }).mount('#app');
-    </script>
-</body>
-
-</html>
                     currentPlan: computed(() => plans[allData[selectedDate.value]?.planType] || plans.med),
                     getDayDotClass, getMealLabel, getPlanLabel,
                     getDailySum: (type) => (allData[selectedDate.value]?.meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0),
