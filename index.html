@@ -566,21 +566,27 @@
                                         <span class="text-xs font-bold text-slate-300 ml-auto uppercase tracking-widest">{{ getMealsByType(typeObj.key).length }} 筆</span>
                                     </div>
                                     <div class="space-y-4">
-                                        <div v-for="meal in getMealsByType(typeObj.key)" :key="meal.originalIndex" class="meal-card rounded-[2rem] border border-slate-50 bg-[#fcfdfe] relative overflow-hidden group">
-                                            <div v-if="editingIndex !== meal.originalIndex" class="p-6 pr-32">
-                                                <div class="flex items-center gap-3 mb-4"><span class="text-xl font-black text-slate-900 break-words leading-tight">{{ meal.name || '未命名餐點' }}</span></div>
-                                                <div class="flex flex-wrap items-center gap-y-3">
-                                                    <div class="flex items-center text-sm font-black mr-6"><span class="text-indigo-500 bg-indigo-50/50 px-3 py-1 rounded-xl mr-3">{{ meal.amount }}{{ meal.unit || '份' }}</span><span class="text-slate-900">{{ formatNum(meal.calories) }} <span class="text-[10px] text-slate-400 uppercase ml-1">kcal</span></span></div>
-                                                    <div class="flex items-center gap-5 border-l border-slate-100 pl-6">
-                                                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">碳水: <span class="text-slate-900 font-black">{{ formatNum(meal.carbs) }}g</span></span>
-                                                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">蛋白: <span class="text-slate-900 font-black">{{ formatNum(meal.protein) }}g</span></span>
-                                                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">脂肪: <span class="text-slate-900 font-black">{{ formatNum(meal.fat) }}g</span></span>
-                                                    </div>
+                                        <div v-for="meal in getMealsByType(typeObj.key)" :key="meal.originalIndex" class="meal-card rounded-3xl border border-slate-100 bg-[#fcfdfe] relative overflow-hidden group">
+                                            <div v-if="editingIndex !== meal.originalIndex" class="p-5 pr-24">
+                                                <div class="flex items-center gap-2 mb-3 min-w-0">
+                                                    <span class="text-lg font-black text-slate-900 break-words min-w-0 leading-tight">{{ meal.name || '未命名餐點' }}</span>
+                                                </div>
+                                                <!-- 第一行：份量 | 熱量 -->
+                                                <div class="flex items-center text-sm font-black mb-2">
+                                                    <span class="text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-lg">{{ meal.amount }}{{ meal.unit || '份' }}</span>
+                                                    <span class="mx-3 text-slate-200">|</span>
+                                                    <span class="text-slate-900">{{ formatNum(meal.calories) }} <span class="text-[10px] text-slate-400 uppercase ml-0.5">kcal</span></span>
+                                                </div>
+                                                <!-- 第二行：三大營養素 -->
+                                                <div class="flex items-center gap-4">
+                                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">碳水: <span class="text-slate-900 font-black">{{ formatNum(meal.carbs) }}g</span></span>
+                                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">蛋白: <span class="text-slate-900 font-black">{{ formatNum(meal.protein) }}g</span></span>
+                                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">脂肪: <span class="text-slate-900 font-black">{{ formatNum(meal.fat) }}g</span></span>
                                                 </div>
                                             </div>
-                                            <div v-if="editingIndex !== meal.originalIndex" class="absolute top-1/2 -translate-y-1/2 right-6 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button @click="startEdit(meal.originalIndex)" class="w-11 h-11 flex items-center justify-center rounded-2xl bg-white shadow-sm border border-slate-100 text-slate-400 hover:text-indigo-600 transition-all"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></button>
-                                                <button @click="confirmDelete(meal.originalIndex)" class="w-11 h-11 flex items-center justify-center rounded-2xl bg-white shadow-sm border border-slate-100 text-slate-300 hover:text-rose-500 transition-all"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                                            <div v-if="editingIndex !== meal.originalIndex" class="absolute top-1/2 -translate-y-1/2 right-4 flex gap-1">
+                                                <button @click="startEdit(meal.originalIndex)" class="w-10 h-10 flex items-center justify-center rounded-2xl text-slate-300 hover:text-indigo-600 hover:bg-white hover:shadow-sm active:scale-90 transition-all"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></button>
+                                                <button @click="confirmDelete(meal.originalIndex)" class="w-10 h-10 flex items-center justify-center rounded-2xl text-slate-200 hover:text-rose-500 hover:bg-white hover:shadow-sm active:scale-90 transition-all"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
                                             </div>
                                             <div v-if="editingIndex === meal.originalIndex" class="p-8 space-y-6 bg-white border-2 border-indigo-500/20 rounded-[2rem]">
                                                 <div class="flex gap-4"><select v-model="editingMeal.type" class="bg-slate-50 rounded-2xl px-5 py-4 text-sm font-black border border-slate-100 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"><option value="breakfast">🌅 早餐</option><option value="lunch">☀️ 午餐</option><option value="dinner">🌙 晚餐</option><option value="snack">🍰 點心</option></select><input v-model="editingMeal.name" class="flex-1 px-5 py-4 bg-slate-50 rounded-2xl border border-slate-100 text-sm font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 focus:bg-white transition-all" placeholder="餐點名稱"></div>
