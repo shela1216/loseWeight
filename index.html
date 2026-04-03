@@ -591,20 +591,6 @@
                                                 <button @click="startEdit(meal.originalIndex)" class="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl sm:rounded-2xl text-slate-300 hover:text-indigo-600 hover:bg-white hover:shadow-sm active:scale-90 transition-all"><svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></button>
                                                 <button @click="confirmDelete(meal.originalIndex)" class="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl sm:rounded-2xl text-slate-200 hover:text-rose-500 hover:bg-white hover:shadow-sm active:scale-90 transition-all"><svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
                                             </div>
-                                            <div v-if="editingIndex === meal.originalIndex" class="p-8 space-y-6 bg-white border-2 border-indigo-500/20 rounded-[2rem]">
-                                                <div class="flex flex-col sm:flex-row gap-4">
-                                                    <select v-model="editingMeal.type" class="w-full sm:w-auto bg-slate-50 rounded-2xl px-5 py-4 text-sm font-black border border-slate-100 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
-                                                        <option value="breakfast">🌅 早餐</option>
-                                                        <option value="lunch">☀️ 午餐</option>
-                                                        <option value="dinner">🌙 晚餐</option>
-                                                        <option value="snack">🍰 點心</option>
-                                                    </select>
-                                                    <textarea v-model="editingMeal.name" class="flex-1 px-5 py-4 bg-slate-50 rounded-2xl border border-slate-100 text-sm font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 focus:bg-white transition-all min-h-[56px] resize-none" placeholder="餐點名稱"></textarea>
-                                                </div>
-                                                <div class="flex items-center gap-4"><div class="flex-1 flex items-center gap-4 bg-slate-50 rounded-2xl border border-slate-100 px-5 py-4 focus-within:ring-4 focus-within:ring-indigo-500/10 focus-within:border-indigo-500 focus-within:bg-white transition-all"><span class="text-xs font-black text-slate-400 uppercase tracking-widest shrink-0">份量</span><input type="number" v-model.number="editingMeal.amount" @focus="prepareScale" @input="scaleNutrients" class="w-full text-lg font-black outline-none text-right bg-transparent" step="any"></div><select v-model="editingMeal.unit" class="bg-slate-50 rounded-2xl px-5 py-4 text-sm font-black border border-slate-100 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"><option value="份">份</option><option value="g">g</option><option value="ml">ml</option></select></div>
-                                                <div class="grid grid-cols-2 gap-4"><div v-for="n in [{key:'calories', label:'熱量 (kcal)'}, {key:'carbs', label:'碳水 (g)'}, {key:'protein', label:'蛋白質 (g)'}, {key:'fat', label:'脂肪 (g)'}]" :key="n.key" class="space-y-2"><label class="text-[10px] sm:text-xs text-slate-400 font-black uppercase tracking-widest block pl-1">{{ n.label }}</label><input type="number" v-model.number="editingMeal[n.key]" class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl font-black text-center text-lg outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 focus:bg-white transition-all"></div></div>
-                                                <div class="flex gap-4 pt-4"><button @click="cancelEdit" class="w-1/3 py-5 bg-slate-100 text-slate-500 rounded-2xl text-sm font-black hover:bg-slate-200 active:scale-95 transition-all">取消</button><button @click="saveMeal()" class="flex-1 py-5 btn-gradient text-white rounded-2xl text-sm font-black shadow-xl shadow-indigo-100 hover:shadow-indigo-200 active:scale-95 transition-all">儲存餐點變更</button></div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -618,6 +604,105 @@
                             </div>
                         </div>
                     </section>
+                </div>
+            </div>
+        </div>
+
+        <!-- 餐點編輯彈窗 (MyFitnessPal 風格) -->
+        <div v-if="editingIndex !== null" class="fixed inset-0 z-[80] flex items-center justify-center p-4">
+            <div class="modal-overlay absolute inset-0" @click="cancelEdit"></div>
+            <div class="bg-white w-full max-w-lg rounded-[2.5rem] relative z-10 shadow-2xl flex flex-col max-h-[90vh] border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                <!-- Header -->
+                <div class="p-6 sm:p-8 flex justify-between items-center border-b border-slate-50">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-2xl flex items-center justify-center text-white" :style="{ backgroundColor: {breakfast:'#6366f1', lunch:'#8b5cf6', dinner:'#3b82f6', snack:'#ec4899'}[editingMeal.type] }">
+                            <svg v-if="editingMeal.type === 'breakfast'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                            <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-900 tracking-tight">{{ isAddingMeal ? '新增餐點' : '編輯詳情' }}</h3>
+                    </div>
+                    <button @click="cancelEdit" class="w-10 h-10 flex items-center justify-center bg-slate-50 rounded-xl text-slate-400 hover:text-slate-600 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto custom-scroll p-6 sm:p-8 space-y-8">
+                    <!-- 基本資訊區 -->
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="sm:col-span-1 space-y-1.5">
+                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">用餐時段</label>
+                                <select v-model="editingMeal.type" class="w-full bg-slate-50 rounded-2xl px-4 py-4 text-sm font-black border border-slate-100 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
+                                    <option value="breakfast">🌅 早餐</option>
+                                    <option value="lunch">☀️ 午餐</option>
+                                    <option value="dinner">🌙 晚餐</option>
+                                    <option value="snack">🍰 點心</option>
+                                </select>
+                            </div>
+                            <div class="sm:col-span-2 space-y-1.5">
+                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">食物名稱</label>
+                                <div class="relative group">
+                                    <textarea v-model="editingMeal.name" class="w-full px-4 py-4 bg-slate-50 rounded-2xl border border-slate-100 text-sm font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 focus:bg-white transition-all min-h-[56px] resize-none" placeholder="輸入食物名稱..."></textarea>
+                                    <button v-if="isAddingMeal" @click="showHistory = true" class="absolute right-3 bottom-3 text-indigo-500 text-[10px] font-black hover:bg-indigo-50 px-2 py-1 rounded-lg transition-colors">從紀錄搜尋</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 份量計算器 -->
+                    <div class="bg-indigo-50/30 rounded-3xl p-6 border border-indigo-100/50">
+                        <div class="flex items-center gap-2 mb-4">
+                            <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>
+                            <h4 class="text-xs font-black text-indigo-900 uppercase tracking-widest">份量設定</h4>
+                        </div>
+                        <div class="flex items-end gap-4">
+                            <div class="flex-1 space-y-1.5">
+                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">份量數值</label>
+                                <input type="number" v-model.number="editingMeal.amount" @focus="prepareScale" @input="scaleNutrients" class="w-full text-2xl font-black bg-white rounded-2xl border border-slate-100 px-5 py-4 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all text-center" step="any">
+                            </div>
+                            <div class="w-24 sm:w-32 space-y-1.5">
+                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">單位</label>
+                                <select v-model="editingMeal.unit" class="w-full bg-white rounded-2xl px-4 py-5 text-sm font-black border border-slate-100 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
+                                    <option value="份">份</option><option value="g">g</option><option value="ml">ml</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 營養素區塊 -->
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between px-1">
+                            <h4 class="text-xs font-black text-slate-400 uppercase tracking-widest">營養成分細節</h4>
+                            <span class="text-[10px] font-bold text-slate-300">數值會隨份量自動計算</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- 熱量 (強調) -->
+                            <div class="col-span-2 bg-slate-50 rounded-3xl p-5 border border-slate-100 flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-2xl bg-orange-500/10 text-orange-600 flex items-center justify-center font-black">🔥</div>
+                                    <span class="text-sm font-black text-slate-700">總熱量</span>
+                                </div>
+                                <div class="flex items-baseline gap-2">
+                                    <input type="number" v-model.number="editingMeal.calories" class="w-24 text-right text-2xl font-black bg-transparent outline-none text-slate-900">
+                                    <span class="text-xs font-black text-slate-300 uppercase">kcal</span>
+                                </div>
+                            </div>
+                            <!-- 三大營養素 -->
+                            <div v-for="n in [{key:'carbs', label:'碳水', color:'indigo', icon:'🥖'}, {key:'protein', label:'蛋白', color:'violet', icon:'🍗'}, {key:'fat', label:'脂肪', color:'pink', icon:'🥑'}]" :key="n.key" class="bg-slate-50 rounded-2xl p-4 border border-slate-100" :class="n.key === 'fat' ? 'col-span-2' : ''">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ n.icon }} {{ n.label }}</span>
+                                    <span class="text-[10px] font-black text-slate-300">g</span>
+                                </div>
+                                <input type="number" v-model.number="editingMeal[n.key]" class="w-full text-lg font-black bg-transparent outline-none text-slate-800">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Actions -->
+                <div class="p-6 sm:p-8 bg-slate-50 border-t border-slate-100 flex gap-4">
+                    <button @click="cancelEdit" class="w-1/3 py-4 bg-white border border-slate-200 text-slate-500 rounded-2xl text-sm font-black hover:bg-slate-50 active:scale-95 transition-all">取消</button>
+                    <button @click="saveMeal()" class="flex-1 py-4 btn-gradient text-white rounded-2xl text-sm font-black shadow-xl shadow-indigo-100 hover:shadow-indigo-200 active:scale-95 transition-all">完成紀錄</button>
                 </div>
             </div>
         </div>
@@ -800,7 +885,7 @@
             </div>
 
             <!-- 確認刪除 Modal -->
-            <div v-if="mealToDelete !== null" class="fixed inset-0 z-[70] flex items-center justify-center p-4">
+            <div v-if="mealToDelete !== null" class="fixed inset-0 z-[130] flex items-center justify-center p-4">
                 <div class="modal-overlay absolute inset-0"></div>
                 <div class="bg-white rounded-[2.5rem] p-10 relative z-10 w-full max-w-xs text-center shadow-2xl border border-slate-100">
                     <div
