@@ -514,24 +514,22 @@
                         <!-- 三大營養素 -->
                         <div class="grid grid-cols-3 gap-2 sm:gap-10 pt-4 sm:pt-10 border-t border-slate-50">
                             <div v-for="n in nutrientKeys" :key="n.key" class="min-w-0">
-                                <!-- 手機版：標籤與數值並排 -->
-                                <div class="flex flex-col sm:block mb-1 sm:mb-4">
-                                    <div class="nutrient-label text-center sm:text-left truncate uppercase tracking-widest text-[9px] sm:text-[10px] sm:mb-2">{{ n.label }}</div>
-                                    <div class="flex flex-col items-center sm:items-start gap-0 sm:gap-1.5">
-                                        <div class="flex items-baseline gap-1 truncate">
-                                            <span class="text-base sm:text-xl font-black text-slate-800">{{ formatNum(getDailySum(n.key)) }}</span>
-                                            <span class="text-[9px] text-slate-300 font-bold uppercase">g</span>
-                                        </div>
-                                        <div class="text-[9px] font-bold text-slate-400">/ {{ currentPlan[n.key] }}g</div>
+                                <!-- 頂部：還差多少 (較大) -->
+                                <div class="flex flex-col items-center sm:items-start mb-1 sm:mb-3">
+                                    <div class="nutrient-label truncate uppercase tracking-widest text-[9px] sm:text-[10px] mb-0.5 sm:mb-2">{{ n.label }}</div>
+                                    <div class="flex items-baseline gap-0.5 sm:gap-1">
+                                        <span class="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase leading-none">{{ getGap(n.key) >= 0 ? '還差' : '超出' }}</span>
+                                        <span class="text-base sm:text-xl font-black leading-none" :class="getGap(n.key) < 0 ? 'text-rose-500' : 'text-slate-800'">{{ formatNum(Math.abs(getGap(n.key))) }}<span class="text-[9px] font-bold text-slate-300 ml-0.5 uppercase">g</span></span>
                                     </div>
                                 </div>
-                                <div class="bg-slate-50 rounded-full overflow-hidden h-1 sm:h-2 mb-1.5 sm:mb-4">
+                                <div class="bg-slate-50 rounded-full overflow-hidden h-1 sm:h-2 mb-1.5 sm:mb-3">
                                     <div class="h-full rounded-full transition-all duration-1000" :class="n.key === 'carbs' ? 'bg-indigo-500' : n.key === 'protein' ? 'bg-violet-500' : 'bg-pink-500'" :style="{ width: Math.min((getDailySum(n.key) / (currentPlan[n.key] || 1)) * 100, 100) + '%' }"></div>
                                 </div>
+                                <!-- 底部：攝取/目標 (較小) -->
                                 <div class="text-center sm:text-left">
-                                    <div class="flex flex-col sm:block">
-                                        <span class="text-[8px] font-bold text-slate-400 uppercase leading-tight sm:mb-1">{{ getGap(n.key) >= 0 ? '還差' : '超出' }}</span>
-                                        <span class="text-xs sm:text-sm font-black leading-none" :class="getGap(n.key) < 0 ? 'text-rose-500' : 'text-slate-800'">{{ formatNum(Math.abs(getGap(n.key))) }}<span class="text-[9px] font-bold text-slate-300 ml-0.5 uppercase">g</span></span>
+                                    <div class="flex items-center justify-center sm:justify-start gap-1">
+                                        <span class="text-[10px] sm:text-xs font-black text-slate-700">{{ formatNum(getDailySum(n.key)) }}</span>
+                                        <span class="text-[9px] font-bold text-slate-300 uppercase">/ {{ currentPlan[n.key] }}g</span>
                                     </div>
                                 </div>
                             </div>
