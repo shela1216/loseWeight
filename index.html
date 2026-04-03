@@ -627,73 +627,73 @@
                     </button>
                 </div>
 
-                <div class="flex-1 overflow-y-auto custom-scroll px-6 py-4 space-y-5">
+                <div class="flex-1 overflow-y-auto custom-scroll px-6 py-4 space-y-6">
                     
-                    <!-- 第1排: 餐點內容 (改為 Flex 佈局防止重疊) -->
+                    <!-- 第1排: 餐點內容 -->
                     <div class="flex justify-between items-start gap-4">
                         <div class="flex-1 relative">
                             <textarea v-model="editingMeal.name" 
-                                class="w-full text-xl font-black placeholder:text-slate-200 text-slate-900 bg-transparent border-none outline-none resize-none min-h-[50px] leading-tight" 
+                                class="w-full text-2xl font-black placeholder:text-slate-200 text-slate-900 bg-transparent border-none outline-none resize-none min-h-[60px] leading-tight" 
                                 placeholder="食物名稱..."></textarea>
-                            <div class="absolute -bottom-1 left-0 w-8 h-1 bg-indigo-500 rounded-full"></div>
+                            <div class="absolute -bottom-1 left-0 w-10 h-1 bg-indigo-500 rounded-full"></div>
                         </div>
                         <button v-if="isAddingMeal" @click="showHistory = true" 
-                            class="shrink-0 bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-widest hover:bg-indigo-100 px-3 py-2 rounded-xl transition-all shadow-sm">
+                            class="shrink-0 bg-indigo-50 text-indigo-600 text-xs font-black uppercase tracking-widest hover:bg-indigo-100 px-4 py-2.5 rounded-xl transition-all shadow-sm">
                             搜尋紀錄
                         </button>
                     </div>
 
                     <!-- 第2排: 時段 (圓形圖示 + 文字) -->
-                    <div class="flex justify-between px-4">
+                    <div class="flex justify-between px-2 sm:px-4">
                         <button v-for="t in [{k:'breakfast', l:'早餐', i:'🌅'}, {k:'lunch', l:'午餐', i:'☀️'}, {k:'dinner', l:'晚餐', i:'🌙'}, {k:'snack', l:'點心', i:'🍰'}]" 
                             :key="t.k" @click="editingMeal.type = t.k"
                             class="flex flex-col items-center gap-2 group transition-all">
-                            <div class="w-14 h-14 rounded-full flex items-center justify-center text-2xl transition-all duration-300"
+                            <div class="w-16 h-16 rounded-full flex items-center justify-center text-3xl transition-all duration-300"
                                  :class="editingMeal.type === t.k ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-100 scale-110' : 'bg-slate-50 text-slate-400 grayscale opacity-50 hover:opacity-100 hover:grayscale-0'">
                                 {{ t.i }}
                             </div>
-                            <span class="text-[10px] font-black transition-colors" :class="editingMeal.type === t.k ? 'text-slate-900' : 'text-slate-400'">{{ t.l }}</span>
+                            <span class="text-xs font-black transition-colors" :class="editingMeal.type === t.k ? 'text-slate-900' : 'text-slate-400'">{{ t.l }}</span>
                         </button>
                     </div>
 
-                    <!-- 第3排: 份量 + 單位 (左右組合) -->
+                    <!-- 第3排: 份量 + 單位 -->
                     <div class="flex items-center gap-3">
-                        <div class="flex-1 bg-slate-50 rounded-2xl px-5 py-3 flex flex-col border border-transparent focus-within:border-indigo-100 focus-within:bg-white transition-all">
-                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">份量數值</label>
+                        <div class="flex-1 bg-slate-50 rounded-2xl px-5 py-4 flex flex-col border border-transparent focus-within:border-indigo-100 focus-within:bg-white transition-all">
+                            <label class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">份量數值</label>
                             <input type="number" v-model.number="editingMeal.amount" @focus="prepareScale" @input="scaleNutrients" 
-                                class="bg-transparent text-xl font-black outline-none w-full" step="any">
+                                class="bg-transparent text-2xl font-black outline-none w-full" step="any">
                         </div>
-                        <div class="w-1/3 bg-slate-50 rounded-2xl px-5 py-3 flex flex-col border border-transparent focus-within:border-indigo-100 focus-within:bg-white transition-all">
-                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">單位</label>
-                            <select v-model="editingMeal.unit" class="bg-transparent text-sm font-black text-slate-700 outline-none cursor-pointer appearance-none">
+                        <div class="w-1/3 bg-slate-50 rounded-2xl px-5 py-4 flex flex-col border border-transparent focus-within:border-indigo-100 focus-within:bg-white transition-all">
+                            <label class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">單位</label>
+                            <select v-model="editingMeal.unit" class="bg-transparent text-base font-black text-slate-700 outline-none cursor-pointer appearance-none">
                                 <option value="份">份</option><option value="g">公克</option><option value="ml">毫升</option>
                             </select>
                         </div>
                     </div>
 
-                    <!-- 第4排: 熱量 (淺色背景) -->
-                    <div class="bg-slate-50 rounded-[1.75rem] px-6 py-4 flex items-center justify-between border border-transparent focus-within:border-orange-100 focus-within:bg-white transition-all">
+                    <!-- 第4排: 熱量 -->
+                    <div class="bg-slate-50 rounded-[2rem] px-6 py-5 flex items-center justify-between border border-transparent focus-within:border-orange-100 focus-within:bg-white transition-all">
                         <div class="flex flex-col">
-                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">預估熱量</label>
+                            <label class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-1">預估熱量</label>
                             <div class="flex items-baseline gap-1 text-slate-900">
-                                <input type="number" v-model.number="editingMeal.calories" class="bg-transparent text-2xl font-black outline-none w-24">
-                                <span class="text-xs font-bold text-slate-300 uppercase">kcal</span>
+                                <input type="number" v-model.number="editingMeal.calories" class="bg-transparent text-3xl font-black outline-none w-32">
+                                <span class="text-sm font-bold text-slate-300 uppercase">kcal</span>
                             </div>
                         </div>
-                        <div class="w-10 h-10 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center text-xl">🔥</div>
+                        <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center text-2xl">🔥</div>
                     </div>
 
-                    <!-- 第5排: 碳水 蛋白 脂肪 (三欄橫排) -->
+                    <!-- 第5排: 碳水 蛋白 脂肪 -->
                     <div class="grid grid-cols-3 gap-3">
                         <div v-for="n in [{key:'carbs', label:'碳水', color:'#6366f1'}, {key:'protein', label:'蛋白', color:'#8b5cf6'}, {key:'fat', label:'脂肪', color:'#ec4899'}]" 
                              :key="n.key" 
-                             class="bg-slate-50/50 border border-slate-100 rounded-2xl p-3 flex flex-col items-center gap-1.5 focus-within:bg-white focus-within:ring-2 focus-within:ring-indigo-500/10 transition-all">
-                            <div class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{{ n.label }}</div>
+                             class="bg-slate-50/50 border border-slate-100 rounded-3xl p-4 flex flex-col items-center gap-2 focus-within:bg-white focus-within:ring-2 focus-within:ring-indigo-500/10 transition-all">
+                            <div class="text-xs font-black text-slate-400 uppercase tracking-tighter">{{ n.label }}</div>
                             <div class="flex items-baseline gap-0.5">
-                                <input type="number" v-model.number="editingMeal[n.key]" class="w-10 text-center text-base font-black bg-transparent outline-none text-slate-900">
-                                <span class="text-[10px] font-bold text-slate-300">g</span>
+                                <input type="number" v-model.number="editingMeal[n.key]" class="w-12 text-center text-lg font-black bg-transparent outline-none text-slate-900">
+                                <span class="text-xs font-bold text-slate-300">g</span>
                             </div>
-                            <div class="w-4 h-0.5 rounded-full" :style="{ backgroundColor: n.color }"></div>
+                            <div class="w-6 h-1 rounded-full" :style="{ backgroundColor: n.color }"></div>
                         </div>
                     </div>
                 </div>
@@ -1072,14 +1072,22 @@
                 });
 
                 const addFromHistory = (meal) => {
-                    // 複製並加入，避免參照問題
-                    const newMeal = { ...meal, type: 'lunch' }; // 預設午餐，可調整
+                    const newMeal = JSON.parse(JSON.stringify(meal));
                     if (newMeal.amount === undefined) newMeal.amount = 1;
                     if (newMeal.unit === undefined) newMeal.unit = '份';
-                    allData[selectedDate.value].meals.push(newMeal);
-                    const order = { breakfast: 1, lunch: 2, dinner: 3, snack: 4 };
-                    allData[selectedDate.value].meals.sort((a, b) => (order[a.type] || 99) - (order[b.type] || 99));
-                    saveData();
+                    
+                    if (editingIndex.value !== null) {
+                        Object.assign(editingMeal, newMeal);
+                        prepareScale();
+                    } else {
+                        newMeal.type = 'lunch';
+                        if (!allData[selectedDate.value]) {
+                            allData[selectedDate.value] = { planType: 'med', meals: [] };
+                        }
+                        allData[selectedDate.value].meals.push(newMeal);
+                        sortMeals();
+                        saveData();
+                    }
                     showHistory.value = false;
                 };
 
@@ -1305,8 +1313,7 @@
                         } catch (e) {
                             console.error("同步失敗", e);
                         } finally {
-                            // 延遲一小段時間再隱藏，讓使用者能感覺到同步完成的視覺反饋
-                            setTimeout(() => { saving.value = false; }, 500);
+                            saving.value = false;
                         }
                     }, 800);
                 };
