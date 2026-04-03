@@ -121,9 +121,38 @@
             background: linear-gradient(160deg, #f8f9fb 0%, #f1f5f9 100%);
         }
 
-        /* === 週曆圖例 === */
-        .legend-dot {
-            width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0;
+        /* === 月曆進度條與今日標記 === */
+        .calendar-day-cell {
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+        .day-progress-svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+            pointer-events: none;
+        }
+        .today-marker {
+            background-color: #f1f5f9;
+            box-shadow: inset 0 0 0 2px #6366f1;
+        }
+        .today-text-badge {
+            position: absolute;
+            top: 1px;
+            font-size: 7px;
+            font-weight: 900;
+            color: #6366f1;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+        }
+        .selected-day-ring {
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
         }
 
         /* === 熱量大數字 (優化：防止4位數溢出) === */
@@ -404,15 +433,26 @@
                         <div class="grid grid-cols-7 gap-1 sm:gap-1.5">
                             <div v-for="day in calendarDays" :key="day.date" 
                                  @click="selectedDate = day.date; resetCalendarTimer()"
-                                 class="aspect-square flex flex-col items-center justify-center rounded-xl sm:rounded-2xl cursor-pointer transition-all relative"
+                                 class="calendar-day-cell rounded-xl sm:rounded-2xl cursor-pointer transition-all"
                                  :class="[
                                     day.currentMonth ? 'text-slate-900 font-black' : 'text-slate-200',
-                                    selectedDate === day.date ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100 ring-4 ring-indigo-50' : 'hover:bg-slate-50'
+                                    selectedDate === day.date ? 'selected-day-ring' : 'hover:bg-slate-50',
+                                    day.date === new Date().toLocaleDateString('sv-SE') ? 'today-marker' : ''
                                  ]">
-                                <span class="text-xs sm:text-sm" :class="day.date === new Date().toLocaleDateString('sv-SE') && selectedDate !== day.date ? 'text-indigo-600' : ''">{{ day.dayNum }}</span>
-                                <div v-if="getDayDotClass(day.date) !== 'bg-transparent'" 
-                                     class="h-1 w-1 rounded-full mt-1" 
-                                     :class="selectedDate === day.date ? 'bg-white/50' : getDayDotClass(day.date)"></div>
+                                <!-- 進度條 SVG -->
+                                <svg v-if="getDayStats(day.date)" class="day-progress-svg p-1">
+                                    <circle cx="50%" cy="50%" r="42%" fill="none" stroke="#f1f5f9" stroke-width="2"/>
+                                    <circle cx="50%" cy="50%" r="42%" fill="none" 
+                                            :stroke="getDayStats(day.date).color" 
+                                            stroke-width="3" 
+                                            stroke-linecap="round"
+                                            :stroke-dasharray="2 * Math.PI * 18"
+                                            :stroke-dashoffset="2 * Math.PI * 18 * (1 - getDayStats(day.date).percent / 100)"
+                                            style="transition: stroke-dashoffset 0.5s ease"/>
+                                </svg>
+                                
+                                <span class="text-xs sm:text-sm relative z-10" :class="selectedDate === day.date ? 'text-indigo-600' : ''">{{ day.dayNum }}</span>
+                                <span v-if="day.date === new Date().toLocaleDateString('sv-SE')" class="today-text-badge">Today</span>
                             </div>
                         </div>
 
@@ -1376,6 +1416,18 @@
                         allData[selectedDate.value].meals.splice(mealToDelete.value, 1);
                         mealToDelete.value = null;
                         saveData();
+                    },
+                    getDayStats: (date) => {
+                        const record = allData[date];
+                        if (!record || !record.planType) return null;
+                        const plan = plans[record.planType];
+                        const intake = (record.meals || []).reduce((s, m) => s + (Number(m.calories) || 0), 0);
+                        const goal = plan.calories || 1;
+                        // 差距百分比邏輯: Gap 0 -> 100%, Gap 100% -> 0%
+                        const gapPercent = (Math.abs(goal - intake) / goal) * 100;
+                        const progress = Math.max(0, 100 - gapPercent);
+                        const colorMap = { high: '#6366f1', med: '#8b5cf6', low: '#ec4899', rest: '#64748b' };
+                        return { percent: progress, color: colorMap[record.planType] };
                     },
                     autoCalculatePlans, exportCSV, saveData,
                     isCalendarExpanded, resetCalendarTimer,
