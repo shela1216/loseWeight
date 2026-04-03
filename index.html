@@ -952,6 +952,14 @@
 
         createApp({
             setup() {
+                const initialized = ref(false);
+                const user = ref(null);
+                const saving = ref(false);
+                const showSettings = ref(false);
+                const showHistory = ref(false);
+                const showMonthPicker = ref(false);
+                const historySearch = ref('');
+
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
