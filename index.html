@@ -479,11 +479,11 @@
                         <h3 class="text-xs font-black text-slate-800 uppercase tracking-widest">今日計劃切換</h3>
                     </div>
                     <div class="segmented-control relative">
-                        <!-- 滑動背景指示器 (優化：內縮與白邊) -->
+                        <!-- 滑動背景指示器 (精確置中修正) -->
                         <div class="segment-indicator" 
                              :style="{ 
-                                width: 'calc(25% - 12px)', 
-                                transform: `translateX(calc(${Object.keys(plans).indexOf(currentDayRecord.planType) * 100}% + 6px))`,
+                                width: 'calc((100% - 12px) / 4 - 8px)', 
+                                transform: `translateX(calc(${Object.keys(plans).indexOf(currentDayRecord.planType)} * (100% + 8px) + 4px))`,
                                 backgroundColor: {high:'#6366f1', med:'#8b5cf6', low:'#ec4899', rest:'#64748b'}[currentDayRecord.planType]
                              }">
                         </div>
