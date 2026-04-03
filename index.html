@@ -1422,12 +1422,20 @@
                     document.body.removeChild(link);
                 };
 
+                const onlyNumber = (e) => {
+                    // 攔截科學記數法常用字元 e, E, +, -
+                    if (['e', 'E', '+', '-'].includes(e.key)) {
+                        e.preventDefault();
+                    }
+                };
+
                 onMounted(initApp);
 
                 return {
                     initialized, user, saving, showSettings, showHistory, showMonthPicker, historySearch, selectedDate, pickerMonth, loginEmail, loginPassword,
                     editingIndex, isAddingMeal, mealToDelete, nutrientKeys, profile, plans, allData, mealHistory, editingMeal, showSyncModal, templates,
                     weekDays, currentMonthYearDisplay, calculatedTDEE, formatNum, scaleNutrients, lastAmount, prepareScale,
+                    onlyNumber,
                     calendarDays, changePickerMonth, selectDateFromPicker, openMonthPicker,
                     currentDayRecord: computed(() => {
                         if (!allData[selectedDate.value]) { allData[selectedDate.value] = { planType: 'med', meals: [] }; }
