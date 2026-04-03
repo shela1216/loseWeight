@@ -139,18 +139,20 @@
         .nutrient-label { font-size: 0.875rem; font-weight: 800; color: #64748b; letter-spacing: 0.02em; }
         .nutrient-value { font-size: 1.125rem; font-weight: 900; color: #1e293b; }
 
-        /* === Segmented Control (計畫選擇) === */
+        /* === Segmented Control (計畫選擇：優化內縮與層次感) === */
         .segmented-control {
             background: #f1f5f9;
-            padding: 4px;
-            border-radius: 1rem;
+            padding: 6px;
+            border-radius: 1.5rem;
             display: flex;
             position: relative;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
         }
         .segment-item {
             flex: 1;
             text-align: center;
-            padding: 8px 4px;
+            padding: 10px 4px;
             font-size: 0.75rem;
             font-weight: 800;
             color: #64748b;
@@ -161,6 +163,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             gap: 2px;
         }
         .segment-item.active {
@@ -168,22 +171,40 @@
         }
         .segment-indicator {
             position: absolute;
-            top: 4px;
-            bottom: 4px;
-            border-radius: 0.75rem;
+            top: 6px;
+            bottom: 6px;
+            border-radius: 1.15rem;
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s;
             z-index: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12), inset 0 1px 1px rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* === 垂直排列按鈕樣式 === */
+        .btn-vertical {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.2s;
+            height: auto !important;
+        }
+        .btn-vertical span {
+            font-size: 10px;
+            font-weight: 800;
+            line-height: 1;
         }
     </style>
 </head>
 
-<body class="bg-[#f8fafc] min-h-screen font-sans text-slate-900">
+<body class="bg-[#f8fafc] min-h-screen font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-700">
     <div id="app" v-cloak>
 
         <!-- 載入中狀態 -->
         <div v-if="!initialized" class="fixed inset-0 bg-[#f8f9fb] flex flex-col items-center justify-center z-[100]">
-            <div class="w-12 h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
-            <p class="mt-4 text-indigo-600 font-bold">同步數據中...</p>
+            <div class="w-10 h-10 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
+            <p class="mt-4 text-indigo-600 font-bold text-sm">數據加載中...</p>
         </div>
 
         <!-- 登入頁面 -->
@@ -200,7 +221,7 @@
                     <p class="text-slate-500 mt-3 text-base font-medium">追蹤每日營養，邁向健康體態</p>
                 </div>
                 <!-- 表單卡片 -->
-                <div class="bg-white rounded-[2.5rem] shadow-xl p-10 space-y-6 border border-slate-100/50">
+                <div class="bg-white rounded-[2.5rem] shadow-xl p-8 sm:p-10 space-y-6 border border-slate-100/50">
                     <div class="space-y-4">
                         <div class="relative">
                             <svg class="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/></svg>
@@ -242,34 +263,32 @@
                         </div>
                         <div class="min-w-0">
                             <h1 class="text-xl sm:text-2xl font-black tracking-tight text-slate-900 leading-none truncate">輕盈飲食</h1>
-                            <p class="text-[9px] sm:text-[10px] font-bold text-slate-400 mt-1 uppercase truncate">健康與營養追蹤</p>
+                            <p class="text-[9px] sm:text-[10px] font-bold text-slate-400 mt-1 uppercase truncate tracking-widest">Health Record</p>
                         </div>
                     </div>
-                    <div class="flex gap-1.5 sm:gap-2 items-center">
+                    <!-- 頂部按鈕改為垂直排列 -->
+                    <div class="flex gap-2.5 sm:gap-4 items-center">
                         <button @click="exportCSV"
-                            class="h-10 sm:h-11 px-2.5 sm:px-4 flex items-center justify-center bg-white border border-slate-100 rounded-xl sm:rounded-2xl shadow-sm text-xs font-black text-slate-500 hover:text-indigo-600 hover:border-indigo-100 transition-all">
-                            <svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            class="btn-vertical w-10 sm:w-12 h-12 sm:h-14 bg-white border border-slate-100 rounded-xl sm:rounded-2xl shadow-sm text-slate-500 hover:text-indigo-600 hover:border-indigo-100 active:scale-90 transition-all">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                             </svg>
-                            <span class="hidden xs:inline">匯出</span>
+                            <span>匯出</span>
                         </button>
                         <button @click="showSettings = true"
-                            class="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center bg-white border border-slate-100 rounded-xl sm:rounded-2xl shadow-sm text-slate-500 hover:text-indigo-600 transition-all">
+                            class="btn-vertical w-10 sm:w-12 h-12 sm:h-14 bg-white border border-slate-100 rounded-xl sm:rounded-2xl shadow-sm text-slate-500 hover:text-indigo-600 hover:border-indigo-100 active:scale-90 transition-all">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
+                            <span>設定</span>
                         </button>
                         <button @click="handleLogout"
-                            class="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center bg-white border border-rose-50 rounded-xl sm:rounded-2xl shadow-sm text-slate-300 hover:text-rose-500 transition-all"><svg
-                                class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
-                                </path>
-                            </svg></button>
+                            class="btn-vertical w-10 sm:w-12 h-12 sm:h-14 bg-white border border-rose-50 rounded-xl sm:rounded-2xl shadow-sm text-slate-300 hover:text-rose-500 active:scale-90 transition-all">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                            </svg>
+                            <span>登出</span>
+                        </button>
                     </div>
                 </div>
 
@@ -364,14 +383,14 @@
                 <div class="bg-white rounded-[1.5rem] sm:rounded-[2rem] p-4 sm:p-5 shadow-sm border border-slate-100/50">
                     <div class="flex items-center gap-2 mb-4 px-1">
                         <div class="w-1 h-4 bg-indigo-500 rounded-full"></div>
-                        <h3 class="text-xs font-black text-slate-800 uppercase tracking-widest">選擇今日計劃</h3>
+                        <h3 class="text-xs font-black text-slate-800 uppercase tracking-widest">今日計劃切換</h3>
                     </div>
                     <div class="segmented-control relative">
-                        <!-- 滑動背景指示器 -->
-                        <div class="segment-indicator shadow-sm" 
+                        <!-- 滑動背景指示器 (優化：內縮與白邊) -->
+                        <div class="segment-indicator" 
                              :style="{ 
-                                width: '25%', 
-                                transform: `translateX(${Object.keys(plans).indexOf(currentDayRecord.planType) * 100}%)`,
+                                width: 'calc(25% - 12px)', 
+                                transform: `translateX(calc(${Object.keys(plans).indexOf(currentDayRecord.planType) * 100}% + 6px))`,
                                 backgroundColor: {high:'#6366f1', med:'#8b5cf6', low:'#ec4899', rest:'#64748b'}[currentDayRecord.planType]
                              }">
                         </div>
@@ -380,7 +399,7 @@
                              @click="currentDayRecord.planType = key; saveData()"
                              class="segment-item"
                              :class="{ active: currentDayRecord.planType === key }">
-                            <span class="text-sm sm:text-base">{{ p.i }}</span>
+                            <span class="text-sm sm:text-base transition-transform" :class="currentDayRecord.planType === key ? 'scale-110' : ''">{{ p.i }}</span>
                             <span class="text-[9px] sm:text-[10px] uppercase">{{ p.l }}</span>
                         </div>
                     </div>
@@ -411,7 +430,7 @@
                             </div>
                         </div>
 
-                        <!-- 目標與已攝取 (Icon 大小統一且增加間距) -->
+                        <!-- 目標與已攝取 -->
                         <div class="flex flex-row sm:flex-col justify-center gap-4 min-[360px]:gap-8 sm:gap-8 w-full sm:w-auto px-1">
                             <!-- 已攝取 -->
                             <div class="flex flex-col items-center sm:items-start min-w-[65px] min-[360px]:min-w-[80px]">
@@ -481,22 +500,22 @@
                     </div>
                 </div>
 
-                <!-- 餐點紀錄標題區 -->
+                <!-- 餐點紀錄標題區：按鈕改為垂直排列 -->
                 <div class="flex justify-between items-center mb-4 px-1 sm:px-2 mt-2">
                     <div class="min-w-0 mr-2">
                         <h3 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight truncate">餐點紀錄</h3>
                         <p class="text-[10px] sm:text-xs text-slate-400 font-bold mt-0.5 truncate" v-if="currentDayRecord.meals.length > 0">今日共 {{ currentDayRecord.meals.length }} 筆記錄</p>
                     </div>
-                    <div class="flex gap-1.5 sm:gap-2 shrink-0">
+                    <div class="flex gap-2.5 sm:gap-4 shrink-0">
                         <button @click="showHistory = true"
-                            class="h-9 sm:h-10 px-2 sm:px-3 bg-white text-slate-500 border border-slate-200 rounded-lg sm:rounded-xl text-xs font-black hover:bg-slate-50 transition-all flex items-center gap-1.5 shadow-sm">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <span class="hidden min-[400px]:inline">歷史</span>
+                            class="btn-vertical w-10 sm:w-12 h-12 sm:h-14 bg-white text-slate-500 border border-slate-200 rounded-xl shadow-sm hover:text-indigo-600 hover:bg-slate-50 active:scale-90 transition-all">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span>歷史</span>
                         </button>
                         <button @click="addMeal"
-                            class="h-9 sm:h-10 px-2.5 sm:px-4 btn-gradient text-white rounded-lg sm:rounded-xl text-xs font-black shadow-xl shadow-indigo-100 hover:scale-[1.02] transition-all flex items-center gap-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                            新增<span class="hidden min-[400px]:inline">餐點</span>
+                            class="btn-vertical w-10 sm:w-12 h-12 sm:h-14 btn-gradient text-white rounded-xl shadow-lg shadow-indigo-100 active:scale-90 transition-all">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                            <span>新增</span>
                         </button>
                     </div>
                 </div>
@@ -534,9 +553,9 @@
                                         </div>
                                         <!-- 第二行：三大營養素 -->
                                         <div class="flex items-center gap-4">
-                                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">碳水: <span class="text-slate-700">{{ formatNum(meal.carbs) }}g</span></span>
-                                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">蛋白: <span class="text-slate-700">{{ formatNum(meal.protein) }}g</span></span>
-                                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">脂肪: <span class="text-slate-700">{{ formatNum(meal.fat) }}g</span></span>
+                                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">碳水: <span class="text-slate-900 font-black">{{ formatNum(meal.carbs) }}g</span></span>
+                                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">蛋白: <span class="text-slate-900 font-black">{{ formatNum(meal.protein) }}g</span></span>
+                                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">脂肪: <span class="text-slate-900 font-black">{{ formatNum(meal.fat) }}g</span></span>
                                         </div>
                                     </div>
                                     
@@ -653,16 +672,16 @@
                              @click="addFromHistory(item)"
                              class="p-5 bg-white border border-slate-100 rounded-3xl hover:bg-indigo-50/30 hover:border-indigo-100 cursor-pointer flex justify-between items-center transition-all group active:scale-[0.98]">
                             <div class="flex-1 mr-4">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <span class="font-black text-slate-900 text-base">{{ item.name }}</span>
-                                    <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-lg font-black uppercase group-hover:bg-indigo-100 group-hover:text-indigo-500 transition-colors">{{ item.count }} 次記錄</span>
+                                <div class="flex items-center gap-3 mb-2 min-w-0">
+                                    <span class="font-black text-slate-900 text-base truncate">{{ item.name }}</span>
+                                    <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-lg font-black uppercase group-hover:bg-indigo-100 group-hover:text-indigo-500 transition-colors shrink-0 whitespace-nowrap">{{ item.count }} 次記錄</span>
                                 </div>
                                 <p class="flex items-center gap-2 flex-wrap text-sm">
                                     <span class="font-black text-indigo-500">{{ item.amount }}{{ item.unit || '份' }}</span>
                                     <span class="text-slate-200">•</span>
                                     <span class="font-black text-slate-900">{{ formatNum(item.calories) }}kcal</span>
                                     <span class="text-slate-200">•</span>
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">碳:{{ formatNum(item.carbs) }} 蛋:{{ formatNum(item.protein) }} 脂:{{ formatNum(item.fat) }}</span>
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">碳:<span class="text-slate-900 font-black">{{ formatNum(item.carbs) }}</span> 蛋:<span class="text-slate-900 font-black">{{ formatNum(item.protein) }}</span> 脂:<span class="text-slate-900 font-black">{{ formatNum(item.fat) }}</span></span>
                                 </p>
                             </div>
                             <div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center opacity-0 group-hover:opacity-100 shadow-sm transition-all scale-90 group-hover:scale-100">
