@@ -327,21 +327,38 @@
                 <!-- 左側欄位 (1/3) -->
                 <aside class="lg:col-span-4 space-y-6 lg:sticky lg:top-10">
                     <header class="mb-8">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center gap-3">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center gap-3 min-w-0">
                                 <div class="bg-indigo-600 p-2.5 rounded-[1.25rem] text-white shadow-xl shadow-indigo-100">
                                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                                     </svg>
                                 </div>
-                                <div>
-                                    <h1 class="text-2xl font-black tracking-tight text-slate-900 leading-none">輕盈飲食</h1>
-                                    <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Health Record</p>
+                                <div class="min-w-0">
+                                    <h1 class="text-xl sm:text-2xl font-black tracking-tight text-slate-900 leading-none truncate">輕盈飲食</h1>
+                                    <p class="text-[9px] sm:text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest truncate">Health Record</p>
                                 </div>
                             </div>
-                            <!-- 頂部按鈕 (僅行動版顯示或保持原樣) -->
-                            <div class="flex lg:hidden gap-3 items-center">
-                                <button @click="showSettings = true" class="w-10 h-10 flex items-center justify-center bg-white rounded-xl text-slate-400 shadow-sm border border-slate-100"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+                            <!-- 功能按鈕區 (圓型樣式) -->
+                            <div class="flex gap-3 sm:gap-4 items-center pt-1 shrink-0">
+                                <button @click="exportCSV" class="btn-circular" title="匯出紀錄">
+                                    <div class="icon-wrapper">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                    </div>
+                                    <span>匯出</span>
+                                </button>
+                                <button @click="showSettings = true" class="btn-circular" title="設定目標">
+                                    <div class="icon-wrapper">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    </div>
+                                    <span>設定</span>
+                                </button>
+                                <button @click="handleLogout" class="btn-circular" title="登出帳號">
+                                    <div class="icon-wrapper">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                                    </div>
+                                    <span>登出</span>
+                                </button>
                             </div>
                         </div>
                     </header>
@@ -349,12 +366,9 @@
                     <!-- 月曆 (撐開式) -->
                     <div class="bg-white rounded-[2rem] p-5 shadow-md border border-slate-100/50 transition-all duration-500 overflow-hidden"
                          :class="isCalendarExpanded ? 'max-h-[600px]' : 'max-h-[100px]'">
-                        <div class="flex justify-between items-center px-1 mb-4">
-                            <div class="flex gap-1.5">
-                                <button @click="changeMonth(-1); toggleCalendar(true)" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path></svg></button>
-                                <button @click="changeDay(-1); toggleCalendar(true)" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"></path></svg></button>
-                            </div>
-                            <div class="flex items-center gap-3 min-w-0">
+                        <div class="flex flex-wrap lg:flex-col justify-between items-center px-1 mb-4 lg:mb-6 gap-y-4">
+                            <!-- 日期顯示與今日按鈕 (電腦版置頂，手機版居中) -->
+                            <div class="flex items-center gap-3 min-w-0 order-2 lg:order-1 lg:w-full lg:justify-center">
                                 <div class="relative cursor-pointer group text-center min-w-0" @click="toggleCalendar()">
                                     <div class="flex items-center justify-center gap-2">
                                         <h2 class="text-sm font-black text-slate-800 group-hover:text-indigo-600 transition-colors truncate">{{ currentMonthYearDisplay }}</h2>
@@ -367,7 +381,22 @@
                                 </div>
                                 <button @click="goToToday(); toggleCalendar(true)" class="h-9 px-3 flex items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-all shrink-0"><span class="text-xs font-black">今日</span></button>
                             </div>
-                            <div class="flex gap-1.5">
+
+                            <!-- 左側導覽按鈕 (電腦版與右側合併至下方) -->
+                            <div class="flex gap-1.5 order-1 lg:order-2 lg:w-full lg:justify-center lg:gap-8 lg:border-t lg:border-slate-50 lg:pt-4">
+                                <div class="flex gap-1.5">
+                                    <button @click="changeMonth(-1); toggleCalendar(true)" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 transition-all" title="上個月"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path></svg></button>
+                                    <button @click="changeDay(-1); toggleCalendar(true)" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all" title="前一天"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"></path></svg></button>
+                                </div>
+                                <!-- 電腦版顯示的右側按鈕 (合併排列) -->
+                                <div class="hidden lg:flex gap-1.5">
+                                    <button @click="changeDay(1); toggleCalendar(true)" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all" title="後一天"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"></path></svg></button>
+                                    <button @click="changeMonth(1); toggleCalendar(true)" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 transition-all" title="下個月"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 5l7 7-7 7m-8-14l7 7-7 7"></path></svg></button>
+                                </div>
+                            </div>
+
+                            <!-- 手機版右側導覽按鈕 (電腦版隱藏) -->
+                            <div class="flex gap-1.5 order-3 lg:hidden">
                                 <button @click="changeDay(1); toggleCalendar(true)" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"></path></svg></button>
                                 <button @click="changeMonth(1); toggleCalendar(true)" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 5l7 7-7 7m-8-14l7 7-7 7"></path></svg></button>
                             </div>
@@ -387,17 +416,18 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- 底部說明圖例 -->
+                            <!-- 底部說明圖例 (優化字級與佈局) -->
                             <div class="mt-6 pt-6 border-t border-slate-50">
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div v-for="p in [{k:'high',l:'高碳日',c:'#6366f1',d:'💪 重點訓練'},{k:'med',l:'中碳日',c:'#8b5cf6',d:'🥗 一般運動'},{k:'low',l:'低碳日',c:'#ec4899',d:'🔥 燃脂休息'},{k:'rest',l:'自由日',c:'#64748b',d:'🧘 身心平衡'}]" :key="p.k" class="flex items-center gap-2.5">
-                                        <span class="w-2 h-2 rounded-full shrink-0" :style="{background:p.c}"></span>
+                                <div class="grid grid-cols-2 gap-x-3 gap-y-5">
+                                    <div v-for="p in [{k:'high',l:'高碳日',c:'#6366f1',d:'💪 重點訓練'},{k:'med',l:'中碳日',c:'#8b5cf6',d:'🥗 一般運動'},{k:'low',l:'低碳日',c:'#ec4899',d:'🔥 燃脂休息'},{k:'rest',l:'自由日',c:'#64748b',d:'🧘 身心平衡'}]" :key="p.k" class="flex items-start gap-2.5">
+                                        <span class="w-2.5 h-2.5 rounded-full shrink-0 mt-1" :style="{background:p.c}"></span>
                                         <div class="flex flex-col min-w-0">
-                                            <span class="text-[10px] font-black text-slate-700 leading-none truncate">{{p.l}}</span>
-                                            <span class="text-[8px] font-bold text-slate-300 uppercase mt-1 truncate">{{p.d}}</span>
+                                            <span class="text-xs font-black text-slate-700 leading-none truncate">{{p.l}}</span>
+                                            <span class="text-[10px] font-bold text-slate-400 uppercase mt-1.5 leading-tight">{{p.d}}</span>
                                         </div>
                                     </div>
                                 </div>
+                                <p class="text-center text-[9px] font-bold text-slate-300 mt-6 uppercase tracking-widest leading-relaxed">圓環進度：攝取與目標差距越小，圓環越完整</p>
                             </div>
                         </div>
                     </div>
@@ -500,14 +530,24 @@
 
                     <!-- 餐點紀錄區塊 -->
                     <section>
-                        <div class="flex justify-between items-end mb-6 px-2">
+                        <div class="flex justify-between items-center mb-6 px-2">
                             <div>
                                 <h3 class="text-2xl font-black text-slate-900 tracking-tight">餐點紀錄</h3>
                                 <p class="text-xs text-slate-400 font-bold mt-1 uppercase tracking-widest" v-if="currentDayRecord.meals.length > 0">Today's Meals ({{ currentDayRecord.meals.length }})</p>
                             </div>
-                            <div class="flex gap-4">
-                                <button @click="showHistory = true" class="flex items-center gap-2 px-5 py-3 bg-white border border-slate-100 rounded-2xl text-slate-600 font-bold text-sm shadow-sm hover:bg-slate-50 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>歷史紀錄</button>
-                                <button @click="addMeal" class="flex items-center gap-2 px-6 py-3 btn-gradient text-white rounded-2xl font-black text-sm shadow-lg shadow-indigo-100 hover:scale-105 active:scale-95 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>新增餐點</button>
+                            <div class="flex gap-4 sm:gap-6 shrink-0 items-start pt-1">
+                                <button @click="showHistory = true" class="btn-circular" title="查看歷史紀錄">
+                                    <div class="icon-wrapper">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    </div>
+                                    <span>歷史</span>
+                                </button>
+                                <button @click="addMeal" class="btn-circular btn-primary" title="新增餐點紀錄">
+                                    <div class="icon-wrapper">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                                    </div>
+                                    <span>新增</span>
+                                </button>
                             </div>
                         </div>
 
@@ -808,7 +848,7 @@
                 const loginEmail = ref('');
                 const loginPassword = ref('');
 
-                const isCalendarExpanded = ref(false);
+                const isCalendarExpanded = ref(window.innerWidth >= 1024);
 
                 const toggleCalendar = (val) => {
                     if (val !== undefined) isCalendarExpanded.value = val;
