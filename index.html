@@ -744,100 +744,106 @@
                     </div>
                 </div>
             </div>
-            <!-- 彈出視窗：設定與目標計算 -->
+            <!-- 彈出視窗：設定與目標計算 (優化：修復捲軸溢出圓角問題) -->
             <div v-if="showSettings" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
                 <div class="modal-overlay absolute inset-0" @click="showSettings = false"></div>
                 <div
-                    class="bg-white w-full max-w-xl rounded-[2.5rem] p-10 relative z-10 shadow-2xl overflow-y-auto max-h-[90vh] border border-slate-100">
-                    <div class="flex justify-between items-center mb-10 px-2">
+                    class="bg-white w-full max-w-xl rounded-[2.5rem] relative z-10 shadow-2xl flex flex-col max-h-[90vh] border border-slate-100 overflow-hidden">
+                    
+                    <!-- 固定 Header -->
+                    <div class="flex justify-between items-center p-8 sm:p-10 pb-4 shrink-0 px-10">
                         <div>
                             <h3 class="text-3xl font-black text-slate-900 tracking-tight">設定與目標</h3>
                             <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">個人化您的健康計劃</p>
                         </div>
-                        <button @click="showSettings = false" class="w-12 h-12 flex items-center justify-center bg-slate-50 rounded-2xl text-slate-400 hover:text-slate-600 transition-colors"><svg
-                                class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M6 18L18 6M6 6l12 12"></path>
-                            </svg></button>
+                        <button @click="showSettings = false" class="w-12 h-12 flex items-center justify-center bg-slate-50 rounded-2xl text-slate-400 hover:text-slate-600 transition-colors">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
                     </div>
 
-                    <!-- TDEE 計算器 -->
-                    <div class="bg-[#f8f9fb] border border-slate-100 rounded-[2rem] p-8 mb-10">
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="w-10 h-10 bg-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-100">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                            </div>
-                            <h4 class="text-lg font-black text-slate-900 tracking-tight">TDEE 計算器</h4>
-                        </div>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-5 mb-8">
-                            <div class="space-y-2">
-                                <label class="text-xs font-black text-slate-400 pl-1">性別</label>
-                                <select v-model="profile.gender"
-                                    class="w-full bg-white px-4 py-3.5 rounded-2xl text-sm border border-slate-100 shadow-sm font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
-                                    <option value="male">男性</option>
-                                    <option value="female">女性</option>
-                                </select>
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-xs font-black text-slate-400 pl-1">體重 (kg)</label>
-                                <input type="number" v-model.number="profile.weight"
-                                    class="w-full bg-white px-4 py-3.5 rounded-2xl text-sm border border-slate-100 shadow-sm font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-xs font-black text-slate-400 pl-1">身高 (cm)</label>
-                                <input type="number" v-model.number="profile.height"
-                                    class="w-full bg-white px-4 py-3.5 rounded-2xl text-sm border border-slate-100 shadow-sm font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-xs font-black text-slate-400 pl-1">年齡</label>
-                                <input type="number" v-model.number="profile.age"
-                                    class="w-full bg-white px-4 py-3.5 rounded-2xl text-sm border border-slate-100 shadow-sm font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
-                            </div>
-                            <div class="col-span-2 space-y-2">
-                                <label class="text-xs font-black text-slate-400 pl-1">活動程度</label>
-                                <select v-model="profile.activity"
-                                    class="w-full bg-white px-4 py-3.5 rounded-2xl text-sm border border-slate-100 shadow-sm font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
-                                    <option :value="1.2">久坐 (無規律運動)</option>
-                                    <option :value="1.375">輕度 (每週 1-3 天)</option>
-                                    <option :value="1.55">中度 (每週 3-5 天)</option>
-                                    <option :value="1.725">高度 (每週 6-7 天)</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-6">
-                            <button @click="autoCalculatePlans"
-                                class="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all">依照數據自動計算</button>
-                            <div class="text-right shrink-0">
-                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">預估 TDEE</span>
-                                <span class="text-2xl font-black text-indigo-600 leading-none">{{ calculatedTDEE }} <span class="text-xs text-slate-300 font-bold">kcal</span></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 計畫細節 -->
-                    <div class="space-y-4">
-                        <div class="px-2 mb-2 flex items-center gap-2">
-                            <div class="w-1.5 h-4 bg-slate-200 rounded-full"></div>
-                            <h4 class="text-xs font-black text-slate-400 uppercase tracking-widest">目標數值設定</h4>
-                        </div>
-                        <div v-for="(p, key) in plans" :key="key" class="p-6 bg-white border border-slate-100 rounded-[1.5rem] shadow-sm hover:shadow-md transition-shadow">
-                            <div class="flex justify-between items-center mb-5">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full" :class="'dot-'+key"></span>
-                                    <div class="text-base font-black text-slate-900">{{ getPlanLabel(key) }}</div>
+                    <!-- 內縮式滾動內容區 -->
+                    <div class="flex-1 overflow-y-auto custom-scroll px-8 sm:px-10 pb-10">
+                        <!-- TDEE 計算器 -->
+                        <div class="bg-[#f8f9fb] border border-slate-100 rounded-[2rem] p-8 mb-10">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-10 h-10 bg-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-100">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
                                 </div>
-                                <span class="text-[10px] text-slate-300 font-black uppercase tracking-widest">熱量 • 碳水 • 蛋白 • 脂肪</span>
+                                <h4 class="text-lg font-black text-slate-900 tracking-tight">TDEE 計算器</h4>
                             </div>
-                            <div class="grid grid-cols-4 gap-3">
-                                <div v-for="n in ['calories', 'carbs', 'protein', 'fat']" :key="n" class="space-y-1.5">
-                                    <input type="number" v-model.number="p[n]" @change="saveData"
-                                        class="w-full text-center text-sm p-3.5 bg-slate-50 border border-slate-100 rounded-xl font-black outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all">
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-5 mb-8">
+                                <div class="space-y-2">
+                                    <label class="text-xs font-black text-slate-400 pl-1">性別</label>
+                                    <select v-model="profile.gender"
+                                        class="w-full bg-white px-4 py-3.5 rounded-2xl text-sm border border-slate-100 shadow-sm font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
+                                        <option value="male">男性</option>
+                                        <option value="female">女性</option>
+                                    </select>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-xs font-black text-slate-400 pl-1">體重 (kg)</label>
+                                    <input type="number" v-model.number="profile.weight"
+                                        class="w-full bg-white px-4 py-3.5 rounded-2xl text-sm border border-slate-100 shadow-sm font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-xs font-black text-slate-400 pl-1">身高 (cm)</label>
+                                    <input type="number" v-model.number="profile.height"
+                                        class="w-full bg-white px-4 py-3.5 rounded-2xl text-sm border border-slate-100 shadow-sm font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-xs font-black text-slate-400 pl-1">年齡</label>
+                                    <input type="number" v-model.number="profile.age"
+                                        class="w-full bg-white px-4 py-3.5 rounded-2xl text-sm border border-slate-100 shadow-sm font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
+                                </div>
+                                <div class="col-span-2 space-y-2">
+                                    <label class="text-xs font-black text-slate-400 pl-1">活動程度</label>
+                                    <select v-model="profile.activity"
+                                        class="w-full bg-white px-4 py-3.5 rounded-2xl text-sm border border-slate-100 shadow-sm font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
+                                        <option :value="1.2">久坐 (無規律運動)</option>
+                                        <option :value="1.375">輕度 (每週 1-3 天)</option>
+                                        <option :value="1.55">中度 (每週 3-5 天)</option>
+                                        <option :value="1.725">高度 (每週 6-7 天)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex flex-col sm:flex-row items-center gap-6">
+                                <button @click="autoCalculatePlans"
+                                    class="w-full sm:flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all">依照數據自動計算</button>
+                                <div class="text-center sm:text-right shrink-0">
+                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">預估 TDEE</span>
+                                    <span class="text-2xl font-black text-indigo-600 leading-none">{{ calculatedTDEE }} <span class="text-xs text-slate-300 font-bold">kcal</span></span>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- 計畫細節 -->
+                        <div class="space-y-4">
+                            <div class="px-2 mb-2 flex items-center gap-2">
+                                <div class="w-1.5 h-4 bg-slate-200 rounded-full"></div>
+                                <h4 class="text-xs font-black text-slate-400 uppercase tracking-widest">目標數值設定</h4>
+                            </div>
+                            <div v-for="(p, key) in plans" :key="key" class="p-6 bg-white border border-slate-100 rounded-[1.5rem] shadow-sm hover:shadow-md transition-shadow">
+                                <div class="flex justify-between items-center mb-5">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2.5 h-2.5 rounded-full" :class="'dot-'+key"></span>
+                                        <div class="text-base font-black text-slate-900">{{ getPlanLabel(key) }}</div>
+                                    </div>
+                                    <span class="text-[10px] text-slate-300 font-black uppercase tracking-widest">熱量 • 碳水 • 蛋白 • 脂肪</span>
+                                </div>
+                                <div class="grid grid-cols-4 gap-3">
+                                    <div v-for="n in ['calories', 'carbs', 'protein', 'fat']" :key="n" class="space-y-1.5">
+                                        <input type="number" v-model.number="p[n]" @change="saveData"
+                                            class="w-full text-center text-sm p-3.5 bg-slate-50 border border-slate-100 rounded-xl font-black outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button @click="showSettings = false"
+                            class="w-full mt-10 py-5 bg-slate-900 text-white rounded-[1.5rem] font-black text-base shadow-2xl hover:bg-black active:scale-95 transition-all tracking-tight shrink-0">確定並關閉</button>
                     </div>
-                    <button @click="showSettings = false"
-                        class="w-full mt-10 py-5 bg-slate-900 text-white rounded-[1.5rem] font-black text-base shadow-2xl hover:bg-black active:scale-95 transition-all tracking-tight">確定並關閉</button>
                 </div>
             </div>
 
