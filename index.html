@@ -365,14 +365,14 @@
 
                     <!-- 月曆 (撐開式) -->
                     <div class="bg-white rounded-[2rem] p-5 shadow-md border border-slate-100/50 transition-all duration-500 overflow-hidden"
-                         :class="isCalendarExpanded ? 'max-h-[600px]' : 'max-h-[100px]'">
+                         :class="isCalendarExpanded ? 'max-h-[1000px]' : 'max-h-[100px]'">
                         <div class="flex flex-wrap lg:flex-col justify-between items-center px-1 mb-4 lg:mb-6 gap-y-4">
                             <!-- 日期顯示與今日按鈕 (電腦版置頂，手機版居中) -->
                             <div class="flex items-center gap-3 min-w-0 order-2 lg:order-1 lg:w-full lg:justify-center">
                                 <div class="relative cursor-pointer group text-center min-w-0" @click="toggleCalendar()">
-                                    <div class="flex items-center justify-center gap-2">
+                                    <div class="flex items-center justify-center gap-2" @click.stop="showMonthJump = !showMonthJump; jumpYear = pickerMonth.getFullYear()">
                                         <h2 class="text-sm font-black text-slate-800 group-hover:text-indigo-600 transition-colors truncate">{{ currentMonthYearDisplay }}</h2>
-                                        <svg class="w-3.5 h-3.5 text-slate-300 group-hover:text-indigo-500 transition-colors shrink-0" :class="isCalendarExpanded ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+                                        <svg class="w-3.5 h-3.5 text-slate-300 group-hover:text-indigo-500 transition-colors shrink-0" :class="showMonthJump ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
                                     </div>
                                     <div v-if="!isCalendarExpanded" class="flex items-center justify-center gap-2 mt-1">
                                         <span class="text-lg font-black text-indigo-600">{{ new Date(selectedDate).getDate() }}日</span>
@@ -382,52 +382,61 @@
                                 <button @click="goToToday(); toggleCalendar(true)" class="h-9 px-3 flex items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-all shrink-0"><span class="text-xs font-black">今日</span></button>
                             </div>
 
-                            <!-- 左側導覽按鈕 (電腦版與右側合併至下方) -->
+                            <!-- 簡化後的導覽按鈕 (僅上個月、下個月) -->
                             <div class="flex gap-1.5 order-1 lg:order-2 lg:w-full lg:justify-center lg:gap-8 lg:border-t lg:border-slate-50 lg:pt-4">
-                                <div class="flex gap-1.5">
-                                    <button @click="changeMonth(-1); toggleCalendar(true)" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 transition-all" title="上個月"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path></svg></button>
-                                    <button @click="changeDay(-1); toggleCalendar(true)" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all" title="前一天"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"></path></svg></button>
-                                </div>
-                                <!-- 電腦版顯示的右側按鈕 (合併排列) -->
-                                <div class="hidden lg:flex gap-1.5">
-                                    <button @click="changeDay(1); toggleCalendar(true)" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all" title="後一天"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"></path></svg></button>
-                                    <button @click="changeMonth(1); toggleCalendar(true)" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 transition-all" title="下個月"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 5l7 7-7 7m-8-14l7 7-7 7"></path></svg></button>
-                                </div>
-                            </div>
-
-                            <!-- 手機版右側導覽按鈕 (電腦版隱藏) -->
-                            <div class="flex gap-1.5 order-3 lg:hidden">
-                                <button @click="changeDay(1); toggleCalendar(true)" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"></path></svg></button>
-                                <button @click="changeMonth(1); toggleCalendar(true)" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 5l7 7-7 7m-8-14l7 7-7 7"></path></svg></button>
+                                <button @click="changeMonth(-1); toggleCalendar(true)" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 transition-all" title="上個月"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"></path></svg></button>
+                                <button @click="changeMonth(1); toggleCalendar(true)" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 transition-all" title="下個月"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"></path></svg></button>
                             </div>
                         </div>
-                        <div v-if="isCalendarExpanded" class="animate-in fade-in slide-in-from-top-4 duration-500 pb-2">
-                            <div class="grid grid-cols-7 gap-1 mb-2 px-1">
-                                <div v-for="d in ['一','二','三','四','五','六','日']" class="text-[10px] font-black text-slate-300 text-center py-2 uppercase tracking-tighter">{{ d }}</div>
-                            </div>
-                            <div class="grid grid-cols-7 gap-1.5">
-                                <div v-for="day in calendarDays" :key="day.date" @click="selectedDate = day.date; toggleCalendar(true)" class="calendar-day-cell rounded-2xl cursor-pointer transition-all" :class="[day.currentMonth ? 'text-slate-900' : 'text-slate-200', selectedDate === day.date ? 'selected-day-ring font-black' : 'hover:bg-slate-50']">
-                                    <svg v-if="getDayStats(day.date)" class="day-progress-svg p-1.5" viewBox="0 0 100 100">
-                                        <circle cx="50" cy="50" r="36" fill="none" :stroke="getDayStats(day.date).color" stroke-width="6" class="opacity-[0.15]"/>
-                                        <circle cx="50" cy="50" r="36" fill="none" :stroke="getDayStats(day.date).color" stroke-width="8" stroke-linecap="round" :stroke-dasharray="2 * Math.PI * 36" :stroke-dashoffset="2 * Math.PI * 36 * (1 - getDayStats(day.date).percent / 100)" style="transition: stroke-dashoffset 0.5s ease"/>
-                                    </svg>
-                                    <div :class="day.date === new Date().toLocaleDateString('sv-SE') ? 'today-number-circle' : ''" class="relative z-10">
-                                        <span class="text-xs sm:text-sm" :class="selectedDate === day.date && day.date !== new Date().toLocaleDateString('sv-SE') ? 'text-indigo-600' : ''">{{ day.dayNum }}</span>
-                                    </div>
+                        <div v-if="isCalendarExpanded" class="relative">
+                            <!-- 快速跳月選取器 (層次高於月曆網格) -->
+                            <div v-if="showMonthJump" class="absolute inset-0 z-20 bg-white/95 backdrop-blur-md animate-in fade-in zoom-in-95 duration-200 flex flex-col p-4 rounded-2xl border border-slate-100 shadow-xl">
+                                <div class="flex justify-between items-center mb-6 px-2">
+                                    <button @click="jumpYear--" class="p-2 text-slate-400 hover:text-indigo-600 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg></button>
+                                    <span class="text-lg font-black text-slate-900 tracking-tight">{{ jumpYear }}年</span>
+                                    <button @click="jumpYear++" class="p-2 text-slate-400 hover:text-indigo-600 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
                                 </div>
+                                <div class="grid grid-cols-3 gap-3 flex-1 overflow-y-auto custom-scroll pr-1">
+                                    <button v-for="(m, idx) in ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月']" 
+                                            :key="idx" 
+                                            @click="jumpToMonth(idx)"
+                                            class="py-3.5 rounded-xl text-sm font-bold transition-all"
+                                            :class="idx === pickerMonth.getMonth() && jumpYear === pickerMonth.getFullYear() ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'bg-slate-50 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600'">
+                                        {{ m }}
+                                    </button>
+                                </div>
+                                <button @click="showMonthJump = false" class="mt-6 py-3 bg-slate-100 text-slate-500 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-200 transition-all">取消選取</button>
                             </div>
-                            <!-- 底部說明圖例 (優化字級與佈局) -->
-                            <div class="mt-6 pt-6 border-t border-slate-50">
-                                <div class="grid grid-cols-2 gap-x-3 gap-y-5">
-                                    <div v-for="p in [{k:'high',l:'高碳日',c:'#6366f1',d:'💪 重點訓練'},{k:'med',l:'中碳日',c:'#8b5cf6',d:'🥗 一般運動'},{k:'low',l:'低碳日',c:'#ec4899',d:'🔥 燃脂休息'},{k:'rest',l:'自由日',c:'#64748b',d:'🧘 身心平衡'}]" :key="p.k" class="flex items-start gap-2.5">
-                                        <span class="w-2.5 h-2.5 rounded-full shrink-0 mt-1" :style="{background:p.c}"></span>
-                                        <div class="flex flex-col min-w-0">
-                                            <span class="text-xs font-black text-slate-700 leading-none truncate">{{p.l}}</span>
-                                            <span class="text-[10px] font-bold text-slate-400 uppercase mt-1.5 leading-tight">{{p.d}}</span>
+
+                            <!-- 月曆網格與圖例 -->
+                            <div class="animate-in fade-in slide-in-from-top-4 duration-500 pb-2">
+                                <div class="grid grid-cols-7 gap-1 mb-2 px-1">
+                                    <div v-for="d in ['一','二','三','四','五','六','日']" class="text-[10px] font-black text-slate-300 text-center py-2 uppercase tracking-tighter">{{ d }}</div>
+                                </div>
+                                <div class="grid grid-cols-7 gap-1.5">
+                                    <div v-for="day in calendarDays" :key="day.date" @click="selectedDate = day.date; toggleCalendar(true)" class="calendar-day-cell rounded-2xl cursor-pointer transition-all" :class="[day.currentMonth ? 'text-slate-900' : 'text-slate-200', selectedDate === day.date ? 'selected-day-ring font-black' : 'hover:bg-slate-50']">
+                                        <svg v-if="getDayStats(day.date)" class="day-progress-svg p-1.5" viewBox="0 0 100 100">
+                                            <circle cx="50" cy="50" r="36" fill="none" :stroke="getDayStats(day.date).color" stroke-width="6" class="opacity-[0.15]"/>
+                                            <circle cx="50" cy="50" r="36" fill="none" :stroke="getDayStats(day.date).color" stroke-width="8" stroke-linecap="round" :stroke-dasharray="2 * Math.PI * 36" :stroke-dashoffset="2 * Math.PI * 36 * (1 - getDayStats(day.date).percent / 100)" style="transition: stroke-dashoffset 0.5s ease"/>
+                                        </svg>
+                                        <div :class="day.date === new Date().toLocaleDateString('sv-SE') ? 'today-number-circle' : ''" class="relative z-10">
+                                            <span class="text-xs sm:text-sm" :class="selectedDate === day.date && day.date !== new Date().toLocaleDateString('sv-SE') ? 'text-indigo-600' : ''">{{ day.dayNum }}</span>
                                         </div>
                                     </div>
                                 </div>
-                                <p class="text-center text-[9px] font-bold text-slate-300 mt-6 uppercase tracking-widest leading-relaxed">圓環進度：攝取與目標差距越小，圓環越完整</p>
+                                <!-- 底部說明圖例 (優化字級與佈局) -->
+                                <div class="mt-6 pt-6 border-t border-slate-50">
+                                    <div class="grid grid-cols-2 gap-x-3 gap-y-5">
+                                        <div v-for="p in [{k:'high',l:'高碳日',c:'#6366f1',d:'💪 重點訓練'},{k:'med',l:'中碳日',c:'#8b5cf6',d:'🥗 一般運動'},{k:'low',l:'低碳日',c:'#ec4899',d:'🔥 燃脂休息'},{k:'rest',l:'自由日',c:'#64748b',d:'🧘 身心平衡'}]" :key="p.k" class="flex items-start gap-2.5">
+                                            <span class="w-2.5 h-2.5 rounded-full shrink-0 mt-1" :style="{background:p.c}"></span>
+                                            <div class="flex flex-col min-w-0">
+                                                <span class="text-xs font-black text-slate-700 leading-none truncate">{{p.l}}</span>
+                                                <span class="text-[10px] font-bold text-slate-400 uppercase mt-1.5 leading-tight">{{p.d}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="text-center text-[9px] font-bold text-slate-300 mt-6 uppercase tracking-widest leading-relaxed">圓環進度：攝取與目標差距越小，圓環越完整</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -485,7 +494,7 @@
                             <div class="flex flex-row md:flex-col justify-center gap-8 md:gap-10 w-full md:w-auto">
                                 <div class="flex flex-col items-center md:items-start min-w-[100px]">
                                     <div class="flex items-center gap-3 mb-3">
-                                        <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-indigo-50 text-indigo-500 shadow-sm border border-indigo-100/50"><svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg></div>
+                                        <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-indigo-50 text-indigo-500 shadow-sm border border-indigo-100/50 p-2"><svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg></div>
                                         <span class="text-xs font-black text-slate-400 uppercase tracking-wider">已攝取</span>
                                     </div>
                                     <div class="flex items-baseline gap-1.5">
@@ -495,7 +504,7 @@
                                 </div>
                                 <div class="flex flex-col items-center md:items-start min-w-[100px]">
                                     <div class="flex items-center gap-3 mb-3">
-                                        <div class="w-8 h-8 rounded-xl flex items-center justify-center border border-slate-100 bg-white shadow-sm"><svg class="w-4.5 h-4.5 text-slate-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm0-4a6 6 0 100-12 6 6 0 000 12zm0-2a2 2 0 100-4 2 2 0 000 4z"></path></svg></div>
+                                        <div class="w-9 h-9 rounded-xl flex items-center justify-center border border-slate-100 bg-white shadow-sm p-2"><svg class="w-full h-full text-slate-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm0-4a6 6 0 100-12 6 6 0 000 12zm0-2a2 2 0 100-4 2 2 0 000 4z"></path></svg></div>
                                         <span class="text-xs font-black text-slate-400 uppercase tracking-wider">目標值</span>
                                     </div>
                                     <div class="flex items-baseline gap-1.5">
@@ -849,10 +858,21 @@
                 const loginPassword = ref('');
 
                 const isCalendarExpanded = ref(window.innerWidth >= 1024);
+                const showMonthJump = ref(false);
+                const jumpYear = ref(new Date().getFullYear());
 
                 const toggleCalendar = (val) => {
                     if (val !== undefined) isCalendarExpanded.value = val;
                     else isCalendarExpanded.value = !isCalendarExpanded.value;
+                    // 如果關閉月曆，也同步關閉跳月面板
+                    if (!isCalendarExpanded.value) showMonthJump.value = false;
+                };
+
+                const jumpToMonth = (mIdx) => {
+                    pickerMonth.value = new Date(jumpYear.value, mIdx, 1);
+                    // 同步更新選中日期到該月 1 號
+                    selectedDate.value = formatDate(new Date(jumpYear.value, mIdx, 1));
+                    showMonthJump.value = false;
                 };
 
                 const editingIndex = ref(null);
@@ -1320,7 +1340,7 @@
                         return { percent: progress, color: colorMap[record.planType] };
                     },
                     autoCalculatePlans, exportCSV, saveData,
-                    isCalendarExpanded, toggleCalendar,
+                    isCalendarExpanded, toggleCalendar, showMonthJump, jumpYear, jumpToMonth,
                     handleAuth: async (mode) => {
                         try {
                             mode === 'login'
