@@ -173,11 +173,13 @@
             position: absolute;
             top: 6px;
             bottom: 6px;
+            left: 6px;
             border-radius: 1.15rem;
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s;
             z-index: 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.12), inset 0 1px 1px rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15), inset 0 1px 2px rgba(255,255,255,0.5);
+            border: 2.5px solid rgba(255,255,255,0.6);
+            transform-origin: center;
         }
 
         /* === 自定義捲軸 (與 Indigo 風格融合) === */
@@ -710,24 +712,24 @@
                         <svg class="w-5 h-5 text-slate-300 absolute left-6 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
 
-                    <div class="flex-1 overflow-y-auto custom-scroll space-y-4 px-2 pb-4">
+                    <div class="flex-1 overflow-y-auto overflow-x-hidden custom-scroll space-y-4 px-2 pb-4">
                         <div v-for="item in mealHistory" :key="item.name" 
                              @click="addFromHistory(item)"
-                             class="p-5 bg-white border border-slate-100 rounded-3xl hover:bg-indigo-50/30 hover:border-indigo-100 cursor-pointer flex justify-between items-center transition-all group active:scale-[0.98]">
-                            <div class="flex-1 mr-4">
+                             class="p-4 sm:p-5 bg-white border border-slate-100 rounded-3xl hover:bg-indigo-50/30 hover:border-indigo-100 cursor-pointer flex justify-between items-center transition-all group active:scale-[0.98] overflow-hidden">
+                            <div class="flex-1 mr-3 min-w-0">
                                 <div class="flex items-center gap-3 mb-2 min-w-0">
                                     <span class="font-black text-slate-900 text-base truncate">{{ item.name }}</span>
                                     <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-lg font-black uppercase group-hover:bg-indigo-100 group-hover:text-indigo-500 transition-colors shrink-0 whitespace-nowrap">{{ item.count }} 次記錄</span>
                                 </div>
-                                <p class="flex items-center gap-2 flex-wrap text-sm">
-                                    <span class="font-black text-indigo-500">{{ item.amount }}{{ item.unit || '份' }}</span>
-                                    <span class="text-slate-200">•</span>
-                                    <span class="font-black text-slate-900">{{ formatNum(item.calories) }}kcal</span>
-                                    <span class="text-slate-200">•</span>
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">碳:<span class="text-slate-900 font-black">{{ formatNum(item.carbs) }}</span> 蛋:<span class="text-slate-900 font-black">{{ formatNum(item.protein) }}</span> 脂:<span class="text-slate-900 font-black">{{ formatNum(item.fat) }}</span></span>
+                                <p class="flex items-center gap-2 flex-wrap text-sm min-w-0">
+                                    <span class="font-black text-indigo-500 shrink-0">{{ item.amount }}{{ item.unit || '份' }}</span>
+                                    <span class="text-slate-200 shrink-0">•</span>
+                                    <span class="font-black text-slate-900 shrink-0">{{ formatNum(item.calories) }}kcal</span>
+                                    <span class="text-slate-200 shrink-0">•</span>
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter truncate">碳:<span class="text-slate-900 font-black">{{ formatNum(item.carbs) }}</span> 蛋:<span class="text-slate-900 font-black">{{ formatNum(item.protein) }}</span> 脂:<span class="text-slate-900 font-black">{{ formatNum(item.fat) }}</span></span>
                                 </p>
                             </div>
-                            <div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center opacity-0 group-hover:opacity-100 shadow-sm transition-all scale-90 group-hover:scale-100">
+                            <div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center opacity-0 group-hover:opacity-100 shadow-sm transition-all scale-90 group-hover:scale-100 shrink-0">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
                             </div>
                         </div>
