@@ -586,7 +586,7 @@
                                     <!-- 顯示模式 -->
                                     <div v-if="editingIndex !== meal.originalIndex" class="p-5 pr-24">
                                         <div class="flex items-center gap-2 mb-3 min-w-0">
-                                            <span class="text-lg font-black text-slate-900 truncate min-w-0">
+                                            <span class="text-lg font-black text-slate-900 break-words min-w-0">
                                                 {{ meal.name || '未命名餐點' }}
                                             </span>
                                         </div>
@@ -718,7 +718,7 @@
                              class="p-4 sm:p-5 bg-white border border-slate-100 rounded-3xl hover:bg-indigo-50/30 hover:border-indigo-100 cursor-pointer flex justify-between items-center transition-all group active:scale-[0.98] overflow-hidden">
                             <div class="flex-1 mr-3 min-w-0">
                                 <div class="flex items-center gap-3 mb-2 min-w-0">
-                                    <span class="font-black text-slate-900 text-base truncate">{{ item.name }}</span>
+                                    <span class="font-black text-slate-900 text-base break-words">{{ item.name }}</span>
                                     <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-lg font-black uppercase group-hover:bg-indigo-100 group-hover:text-indigo-500 transition-colors shrink-0 whitespace-nowrap">{{ item.count }} 次記錄</span>
                                 </div>
                                 <p class="flex items-center gap-2 flex-wrap text-sm min-w-0">
@@ -726,7 +726,7 @@
                                     <span class="text-slate-200 shrink-0">•</span>
                                     <span class="font-black text-slate-900 shrink-0">{{ formatNum(item.calories) }}kcal</span>
                                     <span class="text-slate-200 shrink-0">•</span>
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter truncate">碳:<span class="text-slate-900 font-black">{{ formatNum(item.carbs) }}</span> 蛋:<span class="text-slate-900 font-black">{{ formatNum(item.protein) }}</span> 脂:<span class="text-slate-900 font-black">{{ formatNum(item.fat) }}</span></span>
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">碳:<span class="text-slate-900 font-black">{{ formatNum(item.carbs) }}</span> 蛋:<span class="text-slate-900 font-black">{{ formatNum(item.protein) }}</span> 脂:<span class="text-slate-900 font-black">{{ formatNum(item.fat) }}</span></span>
                                 </p>
                             </div>
                             <div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center opacity-0 group-hover:opacity-100 shadow-sm transition-all scale-90 group-hover:scale-100 shrink-0">
