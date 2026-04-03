@@ -657,13 +657,18 @@
                                     <span class="font-black text-slate-900 text-base break-words">{{ item.name }}</span>
                                     <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-lg font-black uppercase group-hover:bg-indigo-100 group-hover:text-indigo-500 transition-colors shrink-0 whitespace-nowrap">{{ item.count }} 次記錄</span>
                                 </div>
-                                <p class="flex items-center gap-2 flex-wrap text-sm min-w-0">
-                                    <span class="font-black text-indigo-500 shrink-0">{{ item.amount }}{{ item.unit || '份' }}</span>
-                                    <span class="text-slate-200 shrink-0">•</span>
-                                    <span class="font-black text-slate-900 shrink-0">{{ formatNum(item.calories) }}kcal</span>
-                                    <span class="text-slate-200 shrink-0">•</span>
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">碳:<span class="text-slate-900 font-black">{{ formatNum(item.carbs) }}</span> 蛋:<span class="text-slate-900 font-black">{{ formatNum(item.protein) }}</span> 脂:<span class="text-slate-900 font-black">{{ formatNum(item.fat) }}</span></span>
-                                </p>
+                                <div class="space-y-1">
+                                    <p class="flex items-center gap-2 text-sm">
+                                        <span class="font-black text-indigo-500">{{ item.amount }}{{ item.unit || '份' }}</span>
+                                        <span class="text-slate-200">•</span>
+                                        <span class="font-black text-slate-900">{{ formatNum(item.calories) }}kcal</span>
+                                    </p>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+                                        碳:<span class="text-slate-900 font-black mr-2">{{ formatNum(item.carbs) }}</span> 
+                                        蛋:<span class="text-slate-900 font-black mr-2">{{ formatNum(item.protein) }}</span> 
+                                        脂:<span class="text-slate-900 font-black">{{ formatNum(item.fat) }}</span>
+                                    </p>
+                                </div>
                             </div>
                             <div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center opacity-0 group-hover:opacity-100 shadow-sm transition-all scale-90 group-hover:scale-100 shrink-0">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
