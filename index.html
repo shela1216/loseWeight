@@ -369,23 +369,32 @@
                         <div class="flex flex-wrap lg:flex-col justify-between items-center px-1 mb-4 lg:mb-6 gap-y-4">
                             <!-- 日期顯示與今日按鈕 (電腦版置頂，手機版居中) -->
                             <div class="flex items-center gap-3 min-w-0 order-2 lg:order-1 lg:w-full lg:justify-center">
-                                <div class="relative cursor-pointer group text-center min-w-0" @click="toggleCalendar()">
-                                    <div class="flex items-center justify-center gap-2" @click.stop="showMonthJump = !showMonthJump; jumpYear = pickerMonth.getFullYear()">
+                                <div class="relative cursor-pointer group text-center min-w-0">
+                                    <!-- 點擊月份標題：僅觸發快速跳月 -->
+                                    <div class="flex items-center justify-center gap-2" @click="showMonthJump = !showMonthJump; jumpYear = pickerMonth.getFullYear(); toggleCalendar(true)">
                                         <h2 class="text-sm font-black text-slate-800 group-hover:text-indigo-600 transition-colors truncate">{{ currentMonthYearDisplay }}</h2>
                                         <svg class="w-3.5 h-3.5 text-slate-300 group-hover:text-indigo-500 transition-colors shrink-0" :class="showMonthJump ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
                                     </div>
+                                    <!-- 精簡模式下的日期資訊 (僅在收合時顯示) -->
                                     <div v-if="!isCalendarExpanded" class="flex items-center justify-center gap-2 mt-1">
                                         <span class="text-lg font-black text-indigo-600">{{ new Date(selectedDate).getDate() }}日</span>
                                         <span class="px-2 py-0.5 rounded-full text-[10px] font-bold text-white uppercase" :class="{'bg-indigo-500': currentDayRecord.planType === 'high','bg-violet-500': currentDayRecord.planType === 'med','bg-pink-500':currentDayRecord.planType === 'low','bg-slate-400': currentDayRecord.planType === 'rest'}">{{ {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[currentDayRecord.planType] }}</span>
                                     </div>
                                 </div>
-                                <button @click="goToToday(); toggleCalendar(true)" class="h-9 px-3 flex items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-all shrink-0"><span class="text-xs font-black">今日</span></button>
+                                <button @click="goToToday()" class="h-9 px-3 flex items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-all shrink-0"><span class="text-xs font-black">今日</span></button>
+                                
+                                <!-- 獨立收合/展開按鈕 -->
+                                <button @click="toggleCalendar()" 
+                                        class="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:bg-slate-100 transition-all"
+                                        :title="isCalendarExpanded ? '收合日曆' : '展開日曆'">
+                                    <svg class="w-5 h-5 transition-transform duration-300" :class="isCalendarExpanded ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+                                </button>
                             </div>
 
                             <!-- 簡化後的導覽按鈕 (僅上個月、下個月) -->
                             <div class="flex gap-1.5 order-1 lg:order-2 lg:w-full lg:justify-center lg:gap-8 lg:border-t lg:border-slate-50 lg:pt-4">
-                                <button @click="changeMonth(-1); toggleCalendar(true)" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 transition-all" title="上個月"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"></path></svg></button>
-                                <button @click="changeMonth(1); toggleCalendar(true)" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 transition-all" title="下個月"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"></path></svg></button>
+                                <button @click="changeMonth(-1)" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 transition-all" title="上個月"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"></path></svg></button>
+                                <button @click="changeMonth(1)" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 transition-all" title="下個月"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"></path></svg></button>
                             </div>
                         </div>
                         <div v-if="isCalendarExpanded" class="relative">
@@ -449,7 +458,7 @@
                         </div>
                         <div class="segmented-control relative">
                             <div class="segment-indicator" :style="{ width: 'calc((100% - 12px) / 4 - 8px)', transform: `translateX(calc(${Object.keys(plans).indexOf(currentDayRecord.planType)} * (100% + 8px) + 4px))`, backgroundColor: {high:'#6366f1', med:'#8b5cf6', low:'#ec4899', rest:'#64748b'}[currentDayRecord.planType] }"></div>
-                            <div v-for="(p, key) in {high:{l:'高碳', i:'💪'}, med:{l:'中碳', i:'🥗'}, low:{l:'低碳', i:'🔥'}, rest:{l:'自由', i:'🧘'}}" :key="key" @click="currentDayRecord.planType = key; saveData()" class="segment-item" :class="{ active: currentDayRecord.planType === key }">
+                            <div v-for="(p, key) in {high:{l:'高碳', i:'💪'}, med:{l:'中碳', i:'🥗'}, low:{l:'低碳', i:'🔥'}, rest:{l:'自由', i:'🧘'}}" :key="key" @click="setPlanType(key)" class="segment-item" :class="{ active: currentDayRecord.planType === key }">
                                 <span class="text-base transition-transform" :class="currentDayRecord.planType === key ? 'scale-110' : ''">{{ p.i }}</span>
                                 <span class="text-[10px] uppercase">{{ p.l }}</span>
                             </div>
@@ -977,6 +986,33 @@
                     showHistory.value = false;
                 };
 
+                const isTodayOrFuture = (dateStr) => {
+                    const todayStr = formatDate(new Date());
+                    return dateStr >= todayStr;
+                };
+
+                const setPlanType = (type) => {
+                    if (!allData[selectedDate.value]) {
+                        allData[selectedDate.value] = { meals: [] };
+                    }
+                    const day = allData[selectedDate.value];
+                    day.planType = type;
+                    // 快照當前的目標數值到該日期
+                    day.goals = JSON.parse(JSON.stringify(plans[type]));
+                    saveData();
+                };
+
+                const updateFutureGoals = () => {
+                    const todayStr = formatDate(new Date());
+                    // 僅更新當前及未來日期的快照
+                    Object.keys(allData).forEach(date => {
+                        if (date >= todayStr && allData[date].planType) {
+                            allData[date].goals = JSON.parse(JSON.stringify(plans[allData[date].planType]));
+                        }
+                    });
+                    saveData();
+                };
+
                 const autoCalculatePlans = () => {
                     const { gender, weight, height, age, activity } = profile;
                     let bmr = (10 * weight) + (6.25 * height) - (5 * age);
@@ -988,7 +1024,7 @@
                     plans.med = { calories: base, protein: pGrams, carbs: formatNum(base * 0.3 / 4), fat: formatNum(base * 0.3 / 9) };
                     plans.low = { calories: base - 100, protein: pGrams, carbs: formatNum((base - 100) * 0.15 / 4), fat: formatNum((base - 100) * 0.4 / 9) };
                     plans.rest = { calories: base - 300, protein: pGrams, carbs: formatNum((base - 300) * 0.05 / 4), fat: formatNum((base - 300) * 0.5 / 9) };
-                    saveData();
+                    updateFutureGoals();
                 };
 
                 const weekDays = computed(() => {
@@ -1290,11 +1326,16 @@
                         if (!allData[selectedDate.value]) { allData[selectedDate.value] = { planType: 'med', meals: [] }; }
                         return allData[selectedDate.value];
                     }),
-                    currentPlan: computed(() => plans[allData[selectedDate.value]?.planType] || plans.med),
+                    currentPlan: computed(() => {
+                        const day = allData[selectedDate.value];
+                        if (day?.goals) return day.goals;
+                        return plans[day?.planType] || plans.med;
+                    }),
                     getDayDotClass, getMealLabel, getPlanLabel,
                     getDailySum: (type) => (allData[selectedDate.value]?.meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0),
                     getGap: (type) => {
-                        const plan = plans[allData[selectedDate.value]?.planType] || plans.med;
+                        const day = allData[selectedDate.value];
+                        const plan = day?.goals || plans[day?.planType] || plans.med;
                         const sum = (allData[selectedDate.value]?.meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0);
                         return Math.round(plan[type] - sum);
                     },
