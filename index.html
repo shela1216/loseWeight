@@ -138,21 +138,21 @@
             transform: rotate(-90deg);
             pointer-events: none;
         }
-        .today-marker {
-            background-color: #f1f5f9;
-            box-shadow: inset 0 0 0 2px #6366f1;
-        }
-        .today-text-badge {
-            position: absolute;
-            top: 1px;
-            font-size: 7px;
+        .today-number-circle {
+            width: 24px;
+            height: 24px;
+            background-color: #6366f1;
+            color: white !important;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.4);
             font-weight: 900;
-            color: #6366f1;
-            text-transform: uppercase;
-            letter-spacing: -0.02em;
         }
         .selected-day-ring {
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background-color: rgba(241, 245, 249, 0.5);
         }
 
         /* === 熱量大數字 (優化：防止4位數溢出) === */
@@ -435,33 +435,35 @@
                                  @click="selectedDate = day.date; resetCalendarTimer()"
                                  class="calendar-day-cell rounded-xl sm:rounded-2xl cursor-pointer transition-all"
                                  :class="[
-                                    day.currentMonth ? 'text-slate-900 font-black' : 'text-slate-200',
-                                    selectedDate === day.date ? 'selected-day-ring' : 'hover:bg-slate-50',
-                                    day.date === new Date().toLocaleDateString('sv-SE') ? 'today-marker' : ''
+                                    day.currentMonth ? 'text-slate-900' : 'text-slate-200',
+                                    selectedDate === day.date ? 'selected-day-ring font-black' : 'hover:bg-slate-50'
                                  ]">
-                                <!-- 進度條 SVG -->
-                                <svg v-if="getDayStats(day.date)" class="day-progress-svg p-1">
-                                    <circle cx="50%" cy="50%" r="42%" fill="none" stroke="#f1f5f9" stroke-width="2"/>
-                                    <circle cx="50%" cy="50%" r="42%" fill="none" 
-                                            :stroke="getDayStats(day.date).color" 
-                                            stroke-width="3" 
-                                            stroke-linecap="round"
-                                            :stroke-dasharray="2 * Math.PI * 18"
-                                            :stroke-dashoffset="2 * Math.PI * 18 * (1 - getDayStats(day.date).percent / 100)"
-                                            style="transition: stroke-dashoffset 0.5s ease"/>
+                                <!-- 進度條 SVG (優化：縮小尺寸並加入淡色軌道) -->
+                                <svg v-if="getDayStats(day.date)" class="day-progress-svg p-1.5" viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="36" fill="none" :stroke="getDayStats(day.date).color" stroke-width="6" class="opacity-[0.15]"/>
+                                    <circle cx="50" cy="50" r="36" fill="none" :stroke="getDayStats(day.date).color" stroke-width="8" stroke-linecap="round" :stroke-dasharray="2 * Math.PI * 36" :stroke-dashoffset="2 * Math.PI * 36 * (1 - getDayStats(day.date).percent / 100)" style="transition: stroke-dashoffset 0.5s ease"/>
                                 </svg>
                                 
-                                <span class="text-xs sm:text-sm relative z-10" :class="selectedDate === day.date ? 'text-indigo-600' : ''">{{ day.dayNum }}</span>
-                                <span v-if="day.date === new Date().toLocaleDateString('sv-SE')" class="today-text-badge">Today</span>
+                                <!-- 今日標記 (僅圓圈包圍數字) -->
+                                <div :class="day.date === new Date().toLocaleDateString('sv-SE') ? 'today-number-circle' : ''" class="relative z-10">
+                                    <span class="text-xs sm:text-sm" :class="selectedDate === day.date && day.date !== new Date().toLocaleDateString('sv-SE') ? 'text-indigo-600' : ''">{{ day.dayNum }}</span>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- 顏色圖例 -->
-                        <div class="flex items-center justify-center gap-3 sm:gap-5 mt-4 pt-4 border-t border-slate-50 flex-wrap">
-                            <span v-for="p in [{k:'high',l:'高碳',c:'#6366f1'},{k:'med',l:'中碳',c:'#8b5cf6'},{k:'low',l:'低碳',c:'#ec4899'},{k:'rest',l:'自由',c:'#94a3b8'}]" :key="p.k"
-                                  class="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase">
-                                <span class="legend-dot" :style="{background:p.c}"></span>{{p.l}}
-                            </span>
+                        <!-- 底部說明圖例 -->
+                        <div class="mt-4 pt-4 border-t border-slate-50">
+                            <div class="flex flex-wrap justify-center gap-x-4 gap-y-2">
+                                <div v-for="p in [{k:'high',l:'高碳日',c:'#6366f1',d:'💪 重點訓練'},{k:'med',l:'中碳日',c:'#8b5cf6',d:'🥗 一般運動'},{k:'low',l:'低碳日',c:'#ec4899',d:'🔥 燃脂休息'},{k:'rest',l:'自由日',c:'#64748b',d:'🧘 身心平衡'}]" 
+                                     :key="p.k" class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full" :style="{background:p.c}"></span>
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] font-black text-slate-700 leading-none">{{p.l}}</span>
+                                        <span class="text-[8px] font-bold text-slate-300 uppercase mt-0.5">{{p.d}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-center text-[8px] font-bold text-slate-300 mt-4 uppercase tracking-widest">圓環進度：攝取與目標差距越小，圓環越完整</p>
                         </div>
                     </div>
                 </div>
