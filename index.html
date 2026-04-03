@@ -139,8 +139,8 @@
             pointer-events: none;
         }
         .today-number-circle {
-            width: 24px;
-            height: 24px;
+            width: 26px;
+            height: 26px;
             background-color: #6366f1;
             color: white !important;
             border-radius: 50%;
@@ -149,10 +149,12 @@
             justify-content: center;
             box-shadow: 0 4px 10px rgba(99, 102, 241, 0.4);
             font-weight: 900;
+            position: relative;
+            z-index: 2;
         }
         .selected-day-ring {
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-            background-color: rgba(241, 245, 249, 0.5);
+            box-shadow: inset 0 0 0 2px #6366f1;
+            background-color: #f5f7ff;
         }
 
         /* === 熱量大數字 (優化：防止4位數溢出) === */
@@ -950,14 +952,15 @@
 
         createApp({
             setup() {
-                const initialized = ref(false);
-                const user = ref(null);
-                const saving = ref(false);
-                const showSettings = ref(false);
-                const showHistory = ref(false);
-                const showMonthPicker = ref(false);
-                const historySearch = ref('');
-                const selectedDate = ref(new Date().toLocaleDateString('sv-SE'));
+                // 統一日期格式化工具 (確保 YYYY-MM-DD)
+                const formatDate = (d) => {
+                    const y = d.getFullYear();
+                    const m = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, '0');
+                    return `${y}-${m}-${day}`;
+                };
+
+                const selectedDate = ref(formatDate(new Date()));
                 const pickerMonth = ref(new Date()); // 用於月份選擇器的顯示月份
                 const loginEmail = ref('');
                 const loginPassword = ref('');
@@ -1099,7 +1102,7 @@
                     for (let i = 0; i < 7; i++) {
                         const d = new Date(monday);
                         d.setDate(monday.getDate() + i);
-                        days.push({ date: d.toLocaleDateString('sv-SE'), dayNum: d.getDate(), label: labels[i] });
+                        days.push({ date: formatDate(d), dayNum: d.getDate(), label: labels[i] });
                     }
                     return days;
                 });
@@ -1150,16 +1153,16 @@
                     const prevMonthLastDay = new Date(year, month, 0).getDate();
                     for (let i = startDay - 1; i >= 0; i--) {
                         const d = new Date(year, month - 1, prevMonthLastDay - i);
-                        days.push({ date: d.toLocaleDateString('sv-SE'), dayNum: d.getDate(), currentMonth: false });
+                        days.push({ date: formatDate(d), dayNum: d.getDate(), currentMonth: false });
                     }
                     for (let i = 1; i <= lastDay.getDate(); i++) {
                         const d = new Date(year, month, i);
-                        days.push({ date: d.toLocaleDateString('sv-SE'), dayNum: i, currentMonth: true });
+                        days.push({ date: formatDate(d), dayNum: i, currentMonth: true });
                     }
                     const remaining = 42 - days.length;
                     for (let i = 1; i <= remaining; i++) {
                         const d = new Date(year, month + 1, i);
-                        days.push({ date: d.toLocaleDateString('sv-SE'), dayNum: i, currentMonth: false });
+                        days.push({ date: formatDate(d), dayNum: i, currentMonth: false });
                     }
                     return days;
                 });
@@ -1179,7 +1182,10 @@
                 };
 
                 const goToToday = () => {
-                    selectedDate.value = new Date().toLocaleDateString('sv-SE');
+                    const now = new Date();
+                    selectedDate.value = formatDate(now);
+                    // 強制重設為當月第一天以確保 pickerMonth 視角正確
+                    pickerMonth.value = new Date(now.getFullYear(), now.getMonth(), 1);
                 };
 
                 const initApp = async () => {
@@ -1395,15 +1401,18 @@
                     },
                     changeMonth: (dir) => {
                         const d = new Date(selectedDate.value);
+                        const oldDay = d.getDate();
                         d.setMonth(d.getMonth() + dir);
-                        selectedDate.value = d.toLocaleDateString('sv-SE');
-                        // 同步更新月曆視角
+                        // 處理月底溢位問題 (如 3/31 跳 4/30 而非 5/1)
+                        if (d.getDate() !== oldDay) d.setDate(0);
+                        
+                        selectedDate.value = formatDate(d);
                         pickerMonth.value = new Date(d.getFullYear(), d.getMonth(), 1);
                     },
                     changeDay: (dir) => {
                         const d = new Date(selectedDate.value);
                         d.setDate(d.getDate() + dir);
-                        selectedDate.value = d.toLocaleDateString('sv-SE');
+                        selectedDate.value = formatDate(d);
                         // 如果跨月，也更新月曆視角
                         if (d.getMonth() !== pickerMonth.value.getMonth()) {
                             pickerMonth.value = new Date(d.getFullYear(), d.getMonth(), 1);
