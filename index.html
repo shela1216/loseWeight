@@ -261,7 +261,7 @@
             box-shadow: 0 6px 16px rgba(94, 92, 230, 0.35);
         }
         .btn-circular span {
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
             color: #64748b;
             line-height: 1;
@@ -336,7 +336,7 @@
                                 </div>
                                 <div class="min-w-0">
                                     <h1 class="text-xl sm:text-2xl font-black tracking-tight text-slate-900 leading-none truncate">輕盈飲食</h1>
-                                    <p class="text-[9px] sm:text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest truncate">Health Record</p>
+                                    <p class="text-[9px] sm:text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest truncate">Health Record</p>
                                 </div>
                             </div>
                             <!-- 功能按鈕區 (圓型樣式) -->
@@ -378,7 +378,7 @@
                                     <!-- 精簡模式下的日期資訊 (僅在收合時顯示) -->
                                     <div v-if="!isCalendarExpanded" class="flex items-center justify-center gap-2 mt-1">
                                         <span class="text-lg font-black text-indigo-600">{{ new Date(selectedDate).getDate() }}日</span>
-                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold text-white uppercase" :class="{'bg-indigo-500': currentDayRecord.planType === 'high','bg-violet-500': currentDayRecord.planType === 'med','bg-pink-500':currentDayRecord.planType === 'low','bg-slate-400': currentDayRecord.planType === 'rest'}">{{ {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[currentDayRecord.planType] }}</span>
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold text-white uppercase" :class="{'bg-indigo-500': currentDayRecord.planType === 'high','bg-violet-500': currentDayRecord.planType === 'med','bg-pink-500':currentDayRecord.planType === 'low','bg-slate-400': currentDayRecord.planType === 'rest'}">{{ {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[currentDayRecord.planType] }}</span>
                                     </div>
                                 </div>
                                 <button @click="goToToday()" class="h-9 px-3 flex items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-all shrink-0"><span class="text-xs font-black">今日</span></button>
@@ -420,7 +420,7 @@
                             <!-- 月曆網格與圖例 -->
                             <div class="animate-in fade-in slide-in-from-top-4 duration-500 pb-2">
                                 <div class="grid grid-cols-7 gap-1 mb-2 px-1">
-                                    <div v-for="d in ['一','二','三','四','五','六','日']" class="text-[10px] font-black text-slate-300 text-center py-2 uppercase tracking-tighter">{{ d }}</div>
+                                    <div v-for="d in ['一','二','三','四','五','六','日']" class="text-[10px] sm:text-xs font-black text-slate-300 text-center py-2 uppercase tracking-tighter">{{ d }}</div>
                                 </div>
                                 <div class="grid grid-cols-7 gap-1.5">
                                     <div v-for="day in calendarDays" :key="day.date" @click="selectedDate = day.date; toggleCalendar(true)" class="calendar-day-cell rounded-2xl cursor-pointer transition-all" :class="[day.currentMonth ? 'text-slate-900' : 'text-slate-200', selectedDate === day.date ? 'selected-day-ring font-black' : 'hover:bg-slate-50']">
@@ -440,11 +440,11 @@
                                             <span class="w-2.5 h-2.5 rounded-full shrink-0 mt-1" :style="{background:p.c}"></span>
                                             <div class="flex flex-col min-w-0">
                                                 <span class="text-xs font-black text-slate-700 leading-none truncate">{{p.l}}</span>
-                                                <span class="text-[10px] font-bold text-slate-400 uppercase mt-1.5 leading-tight">{{p.d}}</span>
+                                                <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mt-1.5 leading-tight">{{p.d}}</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <p class="text-center text-[9px] font-bold text-slate-300 mt-6 uppercase tracking-widest leading-relaxed">圓環進度：攝取與目標差距越小，圓環越完整</p>
+                                    <p class="text-center text-[9px] sm:text-xs font-bold text-slate-300 mt-6 uppercase tracking-widest leading-relaxed">圓環進度：攝取與目標差距越小，圓環越完整</p>
                                 </div>
                             </div>
                         </div>
@@ -460,7 +460,7 @@
                             <div class="segment-indicator" :style="{ width: 'calc((100% - 12px) / 4 - 8px)', transform: `translateX(calc(${Object.keys(plans).indexOf(currentDayRecord.planType)} * (100% + 8px) + 4px))`, backgroundColor: {high:'#6366f1', med:'#8b5cf6', low:'#ec4899', rest:'#64748b'}[currentDayRecord.planType] }"></div>
                             <div v-for="(p, key) in {high:{l:'高碳', i:'💪'}, med:{l:'中碳', i:'🥗'}, low:{l:'低碳', i:'🔥'}, rest:{l:'自由', i:'🧘'}}" :key="key" @click="setPlanType(key)" class="segment-item" :class="{ active: currentDayRecord.planType === key }">
                                 <span class="text-base transition-transform" :class="currentDayRecord.planType === key ? 'scale-110' : ''">{{ p.i }}</span>
-                                <span class="text-[10px] uppercase">{{ p.l }}</span>
+                                <span class="text-[10px] sm:text-xs uppercase">{{ p.l }}</span>
                             </div>
                         </div>
                     </div>
@@ -516,10 +516,10 @@
                             <div v-for="n in nutrientKeys" :key="n.key" class="min-w-0">
                                 <!-- 頂部：還差多少 (較大) -->
                                 <div class="flex flex-col items-center sm:items-start mb-1 sm:mb-3">
-                                    <div class="nutrient-label truncate uppercase tracking-widest text-[9px] sm:text-[10px] mb-0.5 sm:mb-2">{{ n.label }}</div>
+                                    <div class="nutrient-label truncate uppercase tracking-widest text-[9px] sm:text-xs mb-0.5 sm:mb-2">{{ n.label }}</div>
                                     <div class="flex items-baseline gap-0.5 sm:gap-1">
-                                        <span class="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase leading-none">{{ getGap(n.key) >= 0 ? '還差' : '超出' }}</span>
-                                        <span class="text-base sm:text-xl font-black leading-none" :class="getGap(n.key) < 0 ? 'text-rose-500' : 'text-slate-800'">{{ formatNum(Math.abs(getGap(n.key))) }}<span class="text-[9px] font-bold text-slate-300 ml-0.5 uppercase">g</span></span>
+                                        <span class="text-[8px] sm:text-xs sm:text-[9px] sm:text-xs font-bold text-slate-400 uppercase leading-none">{{ getGap(n.key) >= 0 ? '還差' : '超出' }}</span>
+                                        <span class="text-base sm:text-xl font-black leading-none" :class="getGap(n.key) < 0 ? 'text-rose-500' : 'text-slate-800'">{{ formatNum(Math.abs(getGap(n.key))) }}<span class="text-[9px] sm:text-xs font-bold text-slate-300 ml-0.5 uppercase">g</span></span>
                                     </div>
                                 </div>
                                 <div class="bg-slate-50 rounded-full overflow-hidden h-1 sm:h-2 mb-1.5 sm:mb-3">
@@ -529,7 +529,7 @@
                                 <div class="text-center sm:text-left">
                                     <div class="flex items-center justify-center sm:justify-start gap-1">
                                         <span class="text-[10px] sm:text-xs font-black text-slate-700">{{ formatNum(getDailySum(n.key)) }}</span>
-                                        <span class="text-[9px] font-bold text-slate-300 uppercase">/ {{ currentPlan[n.key] }}g</span>
+                                        <span class="text-[9px] sm:text-xs font-bold text-slate-300 uppercase">/ {{ currentPlan[n.key] }}g</span>
                                     </div>
                                 </div>
                             </div>
@@ -566,7 +566,7 @@
                                     <div class="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6 px-1">
                                         <span class="w-1.5 h-5 sm:w-2 sm:h-6 rounded-full" :style="{ backgroundColor: {breakfast:'#6366f1', lunch:'#8b5cf6', dinner:'#3b82f6', snack:'#ec4899'}[typeObj.key] }"></span>
                                         <h4 class="text-sm sm:text-base font-black text-slate-800 tracking-wider uppercase">{{ typeObj.label }}</h4>
-                                        <span class="text-[10px] font-bold text-slate-300 ml-auto uppercase tracking-widest">{{ getMealsByType(typeObj.key).length }} 筆</span>
+                                        <span class="text-[10px] sm:text-xs font-bold text-slate-300 ml-auto uppercase tracking-widest">{{ getMealsByType(typeObj.key).length }} 筆</span>
                                     </div>
                                     <div class="space-y-3 sm:space-y-4">
                                         <div v-for="meal in getMealsByType(typeObj.key)" :key="meal.originalIndex" class="meal-card rounded-2xl sm:rounded-3xl border border-slate-100 bg-[#fcfdfe] relative overflow-hidden group">
@@ -578,13 +578,13 @@
                                                 <div class="flex items-center text-xs sm:text-sm font-black mb-1 sm:mb-2">
                                                     <span class="text-indigo-500 bg-indigo-50 px-1.5 py-0.5 rounded-lg">{{ meal.amount }}{{ meal.unit || '份' }}</span>
                                                     <span class="mx-2 text-slate-200">|</span>
-                                                    <span class="text-slate-900">{{ formatNum(meal.calories) }} <span class="text-[9px] sm:text-[10px] text-slate-400 uppercase ml-0.5">kcal</span></span>
+                                                    <span class="text-slate-900">{{ formatNum(meal.calories) }} <span class="text-[9px] sm:text-xs text-slate-400 uppercase ml-0.5">kcal</span></span>
                                                 </div>
                                                 <!-- 第二行：三大營養素 -->
                                                 <div class="flex items-center gap-3 sm:gap-4">
-                                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">碳:<span class="text-slate-900 font-black ml-0.5">{{ formatNum(meal.carbs) }}g</span></span>
-                                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">蛋:<span class="text-slate-900 font-black ml-0.5">{{ formatNum(meal.protein) }}g</span></span>
-                                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">脂:<span class="text-slate-900 font-black ml-0.5">{{ formatNum(meal.fat) }}g</span></span>
+                                                    <span class="text-[9px] sm:text-xs font-bold text-slate-400 uppercase tracking-tighter">碳:<span class="text-slate-900 font-black ml-0.5">{{ formatNum(meal.carbs) }}g</span></span>
+                                                    <span class="text-[9px] sm:text-xs font-bold text-slate-400 uppercase tracking-tighter">蛋:<span class="text-slate-900 font-black ml-0.5">{{ formatNum(meal.protein) }}g</span></span>
+                                                    <span class="text-[9px] sm:text-xs font-bold text-slate-400 uppercase tracking-tighter">脂:<span class="text-slate-900 font-black ml-0.5">{{ formatNum(meal.fat) }}g</span></span>
                                                 </div>
                                             </div>
                                             <div v-if="editingIndex !== meal.originalIndex" class="absolute top-1/2 -translate-y-1/2 right-2 sm:right-4 flex gap-0.5 sm:gap-1">
@@ -594,7 +594,7 @@
                                             <div v-if="editingIndex === meal.originalIndex" class="p-8 space-y-6 bg-white border-2 border-indigo-500/20 rounded-[2rem]">
                                                 <div class="flex gap-4"><select v-model="editingMeal.type" class="bg-slate-50 rounded-2xl px-5 py-4 text-sm font-black border border-slate-100 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"><option value="breakfast">🌅 早餐</option><option value="lunch">☀️ 午餐</option><option value="dinner">🌙 晚餐</option><option value="snack">🍰 點心</option></select><input v-model="editingMeal.name" class="flex-1 px-5 py-4 bg-slate-50 rounded-2xl border border-slate-100 text-sm font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 focus:bg-white transition-all" placeholder="餐點名稱"></div>
                                                 <div class="flex items-center gap-4"><div class="flex-1 flex items-center gap-4 bg-slate-50 rounded-2xl border border-slate-100 px-5 py-4 focus-within:ring-4 focus-within:ring-indigo-500/10 focus-within:border-indigo-500 focus-within:bg-white transition-all"><span class="text-xs font-black text-slate-400 uppercase tracking-widest shrink-0">份量</span><input type="number" v-model.number="editingMeal.amount" @focus="prepareScale" @input="scaleNutrients" class="w-full text-lg font-black outline-none text-right bg-transparent" step="any"></div><select v-model="editingMeal.unit" class="bg-slate-50 rounded-2xl px-5 py-4 text-sm font-black border border-slate-100 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"><option value="份">份</option><option value="g">g</option><option value="ml">ml</option></select></div>
-                                                <div class="grid grid-cols-2 gap-4"><div v-for="n in [{key:'calories', label:'熱量 (kcal)'}, {key:'carbs', label:'碳水 (g)'}, {key:'protein', label:'蛋白質 (g)'}, {key:'fat', label:'脂肪 (g)'}]" :key="n.key" class="space-y-2"><label class="text-[10px] text-slate-400 font-black uppercase tracking-widest block pl-1">{{ n.label }}</label><input type="number" v-model.number="editingMeal[n.key]" class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl font-black text-center text-lg outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 focus:bg-white transition-all"></div></div>
+                                                <div class="grid grid-cols-2 gap-4"><div v-for="n in [{key:'calories', label:'熱量 (kcal)'}, {key:'carbs', label:'碳水 (g)'}, {key:'protein', label:'蛋白質 (g)'}, {key:'fat', label:'脂肪 (g)'}]" :key="n.key" class="space-y-2"><label class="text-[10px] sm:text-xs text-slate-400 font-black uppercase tracking-widest block pl-1">{{ n.label }}</label><input type="number" v-model.number="editingMeal[n.key]" class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl font-black text-center text-lg outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 focus:bg-white transition-all"></div></div>
                                                 <div class="flex gap-4 pt-4"><button @click="cancelEdit" class="w-1/3 py-5 bg-slate-100 text-slate-500 rounded-2xl text-sm font-black hover:bg-slate-200 active:scale-95 transition-all">取消</button><button @click="saveMeal()" class="flex-1 py-5 btn-gradient text-white rounded-2xl text-sm font-black shadow-xl shadow-indigo-100 hover:shadow-indigo-200 active:scale-95 transition-all">儲存餐點變更</button></div>
                                             </div>
                                         </div>
@@ -641,7 +641,7 @@
                     <div class="flex justify-between items-center mb-8 px-2 shrink-0">
                         <div>
                             <h3 class="text-2xl font-black text-slate-900 tracking-tight">選擇歷史餐點</h3>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">從您的資料庫中快速選擇</p>
+                            <p class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">從您的資料庫中快速選擇</p>
                         </div>
                         <button @click="showHistory = false" class="w-10 h-10 flex items-center justify-center bg-slate-50 rounded-2xl text-slate-400 hover:text-slate-600 transition-colors"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg></button>
                     </div>
@@ -658,7 +658,7 @@
                             <div class="flex-1 mr-3 min-w-0">
                                 <div class="flex items-center gap-3 mb-2 min-w-0">
                                     <span class="font-black text-slate-900 text-base break-words">{{ item.name }}</span>
-                                    <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-lg font-black uppercase group-hover:bg-indigo-100 group-hover:text-indigo-500 transition-colors shrink-0 whitespace-nowrap">{{ item.count }} 次記錄</span>
+                                    <span class="text-[10px] sm:text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-lg font-black uppercase group-hover:bg-indigo-100 group-hover:text-indigo-500 transition-colors shrink-0 whitespace-nowrap">{{ item.count }} 次記錄</span>
                                 </div>
                                 <div class="space-y-1">
                                     <p class="flex items-center gap-2 text-sm">
@@ -666,7 +666,7 @@
                                         <span class="text-slate-200">•</span>
                                         <span class="font-black text-slate-900">{{ formatNum(item.calories) }}kcal</span>
                                     </p>
-                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+                                    <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-tighter">
                                         碳:<span class="text-slate-900 font-black mr-2">{{ formatNum(item.carbs) }}</span> 
                                         蛋:<span class="text-slate-900 font-black mr-2">{{ formatNum(item.protein) }}</span> 
                                         脂:<span class="text-slate-900 font-black">{{ formatNum(item.fat) }}</span>
@@ -698,7 +698,7 @@
                     <div class="flex justify-between items-center p-8 sm:p-10 pb-4 shrink-0 px-10">
                         <div>
                             <h3 class="text-3xl font-black text-slate-900 tracking-tight">設定與目標</h3>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">個人化您的健康計劃</p>
+                            <p class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">個人化您的健康計劃</p>
                         </div>
                         <button @click="showSettings = false" class="w-12 h-12 flex items-center justify-center bg-slate-50 rounded-2xl text-slate-400 hover:text-slate-600 transition-colors">
                             <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -756,7 +756,7 @@
                                 <button @click="autoCalculatePlans"
                                     class="w-full sm:flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all">依照數據自動計算</button>
                                 <div class="text-center sm:text-right shrink-0">
-                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">預估 TDEE</span>
+                                    <span class="text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-widest block mb-1">預估 TDEE</span>
                                     <span class="text-2xl font-black text-indigo-600 leading-none">{{ calculatedTDEE }} <span class="text-xs text-slate-300 font-bold">kcal</span></span>
                                 </div>
                             </div>
@@ -774,7 +774,7 @@
                                         <span class="w-2.5 h-2.5 rounded-full" :class="'dot-'+key"></span>
                                         <div class="text-base font-black text-slate-900">{{ getPlanLabel(key) }}</div>
                                     </div>
-                                    <span class="text-[10px] text-slate-300 font-black uppercase tracking-widest">熱量 • 碳水 • 蛋白 • 脂肪</span>
+                                    <span class="text-[10px] sm:text-xs text-slate-300 font-black uppercase tracking-widest">熱量 • 碳水 • 蛋白 • 脂肪</span>
                                 </div>
                                 <div class="grid grid-cols-4 gap-3">
                                     <div v-for="n in ['calories', 'carbs', 'protein', 'fat']" :key="n" class="space-y-1.5">
