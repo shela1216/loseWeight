@@ -659,12 +659,12 @@
                     <!-- 第3排: 份量 + 單位 (左右組合) -->
                     <div class="flex items-center gap-3">
                         <div class="flex-1 bg-slate-50 rounded-2xl px-5 py-3 flex flex-col border border-transparent focus-within:border-indigo-100 focus-within:bg-white transition-all">
-                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">份量數值</label>
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">份量數值</label>
                             <input type="number" v-model.number="editingMeal.amount" @focus="prepareScale" @input="scaleNutrients" 
                                 class="bg-transparent text-xl font-black outline-none w-full" step="any">
                         </div>
                         <div class="w-1/3 bg-slate-50 rounded-2xl px-5 py-3 flex flex-col border border-transparent focus-within:border-indigo-100 focus-within:bg-white transition-all">
-                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">單位</label>
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">單位</label>
                             <select v-model="editingMeal.unit" class="bg-transparent text-sm font-black text-slate-700 outline-none cursor-pointer appearance-none">
                                 <option value="份">份</option><option value="g">公克</option><option value="ml">毫升</option>
                             </select>
@@ -674,7 +674,7 @@
                     <!-- 第4排: 熱量 (淺色背景) -->
                     <div class="bg-slate-50 rounded-[1.75rem] px-6 py-4 flex items-center justify-between border border-transparent focus-within:border-orange-100 focus-within:bg-white transition-all">
                         <div class="flex flex-col">
-                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">預估熱量</label>
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">預估熱量</label>
                             <div class="flex items-baseline gap-1 text-slate-900">
                                 <input type="number" v-model.number="editingMeal.calories" class="bg-transparent text-2xl font-black outline-none w-24">
                                 <span class="text-xs font-bold text-slate-300 uppercase">kcal</span>
@@ -688,10 +688,10 @@
                         <div v-for="n in [{key:'carbs', label:'碳水', color:'#6366f1'}, {key:'protein', label:'蛋白', color:'#8b5cf6'}, {key:'fat', label:'脂肪', color:'#ec4899'}]" 
                              :key="n.key" 
                              class="bg-slate-50/50 border border-slate-100 rounded-2xl p-3 flex flex-col items-center gap-1.5 focus-within:bg-white focus-within:ring-2 focus-within:ring-indigo-500/10 transition-all">
-                            <div class="text-[8px] font-black text-slate-400 uppercase tracking-tighter">{{ n.label }}</div>
+                            <div class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{{ n.label }}</div>
                             <div class="flex items-baseline gap-0.5">
-                                <input type="number" v-model.number="editingMeal[n.key]" class="w-8 text-center text-sm font-black bg-transparent outline-none text-slate-900">
-                                <span class="text-[8px] font-bold text-slate-300">g</span>
+                                <input type="number" v-model.number="editingMeal[n.key]" class="w-10 text-center text-base font-black bg-transparent outline-none text-slate-900">
+                                <span class="text-[10px] font-bold text-slate-300">g</span>
                             </div>
                             <div class="w-4 h-0.5 rounded-full" :style="{ backgroundColor: n.color }"></div>
                         </div>
@@ -705,13 +705,13 @@
                         <span>保存餐點紀錄</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
                     </button>
-                    <button @click="cancelEdit" class="w-full mt-3 text-slate-300 text-[10px] font-black uppercase tracking-[0.2em] hover:text-slate-500 transition-colors text-center">捨棄變更</button>
+                    <button @click="cancelEdit" class="w-full mt-3 text-slate-300 text-xs font-black uppercase tracking-[0.2em] hover:text-slate-500 transition-colors text-center">捨棄變更</button>
                 </div>
             </div>
         </div>
             
             <!-- 同步確認 Modal -->
-            <div v-if="showSyncModal" class="fixed inset-0 z-[90] flex items-center justify-center p-4">
+            <div v-if="showSyncModal" class="fixed inset-0 z-[120] flex items-center justify-center p-4">
                 <div class="modal-overlay absolute inset-0"></div>
                 <div class="bg-white rounded-[2.5rem] p-10 relative z-10 w-full max-w-sm text-center shadow-2xl border border-slate-100">
                     <div class="w-20 h-20 bg-amber-50 text-amber-500 rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-inner">
@@ -731,7 +731,7 @@
             </div>
 
             <!-- 歷史紀錄 Modal -->
-            <div v-if="showHistory" class="fixed inset-0 z-[70] flex items-center justify-center p-4">
+            <div v-if="showHistory" class="fixed inset-0 z-[110] flex items-center justify-center p-4">
                 <div class="modal-overlay absolute inset-0" @click="showHistory = false"></div>
                 <div class="bg-white w-full max-w-lg rounded-[2.5rem] p-8 relative z-10 shadow-2xl flex flex-col max-h-[85vh] border border-slate-100">
                     <div class="flex justify-between items-center mb-8 px-2 shrink-0">
