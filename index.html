@@ -956,8 +956,80 @@
                 const saving = ref(false);
                 const showSettings = ref(false);
                 const showHistory = ref(false);
+                const showExportModal = ref(false);
+                const isExporting = ref(false);
+                const exportRange = reactive({ start: formatDate(new Date()), end: formatDate(new Date()) });
                 const showMonthPicker = ref(false);
                 const historySearch = ref('');
+
+                const exportImage = async () => {
+                    isExporting.value = true;
+                    await Vue.nextTick();
+                    const reportEl = document.getElementById('export-report');
+                    reportEl.style.display = 'block';
+                    const stats = getRangeStats();
+                    renderExportCharts(stats);
+                    await new Promise(r => setTimeout(r, 800));
+                    try {
+                        const canvas = await html2canvas(reportEl, { scale: 2, useCORS: true, backgroundColor: '#f8f9fb' });
+                        const link = document.createElement('a');
+                        link.download = `健康報告_${exportRange.start}_to_${exportRange.end}.png`;
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                        showExportModal.value = false;
+                    } catch (e) {
+                        console.error('匯出圖片失敗', e);
+                        alert('匯出失敗，請稍後再試');
+                    } finally {
+                        reportEl.style.display = 'none';
+                        isExporting.value = false;
+                    }
+                };
+
+                const getRangeStats = () => {
+                    const stats = { days: 0, totalCalories: 0, avgCalories: 0, totalCarbs: 0, totalProtein: 0, totalFat: 0, dailyLabels: [], dailyCals: [], meals: [] };
+                    const start = new Date(exportRange.start);
+                    const end = new Date(exportRange.end);
+                    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                        const dateStr = formatDate(d);
+                        const record = allData[dateStr];
+                        stats.days++;
+                        stats.dailyLabels.push(dateStr.slice(5));
+                        let dayCal = 0;
+                        if (record && record.meals) {
+                            record.meals.forEach(m => {
+                                dayCal += Number(m.calories) || 0;
+                                stats.totalCalories += Number(m.calories) || 0;
+                                stats.totalCarbs += Number(m.carbs) || 0;
+                                stats.totalProtein += Number(m.protein) || 0;
+                                stats.totalFat += Number(m.fat) || 0;
+                                stats.meals.push({ date: dateStr, ...m });
+                            });
+                        }
+                        stats.dailyCals.push(dayCal);
+                    }
+                    stats.avgCalories = stats.days > 0 ? Math.round(stats.totalCalories / stats.days) : 0;
+                    return stats;
+                };
+
+                let nutrientChart = null;
+                let trendChart = null;
+                const renderExportCharts = (stats) => {
+                    if (nutrientChart) nutrientChart.destroy();
+                    if (trendChart) trendChart.destroy();
+                    const ctx1 = document.getElementById('nutrientChart').getContext('2d');
+                    nutrientChart = new Chart(ctx1, {
+                        type: 'doughnut',
+                        data: { labels: ['碳水', '蛋白', '脂肪'], datasets: [{ data: [stats.totalCarbs, stats.totalProtein, stats.totalFat], backgroundColor: ['#6366f1', '#8b5cf6', '#ec4899'], borderWidth: 0 }] },
+                        options: { responsive: false, animation: false, plugins: { legend: { position: 'bottom', labels: { font: { weight: 'bold' } } } } }
+                    });
+                    const ctx2 = document.getElementById('trendChart').getContext('2d');
+                    trendChart = new Chart(ctx2, {
+                        type: 'line',
+                        data: { labels: stats.dailyLabels, datasets: [{ label: '每日熱量 (kcal)', data: stats.dailyCals, borderColor: '#6366f1', backgroundColor: 'rgba(99, 102, 241, 0.1)', fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: '#6366f1' }] },
+                        options: { responsive: false, animation: false, scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } }
+                    });
+                };
 
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
