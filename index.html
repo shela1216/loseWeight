@@ -15,9 +15,10 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <!-- 引入圖表與截圖庫 -->
+    <!-- 引入圖表、截圖與 PDF 庫 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="manifest" href='manifest.json'>
     <style>
         [v-cloak] {
@@ -1682,6 +1683,52 @@
                         const gapPercent = (Math.abs(goal - intake) / goal) * 100;
                         const progress = Math.max(0, 100 - gapPercent);
                         const colorMap = { high: '#6366f1', med: '#8b5cf6', low: '#ec4899', rest: '#64748b' };
+                        return { percent: progress, color: colorMap[record.planType] };
+                    },
+                    autoCalculatePlans, exportCSV, saveData,
+                    showExportModal, isExporting, exportRange, exportPDF, getRangeStats,
+                    isCalendarExpanded, toggleCalendar, showMonthJump, jumpYear, jumpToMonth,
+                    handleAuth: async (mode) => {
+                        try {
+                            mode === 'login'
+                                ? await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value)
+                                : await createUserWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
+                        } catch (e) { alert('驗證失敗'); }
+                    },
+                    handleAnonymous: () => signInAnonymously(auth),
+                    handleLogout: () => signOut(auth)
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+
+</html>onst goal = plan.calories || 1;
+                        // 差距百分比邏輯: Gap 0 -> 100%, Gap 100% -> 0%
+                        const gapPercent = (Math.abs(goal - intake) / goal) * 100;
+                        const progress = Math.max(0, 100 - gapPercent);
+                        const colorMap = { high: '#6366f1', med: '#8b5cf6', low: '#ec4899', rest: '#64748b' };
+                        return { percent: progress, color: colorMap[record.planType] };
+                    },
+                    autoCalculatePlans, exportCSV, saveData,
+                    showExportModal, isExporting, exportRange, exportImage, getRangeStats,
+                    isCalendarExpanded, toggleCalendar, showMonthJump, jumpYear, jumpToMonth,
+                    handleAuth: async (mode) => {
+                        try {
+                            mode === 'login'
+                                ? await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value)
+                                : await createUserWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
+                        } catch (e) { alert('驗證失敗'); }
+                    },
+                    handleAnonymous: () => signInAnonymously(auth),
+                    handleLogout: () => signOut(auth)
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+
+</html>'#ec4899', rest: '#64748b' };
                         return { percent: progress, color: colorMap[record.planType] };
                     },
                     autoCalculatePlans, exportCSV, saveData,
