@@ -122,14 +122,14 @@
                                 <p class="text-[9px] sm:text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">Health Record</p>
                             </div>
                         </div>
-                        <!-- FAB Container for Desktop -->
+                        <!-- FAB Container for Desktop & Mobile Header -->
                         <div class="flex gap-3 sm:gap-4 items-center lg:fixed lg:bottom-8 lg:right-8 lg:flex-col lg:gap-6 lg:z-[90] lg:bg-indigo-50/90 lg:backdrop-blur-xl lg:p-6 lg:rounded-[3rem] lg:shadow-2xl lg:border lg:border-indigo-100/50">
                             <button @click="showExportModal = true" class="btn-circular group" title="匯出報告">
                                 <div class="icon-wrapper"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg></div>
                                 <span class="lg:absolute lg:right-20 lg:bg-slate-900 lg:text-white lg:px-3 lg:py-1.5 lg:rounded-lg lg:text-[10px] lg:opacity-0 lg:group-hover:opacity-100 lg:transition-all lg:whitespace-nowrap lg:shadow-xl">匯出報告</span>
                             </button>
                             <button @click="showSettings = true" class="btn-circular group" title="設定目標">
-                                <div class="icon-wrapper"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+                                <div class="icon-wrapper"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
                                 <span class="lg:absolute lg:right-20 lg:bg-slate-900 lg:text-white lg:px-3 lg:py-1.5 lg:rounded-lg lg:text-[10px] lg:opacity-0 lg:group-hover:opacity-100 lg:transition-all lg:whitespace-nowrap lg:shadow-xl">設定</span>
                             </button>
                             <button @click="handleLogout" class="btn-circular group" title="登出">
@@ -144,7 +144,7 @@
                         <div class="flex justify-between items-center mb-4">
                             <div class="flex items-center gap-2">
                                 <button @click="toggleCalendar()" class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 text-slate-400"><svg class="w-4 h-4 transition-transform" :class="isCalendarExpanded ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button>
-                                <h2 class="text-sm font-black text-slate-800" @click="showMonthJump = !showMonthJump">{{ currentMonthYearDisplay }}</h2>
+                                <h2 class="text-sm font-black text-slate-800">{{ currentMonthYearDisplay }}</h2>
                             </div>
                             <div class="flex gap-2">
                                 <button @click="changeMonth(-1)" class="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-indigo-600"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg></button>
@@ -153,7 +153,7 @@
                         </div>
                         <div v-if="isCalendarExpanded">
                             <div class="grid grid-cols-7 gap-1 mb-2 text-center text-[10px] font-black text-slate-300 uppercase">
-                                <div v-for="d in ['一','二','三','四','五','六','日']">{{d}}</div>
+                                <div v-for="d in ['一','二','三','四','五','六','日']" :key="d">{{d}}</div>
                             </div>
                             <div class="grid grid-cols-7 gap-1.5">
                                 <div v-for="day in calendarDays" :key="day.date" @click="selectedDate = day.date" class="calendar-day-cell rounded-xl cursor-pointer transition-all" :class="[day.currentMonth ? 'text-slate-900' : 'text-slate-200', selectedDate === day.date ? 'selected-day-ring' : 'hover:bg-slate-50']">
@@ -170,7 +170,7 @@
                     <!-- Plan Selector -->
                     <div class="bg-white rounded-[2rem] p-5 shadow-sm border border-slate-100/50">
                         <div class="segmented-control relative">
-                            <div class="segment-indicator" :style="{ width: 'calc((100% - 12px) / 4 - 4px)', transform: `translateX(calc(${Object.keys(plans).indexOf(currentDayRecord.planType)} * (100% + 4px) + 2px))`, backgroundColor: {high:'#f59e0b', med:'#6366f1', low:'#f43f5e', rest:'#64748b'}[currentDayRecord.planType] }"></div>
+                            <div class="segment-indicator" :style="{ width: 'calc((100% - 12px) / 4 - 4px)', transform: `translateX(calc(${['high','med','low','rest'].indexOf(currentDayRecord.planType)} * (100% + 4px) + 2px))`, backgroundColor: {high:'#f59e0b', med:'#6366f1', low:'#f43f5e', rest:'#64748b'}[currentDayRecord.planType] }"></div>
                             <div v-for="(p, key) in {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}" :key="key" @click="setPlanType(key)" class="segment-item" :class="{ active: currentDayRecord.planType === key }">
                                 <span class="text-[11px] uppercase font-black">{{ p }}</span>
                             </div>
@@ -272,7 +272,7 @@
         <!-- Edit Meal -->
         <div v-if="editingIndex !== null" class="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
             <div class="modal-overlay absolute inset-0" @click="cancelEdit"></div>
-            <div class="bg-white w-full max-w-lg rounded-t-[3rem] sm:rounded-[3rem] relative z-10 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in slide-in-from-bottom-10 duration-300">
+            <div class="bg-white w-full max-w-lg rounded-t-[3rem] sm:rounded-[3rem] relative z-10 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
                 <div class="px-8 pt-10 pb-6">
                     <h3 class="text-3xl font-black text-slate-900 tracking-tight">{{ isAddingMeal ? '新增餐點' : '編輯餐點' }}</h3>
                 </div>
@@ -329,10 +329,15 @@
                             <input type="number" v-model.number="profile.weight" placeholder="體重" class="bg-white px-4 py-3 rounded-xl border border-slate-100 font-black text-sm outline-none">
                             <input type="number" v-model.number="profile.height" placeholder="身高" class="bg-white px-4 py-3 rounded-xl border border-slate-100 font-black text-sm outline-none">
                             <input type="number" v-model.number="profile.age" placeholder="年齡" class="bg-white px-4 py-3 rounded-xl border border-slate-100 font-black text-sm outline-none">
-                            <select v-model="profile.activity" class="col-span-2 bg-white px-4 py-3 rounded-xl border border-slate-100 font-black text-sm outline-none"><option :value="1.2">久坐</option><option :value="1.375">輕度</option><option :value="1.55">中度</option><option :value="1.725">高度</option></select>
+                            <select v-model="profile.activity" class="col-span-2 bg-white px-4 py-3 rounded-xl border border-slate-100 font-black text-sm outline-none">
+                                <option :value="1.2">久坐 (不太運動)</option>
+                                <option :value="1.375">輕度 (每週運動 1-3 天)</option>
+                                <option :value="1.55">中度 (每週運動 3-5 天)</option>
+                                <option :value="1.725">高度 (每週運動 6-7 天)</option>
+                            </select>
                         </div>
                         <div class="flex items-center justify-between">
-                            <button @click="autoCalculatePlans" class="px-6 py-3 bg-indigo-600 text-white rounded-xl font-black text-sm shadow-lg">自動計算</button>
+                            <button @click="autoCalculatePlans" class="px-6 py-3 bg-indigo-600 text-white rounded-xl font-black text-sm shadow-lg">自動計算四大計畫</button>
                             <div class="text-right"><p class="text-[10px] font-black text-slate-400 uppercase">預估 TDEE</p><p class="text-2xl font-black text-indigo-600">{{calculatedTDEE}} <span class="text-xs">kcal</span></p></div>
                         </div>
                     </div>
@@ -360,12 +365,12 @@
                         <button v-for="r in [{k:'thisWeek',l:'本週'},{k:'lastWeek',l:'上週'},{k:'thisMonth',l:'本月'},{k:'thisYear',l:'今年'}]" :key="r.k" @click="setQuickRange(r.k)" class="px-3 py-1.5 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg text-[10px] font-black text-slate-500 transition-all border border-slate-100/50">{{ r.l }}</button>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
-                        <div><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">開始</label><input type="date" v-model="exportRange.start" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl font-black text-xs"></div>
-                        <div><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">結束</label><input type="date" v-model="exportRange.end" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl font-black text-xs"></div>
+                        <div><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">開始日期</label><input type="date" v-model="exportRange.start" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl font-black text-xs"></div>
+                        <div><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">結束日期</label><input type="date" v-model="exportRange.end" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl font-black text-xs"></div>
                     </div>
                     <!-- Exclusion List -->
                     <div v-if="exportDateList.length > 0">
-                        <div class="flex justify-between items-center mb-2 px-1"><span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">排除日期</span><button @click="excludedDates.clear()" class="text-[9px] font-black text-indigo-600 uppercase">重設</button></div>
+                        <div class="flex justify-between items-center mb-2 px-1"><span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">選擇匯出日期</span><button @click="excludedDates.clear()" class="text-[9px] font-black text-indigo-600 uppercase">重設</button></div>
                         <div class="max-h-32 overflow-y-auto custom-scroll border border-slate-50 rounded-xl p-2 bg-slate-50/50 grid grid-cols-2 gap-2">
                             <div v-for="date in exportDateList" :key="date" @click="toggleExcludedDate(date)" class="flex items-center gap-2 p-1.5 rounded-lg cursor-pointer text-[10px] font-black transition-all" :class="!excludedDates.has(date) ? 'bg-white text-slate-700 shadow-sm' : 'bg-slate-200 text-slate-400 grayscale line-through opacity-50'">
                                 <span>{{ date.slice(5) }}</span>
@@ -376,7 +381,7 @@
                 <div class="flex gap-3">
                     <button @click="showExportModal = false" class="flex-1 py-4 bg-slate-50 text-slate-500 rounded-2xl font-black text-sm">取消</button>
                     <button @click="exportPDF" :disabled="isExporting" class="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-indigo-100 disabled:bg-slate-300">
-                        {{ isExporting ? '生成中...' : 'PDF 報告' }}
+                        {{ isExporting ? '生成中...' : '下載 PDF' }}
                     </button>
                 </div>
             </div>
@@ -389,9 +394,6 @@
                     <div>
                         <h1 style="font-size: 36px; font-weight: 900; color: #1e293b; margin: 0;">健康飲食分析報告</h1>
                         <p style="font-size: 14px; font-weight: 700; color: #94a3b8; margin-top: 10px; text-transform: uppercase; letter-spacing: 2px;">{{ exportRange.start }} ~ {{ exportRange.end }}</p>
-                    </div>
-                    <div style="background-color: #6366f1; width: 60px; height: 60px; border-radius: 20px; display: flex; align-items: center; justify-content: center; color: white;">
-                        <svg style="width: 30px; height: 30px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                     </div>
                 </div>
 
@@ -422,29 +424,29 @@
 
                 <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 60px; margin-bottom: 60px;">
                     <div style="text-align: center;">
-                        <h3 style="font-size: 15px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 30px;">營養素佔比</h3>
+                        <h3 style="font-size: 15px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 30px;">營養素分佈</h3>
                         <div style="display: flex; justify-content: center;"><canvas id="nutrientChart" width="240" height="240"></canvas></div>
                     </div>
                     <div>
-                        <h3 style="font-size: 15px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 30px;">熱量趨勢</h3>
+                        <h3 style="font-size: 15px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 30px;">熱量趨勢圖</h3>
                         <div style="display: flex; justify-content: center;"><canvas id="trendChart" width="400" height="240"></canvas></div>
                     </div>
                 </div>
 
-                <h3 style="font-size: 16px; font-weight: 800; color: #1e293b; text-transform: uppercase; margin-bottom: 30px; border-left: 5px solid #6366f1; padding-left: 15px;">飲食詳情</h3>
+                <h3 style="font-size: 16px; font-weight: 800; color: #1e293b; text-transform: uppercase; margin-bottom: 30px; border-left: 5px solid #6366f1; padding-left: 15px;">飲食明細紀錄</h3>
                 <div style="display: flex; flex-direction: column; gap: 35px;">
                     <div v-for="day in getRangeStats().dailyRecords" :key="day.date" v-if="day.meals.length > 0">
                         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f8fafc; padding-bottom: 12px; margin-bottom: 15px;">
                             <span style="font-size: 16px; font-weight: 900; color: #1e293b;">📅 {{ day.date }} ({{ {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[day.planType] }})</span>
-                            <span style="font-size: 14px; font-weight: 800; color: #6366f1;">當日總計: {{ day.totalCalories }} kcal</span>
+                            <span style="font-size: 14px; font-weight: 800; color: #6366f1;">總攝取: {{ day.totalCalories }} kcal</span>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                            <div v-for="m in day.meals" :key="m.name" style="background-color: #fff; border: 1px solid #f1f5f9; padding: 15px 20px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center;">
-                                <div style="min-w-0">
-                                    <p style="font-size: 15px; font-weight: 800; color: #1e293b; margin: 0;">{{ m.name }}</p>
+                            <div v-for="m in day.meals" :key="m.name + Math.random()" style="background-color: #fff; border: 1px solid #f1f5f9; padding: 15px 20px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center;">
+                                <div style="min-width: 0;">
+                                    <p style="font-size: 15px; font-weight: 800; color: #1e293b; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ m.name }}</p>
                                     <p style="font-size: 11px; font-weight: 700; color: #94a3b8; margin-top: 4px;">{{ m.amount }}{{ m.unit }}</p>
                                 </div>
-                                <span style="font-size: 14px; font-weight: 900; color: #1e293b;">{{ m.calories }} <span style="font-size: 10px; color: #cbd5e1;">kcal</span></span>
+                                <span style="font-size: 14px; font-weight: 900; color: #1e293b;">{{ Math.round(m.calories) }} <span style="font-size: 10px; color: #cbd5e1;">kcal</span></span>
                             </div>
                         </div>
                     </div>
@@ -471,12 +473,12 @@
             <div class="modal-overlay absolute inset-0" @click="showHistory = false"></div>
             <div class="bg-white w-full max-w-lg rounded-[2.5rem] p-8 relative z-10 shadow-2xl flex flex-col max-h-[80vh] overflow-hidden">
                 <h3 class="text-2xl font-black mb-6">選擇歷史餐點</h3>
-                <input type="text" v-model="historySearch" placeholder="搜尋..." class="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-indigo-100 mb-6 font-bold">
+                <input type="text" v-model="historySearch" placeholder="搜尋常用食物..." class="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-indigo-100 mb-6 font-bold">
                 <div class="flex-1 overflow-y-auto custom-scroll space-y-4">
                     <div v-for="item in filteredHistory" :key="item.name" @click="addFromHistory(item)" class="p-4 rounded-2xl border border-slate-50 hover:bg-indigo-50/50 cursor-pointer flex justify-between items-center transition-all">
-                        <div class="min-w-0">
+                        <div class="min-width: 0;">
                             <p class="font-black text-slate-900 truncate">{{ item.name }}</p>
-                            <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase">{{ item.calories }}kcal • 碳:{{ item.carbs }}g 蛋:{{ item.protein }}g 脂:{{ item.fat }}g</p>
+                            <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase">{{ Math.round(item.calories) }}kcal • 碳:{{ formatNum(item.carbs) }}g 蛋:{{ formatNum(item.protein) }}g 脂:{{ formatNum(item.fat) }}g</p>
                         </div>
                         <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg></div>
                     </div>
@@ -485,7 +487,7 @@
         </div>
 
         <!-- Saving Indicator -->
-        <div v-if="saving" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-900/90 text-white px-6 py-3 rounded-full text-[10px] font-black shadow-2xl animate-in slide-in-from-bottom-4 flex items-center gap-3"><div class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></div> 同步中...</div>
+        <div v-if="saving" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-900/90 text-white px-6 py-3 rounded-full text-[10px] font-black shadow-2xl animate-in slide-in-from-bottom-4 flex items-center gap-3"><div class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></div> 雲端同步中...</div>
     </div>
 
     <script type="module">
@@ -506,7 +508,6 @@
                 const showExportModal = ref(false);
                 const isExporting = ref(false);
                 const showSyncModal = ref(false);
-                const showMonthJump = ref(false);
                 const isCalendarExpanded = ref(window.innerWidth >= 1024);
                 
                 const selectedDate = ref(formatDate(new Date()));
@@ -537,7 +538,7 @@
                 const appId = 'diet-tracker-v3';
 
                 const nutrientKeys = [
-                    { key: 'carbs', label: '碳水', color: '#f59e0b' },
+                    { key: 'carbs', label: '碳水化合物', color: '#f59e0b' },
                     { key: 'protein', label: '蛋白質', color: '#6366f1' },
                     { key: 'fat', label: '脂肪', color: '#f43f5e' }
                 ];
@@ -550,8 +551,13 @@
                 ];
 
                 const currentDayRecord = computed(() => {
-                    if (!allData[selectedDate.value]) allData[selectedDate.value] = { planType: 'med', meals: [] };
-                    return allData[selectedDate.value];
+                    if (!allData[selectedDate.value]) {
+                        allData[selectedDate.value] = { planType: 'med', meals: [] };
+                    }
+                    const record = allData[selectedDate.value];
+                    if (!record.meals) record.meals = [];
+                    if (!record.planType) record.planType = 'med';
+                    return record;
                 });
 
                 const currentPlan = computed(() => {
@@ -627,7 +633,7 @@
                 };
 
                 const getRangeStats = () => {
-                    const stats = { totalCalories: 0, totalCarbs: 0, totalProtein: 0, totalFat: 0, days: 0, dailyLabels: [], dailyCals: [], dailyRecords: [], daysByType: { high:0, med:0, low:0, rest:0 }, nutrientPercents: { carbs:0, protein:0, fat:0 }, planAverages: { high: null, med: null, low: null } };
+                    const stats = { totalCalories: 0, totalCarbs: 0, totalProtein: 0, totalFat: 0, days: 0, dailyLabels: [], dailyCals: [], dailyRecords: [], daysByType: { high:0, med:0, low:0, rest:0 }, nutrientPercents: { carbs:0, protein:0, fat:0 } };
                     exportDateList.value.forEach(d => {
                         if (excludedDates.has(d)) return;
                         stats.days++;
@@ -636,17 +642,13 @@
                         const planType = r.planType || 'med';
                         stats.daysByType[planType]++;
                         
-                        if (!stats.planAverages[planType] && planType !== 'rest') {
-                            stats.planAverages[planType] = r.goals || plans[planType];
-                        }
-
                         let dayCal = 0;
                         meals.forEach(m => {
                             const c = Number(m.calories)||0; dayCal += c; stats.totalCalories += c;
                             stats.totalCarbs += (Number(m.carbs)||0); stats.totalProtein += (Number(m.protein)||0); stats.totalFat += (Number(m.fat)||0);
                         });
                         stats.dailyLabels.push(d.slice(5)); stats.dailyCals.push(dayCal);
-                        stats.dailyRecords.push({ date: d, meals: meals, totalCalories: dayCal, planType: planType });
+                        stats.dailyRecords.push({ date: d, meals: meals, totalCalories: Math.round(dayCal), planType: planType });
                     });
                     stats.avgCalories = stats.days > 0 ? Math.round(stats.totalCalories / stats.days) : 0;
                     const cCal = stats.totalCarbs * 4;
@@ -665,8 +667,8 @@
                     const nCtx = document.getElementById('nutrientChart').getContext('2d');
                     new Chart(nCtx, { type: 'doughnut', data: { labels: ['碳水', '蛋白', '脂肪'], datasets: [{ data: [stats.totalCarbs, stats.totalProtein, stats.totalFat], backgroundColor: ['#f59e0b', '#6366f1', '#f43f5e'], borderWidth: 0 }] }, options: { animation: false, plugins: { legend: { position: 'bottom' } } } });
                     const tCtx = document.getElementById('trendChart').getContext('2d');
-                    new Chart(tCtx, { type: 'line', data: { labels: stats.dailyLabels, datasets: [{ label: '熱量', data: stats.dailyCals, borderColor: '#6366f1', tension: 0.4, fill: true, backgroundColor: 'rgba(99, 102, 241, 0.1)' }] }, options: { animation: false, scales: { y: { beginAtZero: true } } } });
-                    await new Promise(r => setTimeout(r, 1000));
+                    new Chart(tCtx, { type: 'line', data: { labels: stats.dailyLabels, datasets: [{ label: '每日攝取', data: stats.dailyCals, borderColor: '#6366f1', tension: 0.4, fill: true, backgroundColor: 'rgba(99, 102, 241, 0.1)' }] }, options: { animation: false, scales: { y: { beginAtZero: true } } } });
+                    await new Promise(r => setTimeout(r, 1200));
                     const canvas = await html2canvas(el, { scale: 2 });
                     const img = canvas.toDataURL('image/png');
                     const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
@@ -685,7 +687,7 @@
                         try {
                             const ref = doc(db, 'artifacts', appId, 'users', user.value.uid, 'settings', 'dietData');
                             await setDoc(ref, { plans, profile, allData, templates });
-                        } finally { saving.value = false; }
+                        } catch(e) { console.error(e); } finally { saving.value = false; }
                     }, 1000);
                 };
 
@@ -700,9 +702,11 @@
                 };
 
                 const addMeal = () => {
-                    isAddingMeal.value = true; editingIndex.value = currentDayRecord.value.meals.length;
+                    isAddingMeal.value = true; 
+                    const mList = currentDayRecord.value.meals;
+                    editingIndex.value = mList.length;
                     Object.assign(editingMeal, { type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0 });
-                    currentDayRecord.value.meals.push({ ...editingMeal });
+                    mList.push({ ...editingMeal });
                 };
 
                 const startEdit = (i) => {
@@ -760,36 +764,44 @@
                 };
 
                 onMounted(async () => {
-                    const res = await fetch('/firebase-config.json');
-                    const config = await res.json();
-                    const app = initializeApp(config);
-                    auth = getAuth(app); db = getFirestore(app);
-                    onAuthStateChanged(auth, (u) => {
-                        user.value = u;
-                        if (u) {
-                            onSnapshot(doc(db, 'artifacts', appId, 'users', u.uid, 'settings', 'dietData'), (snap) => {
-                                if (snap.exists()) {
-                                    const d = snap.data();
-                                    if (d.plans) Object.assign(plans, d.plans);
-                                    if (d.profile) Object.assign(profile, d.profile);
-                                    if (d.allData) Object.assign(allData, d.allData);
-                                    if (d.templates) Object.assign(templates, d.templates);
-                                }
-                                initialized.value = true;
-                            });
-                        } else initialized.value = true;
-                    });
+                    try {
+                        const res = await fetch('/firebase-config.json');
+                        const config = await res.json();
+                        const app = initializeApp(config);
+                        auth = getAuth(app); db = getFirestore(app);
+                        onAuthStateChanged(auth, (u) => {
+                            user.value = u;
+                            if (u) {
+                                onSnapshot(doc(db, 'artifacts', appId, 'users', u.uid, 'settings', 'dietData'), (snap) => {
+                                    if (snap.exists()) {
+                                        const d = snap.data();
+                                        if (d.plans) Object.assign(plans, d.plans);
+                                        if (d.profile) Object.assign(profile, d.profile);
+                                        if (d.allData) Object.assign(allData, d.allData);
+                                        if (d.templates) Object.assign(templates, d.templates);
+                                    }
+                                    initialized.value = true;
+                                });
+                            } else initialized.value = true;
+                        });
+                    } catch(e) { console.error(e); initialized.value = true; }
                 });
 
                 return {
-                    initialized, user, saving, showSettings, showHistory, showExportModal, isExporting, showSyncModal, showMonthJump, isCalendarExpanded,
+                    initialized, user, saving, showSettings, showHistory, showExportModal, isExporting, showSyncModal, isCalendarExpanded,
                     selectedDate, loginEmail, loginPassword, historySearch, editingIndex, isAddingMeal, editingMeal,
                     profile, plans, allData, templates, excludedDates, exportRange,
                     nutrientKeys, mealTypes, currentDayRecord, currentPlan, calculatedTDEE, calendarDays, filteredHistory, exportDateList, currentMonthYearDisplay,
                     formatNum, getDailySum, getGap, getDayStats, toggleExcludedDate, setQuickRange, getRangeStats, exportPDF, saveData, scaleNutrients, prepareScale,
                     addMeal, startEdit, cancelEdit, saveMeal, addFromHistory, setPlanType, autoCalculatePlans, changeMonth, toggleCalendar: () => isCalendarExpanded.value = !isCalendarExpanded.value,
-                    getMealsByType: (t) => (currentDayRecord.value.meals || []).map((m, i) => ({ ...m, originalIndex: i })).filter(m => m.type === t),
-                    confirmDelete: (i) => { currentDayRecord.value.meals.splice(i, 1); saveData(); },
+                    getMealsByType: (t) => {
+                        const mList = currentDayRecord.value.meals || [];
+                        return mList.map((m, i) => ({ ...m, originalIndex: i })).filter(m => m.type === t);
+                    },
+                    confirmDelete: (i) => { 
+                        const mList = currentDayRecord.value.meals;
+                        if (mList && mList[i]) { mList.splice(i, 1); saveData(); }
+                    },
                     handleAuth: (mode) => mode === 'login' ? signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value) : createUserWithEmailAndPassword(auth, loginEmail.value, loginPassword.value),
                     handleAnonymous: () => signInAnonymously(auth),
                     handleLogout: () => signOut(auth),
