@@ -935,14 +935,50 @@
                 <div class="modal-overlay absolute inset-0" @click="showExportModal = false"></div>
                 <div class="bg-white rounded-[2.5rem] p-8 relative z-10 w-full max-w-md shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
                     <h3 class="text-2xl font-black text-slate-900 mb-6">匯出健康報告</h3>
-                    <div class="space-y-4 mb-8">
-                        <div>
-                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">開始日期</label>
-                            <input type="date" v-model="exportRange.start" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl font-black text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10">
+                    <div class="space-y-4 mb-6">
+                        <!-- 快速選取按鈕 -->
+                        <div class="flex flex-wrap gap-2 px-1">
+                            <button v-for="r in [{k:'thisWeek',l:'本週'},{k:'lastWeek',l:'上週'},{k:'thisMonth',l:'本月'},{k:'lastMonth',l:'上月'},{k:'thisYear',l:'今年'}]" 
+                                    :key="r.k" @click="setQuickRange(r.k)"
+                                    class="px-3 py-1.5 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg text-[10px] font-black text-slate-500 transition-all border border-slate-100/50 hover:border-indigo-100">
+                                {{ r.l }}
+                            </button>
                         </div>
-                        <div>
-                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">結束日期</label>
-                            <input type="date" v-model="exportRange.end" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl font-black text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10">
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">開始日期</label>
+                                <input type="date" v-model="exportRange.start" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl font-black text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 text-xs">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">結束日期</label>
+                                <input type="date" v-model="exportRange.end" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl font-black text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 text-xs">
+                            </div>
+                        </div>
+
+                        <!-- 排除日期清單 -->
+                        <div v-if="exportDateList.length > 0" class="mt-4">
+                            <div class="flex justify-between items-center mb-2 px-1">
+                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">選取欲匯出的日期 ({{ exportDateList.length - excludedDates.size }} 天)</label>
+                                <div class="flex gap-2">
+                                    <button @click="toggleAllExportDates(true)" class="text-[9px] font-black text-indigo-600 hover:text-indigo-800 uppercase">全選</button>
+                                    <span class="text-slate-200 text-[9px]">|</span>
+                                    <button @click="toggleAllExportDates(false)" class="text-[9px] font-black text-slate-400 hover:text-slate-600 uppercase">全不選</button>
+                                </div>
+                            </div>
+                            <div class="max-h-40 overflow-y-auto custom-scroll border border-slate-50 rounded-2xl p-2 bg-slate-50/50">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div v-for="date in exportDateList" :key="date" 
+                                         @click="toggleExcludedDate(date)"
+                                         class="flex items-center gap-2 p-2 rounded-xl cursor-pointer transition-all border"
+                                         :class="!excludedDates.has(date) ? 'bg-white border-indigo-100 text-indigo-700 shadow-sm' : 'bg-slate-100 border-transparent text-slate-400 grayscale opacity-60'">
+                                        <div class="w-4 h-4 rounded-md flex items-center justify-center border" :class="!excludedDates.has(date) ? 'bg-indigo-600 border-indigo-600' : 'bg-white border-slate-200'">
+                                            <svg v-if="!excludedDates.has(date)" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg>
+                                        </div>
+                                        <span class="text-[11px] font-black">{{ date.slice(5) }} ({{ ['日','一','二','三','四','五','六'][new Date(date).getDay()] }})</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="flex gap-3">
