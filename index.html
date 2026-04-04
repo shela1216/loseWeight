@@ -351,24 +351,24 @@
                                 </div>
                             </div>
                             <!-- 功能按鈕區 (圓型樣式：大螢幕改為右下角浮動) -->
-                            <div class="flex gap-3 sm:gap-4 items-center shrink-0 lg:fixed lg:bottom-10 lg:right-10 lg:flex-col lg:gap-6 lg:z-50 lg:bg-white/80 lg:backdrop-blur-xl lg:p-6 lg:rounded-[3rem] lg:shadow-2xl lg:border lg:border-slate-100/50">
-                                <button @click="exportCSV" class="btn-circular" title="匯出紀錄">
+                            <div class="flex gap-3 sm:gap-4 items-center shrink-0 lg:fixed lg:bottom-8 lg:right-8 lg:flex-col lg:gap-6 lg:z-50 lg:bg-indigo-50/90 lg:backdrop-blur-xl lg:p-6 lg:rounded-[3rem] lg:shadow-2xl lg:border lg:border-indigo-100/50">
+                                <button @click="exportCSV" class="btn-circular group" title="匯出紀錄">
                                     <div class="icon-wrapper">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                                     </div>
-                                    <span>匯出</span>
+                                    <span class="lg:absolute lg:right-20 lg:bg-slate-900 lg:text-white lg:px-3 lg:py-1.5 lg:rounded-lg lg:text-[10px] lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 lg:pointer-events-none lg:transition-all lg:duration-300 lg:whitespace-nowrap lg:shadow-xl lg:after:content-[''] lg:after:absolute lg:after:top-1/2 lg:after:-translate-y-1/2 lg:after:-right-1.5 lg:after:border-y-[6px] lg:after:border-y-transparent lg:after:border-l-[6px] lg:after:border-l-slate-900">匯出</span>
                                 </button>
-                                <button @click="showSettings = true" class="btn-circular" title="設定目標">
+                                <button @click="showSettings = true" class="btn-circular group" title="設定目標">
                                     <div class="icon-wrapper">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                     </div>
-                                    <span>設定</span>
+                                    <span class="lg:absolute lg:right-20 lg:bg-slate-900 lg:text-white lg:px-3 lg:py-1.5 lg:rounded-lg lg:text-[10px] lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 lg:pointer-events-none lg:transition-all lg:duration-300 lg:whitespace-nowrap lg:shadow-xl lg:after:content-[''] lg:after:absolute lg:after:top-1/2 lg:after:-translate-y-1/2 lg:after:-right-1.5 lg:after:border-y-[6px] lg:after:border-y-transparent lg:after:border-l-[6px] lg:after:border-l-slate-900">設定</span>
                                 </button>
-                                <button @click="handleLogout" class="btn-circular" title="登出帳號">
+                                <button @click="handleLogout" class="btn-circular group" title="登出帳號">
                                     <div class="icon-wrapper">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                                     </div>
-                                    <span>登出</span>
+                                    <span class="lg:absolute lg:right-20 lg:bg-slate-900 lg:text-white lg:px-3 lg:py-1.5 lg:rounded-lg lg:text-[10px] lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 lg:pointer-events-none lg:transition-all lg:duration-300 lg:whitespace-nowrap lg:shadow-xl lg:after:content-[''] lg:after:absolute lg:after:top-1/2 lg:after:-translate-y-1/2 lg:after:-right-1.5 lg:after:border-y-[6px] lg:after:border-y-transparent lg:after:border-l-[6px] lg:after:border-l-slate-900">登出</span>
                                 </button>
                             </div>
                         </div>
