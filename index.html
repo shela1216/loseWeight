@@ -243,7 +243,7 @@
 
                         <div class="space-y-4">
                             <div v-for="typeObj in mealTypes" :key="typeObj.key">
-                                <div v-if="getMealsByType(typeObj.key).length > 0" class="bg-white rounded-[2.5rem] p-6 sm:p-8 shadow-md border border-slate-100/50">
+                                <div v-if="getMealsByType(typeObj.key)?.length > 0" class="bg-white rounded-[2.5rem] p-6 sm:p-8 shadow-md border border-slate-100/50">
                                     <h4 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-6 flex items-center gap-3">
                                         <span class="w-2 h-2 rounded-full" :style="{ backgroundColor: typeObj.dotColor }"></span> {{ typeObj.label }}
                                     </h4>
@@ -440,13 +440,13 @@
 
                 <h3 style="font-size: 16px; font-weight: 800; color: #1e293b; text-transform: uppercase; margin-bottom: 30px; border-left: 5px solid #6366f1; padding-left: 15px;">飲食明細紀錄</h3>
                 <div style="display: flex; flex-direction: column; gap: 35px;">
-                    <div v-for="day in getRangeStats().dailyRecords" :key="day.date" v-if="day.meals.length > 0">
+                    <div v-for="day in getRangeStats().dailyRecords" :key="day.date" v-if="day?.meals?.length > 0">
                         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f8fafc; padding-bottom: 12px; margin-bottom: 15px;">
                             <span style="font-size: 16px; font-weight: 900; color: #1e293b;">📅 {{ day.date }} ({{ {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[day.planType] }})</span>
                             <span style="font-size: 14px; font-weight: 800; color: #6366f1;">總攝取: {{ day.totalCalories }} kcal</span>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                            <div v-for="m in day.meals" :key="m.name + Math.random()" style="background-color: #fff; border: 1px solid #f1f5f9; padding: 15px 20px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center;">
+                            <div v-for="m in day?.meals" :key="m.name + Math.random()" style="background-color: #fff; border: 1px solid #f1f5f9; padding: 15px 20px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center;">
                                 <div style="min-width: 0;">
                                     <p style="font-size: 15px; font-weight: 800; color: #1e293b; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ m.name }}</p>
                                     <p style="font-size: 11px; font-weight: 700; color: #94a3b8; margin-top: 4px;">{{ m.amount }}{{ m.unit }}</p>
@@ -462,7 +462,7 @@
         <!-- Sync Modal -->
         <div v-if="showSyncModal" class="fixed inset-0 z-[150] flex items-center justify-center p-4">
             <div class="modal-overlay absolute inset-0"></div>
-            <div class="bg-white rounded-[2.5rem] p-10 relative z-10 w-full max-w-sm text-center shadow-2xl">
+            <div class="bg-white rounded-[2.5rem] p-10 relative z-10 w-full max-sm:px-6 text-center shadow-2xl">
                 <div class="w-20 h-20 bg-amber-50 text-amber-500 rounded-3xl flex items-center justify-center mx-auto mb-6"><svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></div>
                 <h4 class="text-xl font-black text-slate-900 mb-4">更新餐點模板？</h4>
                 <p class="text-sm text-slate-500 mb-8">此餐點的營養數值與歷史紀錄不同，是否要更新為未來的預設值？</p>
@@ -555,15 +555,7 @@
                     { key: 'snack', label: '🍰 點心', dotColor: '#ec4899' }
                 ];
 
-                const currentDayRecord = computed(() => {
-                    if (!allData[selectedDate.value]) {
-                        allData[selectedDate.value] = { planType: 'med', meals: [] };
-                    }
-                    const record = allData[selectedDate.value];
-                    if (!record.meals) record.meals = [];
-                    if (!record.planType) record.planType = 'med';
-                    return record;
-                });
+                const currentDayRecord = computed(() => allData[selectedDate.value] || { planType: 'med', meals: [] });
 
                 const currentPlan = computed(() => {
                     const day = currentDayRecord.value;
@@ -613,7 +605,7 @@
 
                 const formatNum = (v) => Number(Number(v || 0).toFixed(1));
 
-                const getDailySum = (type) => (currentDayRecord.value.meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0);
+                const getDailySum = (type) => (currentDayRecord.value?.meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0);
                 const getGap = (type) => Math.round(currentPlan.value[type] - getDailySum(type));
 
                 const getDayStats = (date) => {
@@ -707,8 +699,12 @@
                 };
 
                 const addMeal = () => {
+                    const date = selectedDate.value;
+                    if (!allData[date]) allData[date] = { planType: 'med', meals: [] };
+                    if (!allData[date].meals) allData[date].meals = [];
+                    
                     isAddingMeal.value = true; 
-                    const mList = currentDayRecord.value.meals;
+                    const mList = allData[date].meals;
                     editingIndex.value = mList.length;
                     Object.assign(editingMeal, { type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0 });
                     mList.push({ ...editingMeal });
@@ -716,40 +712,56 @@
 
                 const startEdit = (i) => {
                     editingIndex.value = i; isAddingMeal.value = false;
-                    const m = currentDayRecord.value.meals[i];
-                    Object.assign(editingMeal, JSON.parse(JSON.stringify(m)));
-                    tempMealBackup.value = JSON.parse(JSON.stringify(m));
-                    prepareScale();
+                    const m = currentDayRecord.value?.meals?.[i];
+                    if (m) {
+                        Object.assign(editingMeal, JSON.parse(JSON.stringify(m)));
+                        tempMealBackup.value = JSON.parse(JSON.stringify(m));
+                        prepareScale();
+                    }
                 };
 
                 const cancelEdit = () => {
-                    if (isAddingMeal.value) currentDayRecord.value.meals.splice(editingIndex.value, 1);
-                    else if (tempMealBackup.value) currentDayRecord.value.meals[editingIndex.value] = tempMealBackup.value;
+                    const date = selectedDate.value;
+                    if (!allData[date]) return;
+                    if (isAddingMeal.value) allData[date].meals.splice(editingIndex.value, 1);
+                    else if (tempMealBackup.value) allData[date].meals[editingIndex.value] = tempMealBackup.value;
                     editingIndex.value = null;
                 };
 
                 const saveMeal = (opt = null) => {
                     if (!editingMeal.name) return;
+                    const date = selectedDate.value;
+                    if (!allData[date]) allData[date] = { planType: 'med', meals: [] };
+                    if (!allData[date].meals) allData[date].meals = [];
+
                     const k = editingMeal.name.toLowerCase().trim();
                     const norm = { ...editingMeal, amount:1, calories: formatNum(editingMeal.calories/editingMeal.amount), carbs: formatNum(editingMeal.carbs/editingMeal.amount), protein: formatNum(editingMeal.protein/editingMeal.amount), fat: formatNum(editingMeal.fat/editingMeal.amount) };
                     if (opt === null && templates[k]) {
                         if (Math.abs(templates[k].calories - norm.calories) > 1) { showSyncModal.value = true; return; }
                     }
                     if (opt === 'sync' || !templates[k]) templates[k] = norm;
-                    currentDayRecord.value.meals[editingIndex.value] = JSON.parse(JSON.stringify(editingMeal));
+                    allData[date].meals[editingIndex.value] = JSON.parse(JSON.stringify(editingMeal));
                     editingIndex.value = null; showSyncModal.value = false; saveData();
                 };
 
                 const addFromHistory = (item) => {
+                    const date = selectedDate.value;
+                    if (!allData[date]) allData[date] = { planType: 'med', meals: [] };
+                    if (!allData[date].meals) allData[date].meals = [];
+
                     const m = { ...item, type: 'lunch', amount: 1 };
                     if (editingIndex.value !== null) { Object.assign(editingMeal, m); prepareScale(); }
-                    else { currentDayRecord.value.meals.push(m); saveData(); }
+                    else { allData[date].meals.push(m); saveData(); }
                     showHistory.value = false;
                 };
 
                 const setPlanType = (t) => {
-                    currentDayRecord.value.planType = t;
-                    currentDayRecord.value.goals = JSON.parse(JSON.stringify(plans[t]));
+                    const date = selectedDate.value;
+                    if (!allData[date]) allData[date] = { planType: 'med', meals: [] };
+                    if (!allData[date].meals) allData[date].meals = [];
+                    
+                    allData[date].planType = t;
+                    allData[date].goals = JSON.parse(JSON.stringify(plans[t]));
                     saveData();
                 };
 
@@ -799,13 +811,13 @@
                     nutrientKeys, mealTypes, currentDayRecord, currentPlan, calculatedTDEE, calendarDays, filteredHistory, exportDateList, currentMonthYearDisplay,
                     formatNum, getDailySum, getGap, getDayStats, toggleExcludedDate, setQuickRange, getRangeStats, exportPDF, saveData, scaleNutrients, prepareScale,
                     addMeal, startEdit, cancelEdit, saveMeal, addFromHistory, setPlanType, autoCalculatePlans, changeMonth, toggleCalendar: () => isCalendarExpanded.value = !isCalendarExpanded.value,
-                    getMealsByType: (t) => {
-                        const mList = currentDayRecord.value.meals || [];
-                        return mList.map((m, i) => ({ ...m, originalIndex: i })).filter(m => m.type === t);
-                    },
+                    getMealsByType: (t) => (currentDayRecord.value?.meals || []).map((m, i) => ({ ...m, originalIndex: i })).filter(m => m.type === t),
                     confirmDelete: (i) => { 
-                        const mList = currentDayRecord.value.meals;
-                        if (mList && mList[i]) { mList.splice(i, 1); saveData(); }
+                        const date = selectedDate.value;
+                        if (allData[date]?.meals?.[i]) {
+                            allData[date].meals.splice(i, 1);
+                            saveData();
+                        }
                     },
                     handleAuth: (mode) => mode === 'login' ? signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value) : createUserWithEmailAndPassword(auth, loginEmail.value, loginPassword.value),
                     handleAnonymous: () => signInAnonymously(auth),
