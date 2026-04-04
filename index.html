@@ -1031,14 +1031,6 @@
                     });
                 };
 
-                // 統一日期格式化工具 (確保 YYYY-MM-DD)
-                const formatDate = (d) => {
-                    const y = d.getFullYear();
-                    const m = String(d.getMonth() + 1).padStart(2, '0');
-                    const day = String(d.getDate()).padStart(2, '0');
-                    return `${y}-${m}-${day}`;
-                };
-
                 const selectedDate = ref(formatDate(new Date()));
                 const pickerMonth = ref(new Date()); // 用於月份選擇器的顯示月份
                 const loginEmail = ref('');
