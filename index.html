@@ -451,7 +451,7 @@
                                 <!-- 底部說明圖例 (優化字級與佈局) -->
                                 <div class="mt-6 pt-6 border-t border-slate-50">
                                     <div class="grid grid-cols-2 gap-x-3 gap-y-5">
-                                        <div v-for="p in [{k:'high',l:'高碳日',c:'#6366f1',d:'💪 重點訓練'},{k:'med',l:'中碳日',c:'#8b5cf6',d:'🥗 一般運動'},{k:'low',l:'低碳日',c:'#ec4899',d:'🔥 燃脂休息'},{k:'rest',l:'自由日',c:'#64748b',d:'🧘 身心平衡'}]" :key="p.k" class="flex items-start gap-2.5">
+                                        <div v-for="p in [{k:'high',l:'高碳日',c:'#f59e0b',d:'💪 重點訓練'},{k:'med',l:'中碳日',c:'#6366f1',d:'🥗 一般運動'},{k:'low',l:'低碳日',c:'#f43f5e',d:'🔥 燃脂休息'},{k:'rest',l:'自由日',c:'#64748b',d:'🧘 身心平衡'}]" :key="p.k" class="flex items-start gap-2.5">
                                             <span class="w-2.5 h-2.5 rounded-full shrink-0 mt-1" :style="{background:p.c}"></span>
                                             <div class="flex flex-col min-w-0">
                                                 <span class="text-xs font-black text-slate-700 leading-none truncate">{{p.l}}</span>
@@ -1807,7 +1807,7 @@
                         const goal = plan.calories || 1;
                         const gapPercent = (Math.abs(goal - intake) / goal) * 100;
                         const progress = Math.max(0, 100 - gapPercent);
-                        const colorMap = { high: '#6366f1', med: '#8b5cf6', low: '#ec4899', rest: '#64748b' };
+                        const colorMap = { high: '#f59e0b', med: '#6366f1', low: '#f43f5e', rest: '#64748b' };
                         return { percent: progress, color: colorMap[record.planType] };
                     },
                     autoCalculatePlans, exportCSV, saveData,
@@ -1826,6 +1826,10 @@
                 };
             }
         }).mount('#app');
+    </script>
+</body>
+
+</html>     }).mount('#app');
     </script>
 </body>
 
