@@ -350,8 +350,8 @@
                                     <p class="text-[9px] sm:text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest truncate">Health Record</p>
                                 </div>
                             </div>
-                            <!-- 功能按鈕區 (圓型樣式) -->
-                            <div class="flex gap-3 sm:gap-4 items-center shrink-0">
+                            <!-- 功能按鈕區 (圓型樣式：大螢幕改為右下角浮動) -->
+                            <div class="flex gap-3 sm:gap-4 items-center shrink-0 lg:fixed lg:bottom-10 lg:right-10 lg:flex-col lg:gap-6 lg:z-50 lg:bg-white/80 lg:backdrop-blur-xl lg:p-6 lg:rounded-[3rem] lg:shadow-2xl lg:border lg:border-slate-100/50">
                                 <button @click="exportCSV" class="btn-circular" title="匯出紀錄">
                                     <div class="icon-wrapper">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
