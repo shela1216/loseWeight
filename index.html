@@ -1112,6 +1112,60 @@
                 const showExportModal = ref(false);
                 const isExporting = ref(false);
                 const exportRange = reactive({ start: formatDate(new Date(new Date().setDate(new Date().getDate() - 7))), end: formatDate(new Date()) });
+                const excludedDates = ref(new Set()); 
+
+                const exportDateList = computed(() => {
+                    const list = [];
+                    const start = new Date(exportRange.start);
+                    const end = new Date(exportRange.end);
+                    if (isNaN(start.getTime()) || isNaN(end.getTime())) return [];
+                    const temp = new Date(start);
+                    while (temp <= end) {
+                        list.push(formatDate(new Date(temp)));
+                        temp.setDate(temp.getDate() + 1);
+                    }
+                    return list;
+                });
+
+                const toggleExcludedDate = (date) => {
+                    if (excludedDates.value.has(date)) excludedDates.value.delete(date);
+                    else excludedDates.value.add(date);
+                };
+
+                const toggleAllExportDates = (select) => {
+                    if (select) excludedDates.value.clear();
+                    else exportDateList.value.forEach(d => excludedDates.value.add(d));
+                };
+
+                const setQuickRange = (type) => {
+                    const now = new Date();
+                    let start, end = new Date(now);
+                    if (type === 'thisWeek') {
+                        const day = now.getDay(); 
+                        const diff = (day === 0 ? -6 : 1) - day;
+                        start = new Date(now.getTime() + diff * 86400000);
+                        end = new Date();
+                    } else if (type === 'lastWeek') {
+                        const day = now.getDay();
+                        const diff = (day === 0 ? -6 : 1) - day - 7;
+                        start = new Date(now.getTime() + diff * 86400000);
+                        end = new Date(start.getTime() + 6 * 86400000);
+                    } else if (type === 'thisMonth') {
+                        start = new Date(now.getFullYear(), now.getMonth(), 1);
+                        end = new Date();
+                    } else if (type === 'lastMonth') {
+                        start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                        end = new Date(now.getFullYear(), now.getMonth(), 0);
+                    } else if (type === 'thisYear') {
+                        start = new Date(now.getFullYear(), 0, 1);
+                        end = new Date();
+                    }
+                    if (start && end) {
+                        exportRange.start = formatDate(start);
+                        exportRange.end = formatDate(end);
+                    }
+                };
+
                 const showMonthPicker = ref(false);
                 const historySearch = ref('');
 
