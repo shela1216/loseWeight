@@ -627,23 +627,33 @@
                 };
 
                 const getRangeStats = () => {
-                    const stats = { totalCalories: 0, totalCarbs: 0, totalProtein: 0, totalFat: 0, days: 0, dailyLabels: [], dailyCals: [], dailyRecords: [], daysByType: { high:0, med:0, low:0, rest:0 }, nutrientPercents: { carbs:0, protein:0, fat:0 } };
+                    const stats = { totalCalories: 0, totalCarbs: 0, totalProtein: 0, totalFat: 0, days: 0, dailyLabels: [], dailyCals: [], dailyRecords: [], daysByType: { high:0, med:0, low:0, rest:0 }, nutrientPercents: { carbs:0, protein:0, fat:0 }, planAverages: { high: null, med: null, low: null } };
                     exportDateList.value.forEach(d => {
                         if (excludedDates.has(d)) return;
                         stats.days++;
                         const r = allData[d] || { meals: [], planType: 'med' };
-                        stats.daysByType[r.planType || 'med']++;
+                        const meals = r.meals || [];
+                        const planType = r.planType || 'med';
+                        stats.daysByType[planType]++;
+                        
+                        if (!stats.planAverages[planType] && planType !== 'rest') {
+                            stats.planAverages[planType] = r.goals || plans[planType];
+                        }
+
                         let dayCal = 0;
-                        r.meals.forEach(m => {
+                        meals.forEach(m => {
                             const c = Number(m.calories)||0; dayCal += c; stats.totalCalories += c;
                             stats.totalCarbs += (Number(m.carbs)||0); stats.totalProtein += (Number(m.protein)||0); stats.totalFat += (Number(m.fat)||0);
                         });
                         stats.dailyLabels.push(d.slice(5)); stats.dailyCals.push(dayCal);
-                        stats.dailyRecords.push({ date: d, meals: r.meals, totalCalories: dayCal, planType: r.planType || 'med' });
+                        stats.dailyRecords.push({ date: d, meals: meals, totalCalories: dayCal, planType: planType });
                     });
                     stats.avgCalories = stats.days > 0 ? Math.round(stats.totalCalories / stats.days) : 0;
-                    const totalNutrientCal = stats.totalCarbs*4 + stats.totalProtein*4 + stats.totalFat*9 || 1;
-                    stats.nutrientPercents = { carbs: Math.round(stats.totalCarbs*4/totalNutrientCal*100), protein: Math.round(stats.totalProtein*4/totalNutrientCal*100), fat: Math.round(stats.totalFat*9/totalNutrientCal*100) };
+                    const cCal = stats.totalCarbs * 4;
+                    const pCal = stats.totalProtein * 4;
+                    const fCal = stats.totalFat * 9;
+                    const totalNutrientCal = cCal + pCal + fCal || 1;
+                    stats.nutrientPercents = { carbs: Math.round(cCal/totalNutrientCal*100), protein: Math.round(pCal/totalNutrientCal*100), fat: Math.round(fCal/totalNutrientCal*100) };
                     return stats;
                 };
 
