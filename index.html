@@ -440,8 +440,8 @@
                                 <div class="grid grid-cols-7 gap-1.5">
                                     <div v-for="day in calendarDays" :key="day.date" @click="selectedDate = day.date; toggleCalendar(true)" class="calendar-day-cell rounded-2xl cursor-pointer transition-all" :class="[day.currentMonth ? 'text-slate-900' : 'text-slate-200', selectedDate === day.date ? 'selected-day-ring font-black' : 'hover:bg-slate-50']">
                                         <svg v-if="getDayStats(day.date)" class="day-progress-svg p-1.5" viewBox="0 0 100 100">
-                                            <circle cx="50" cy="50" r="36" fill="none" :stroke="getDayStats(day.date).color" stroke-width="6" class="opacity-[0.15]"/>
-                                            <circle cx="50" cy="50" r="36" fill="none" :stroke="getDayStats(day.date).color" stroke-width="8" stroke-linecap="round" :stroke-dasharray="2 * Math.PI * 36" :stroke-dashoffset="2 * Math.PI * 36 * (1 - getDayStats(day.date).percent / 100)" style="transition: stroke-dashoffset 0.5s ease"/>
+                                            <circle cx="50" cy="50" r="38" fill="none" :stroke="getDayStats(day.date).color" stroke-width="6" class="opacity-[0.15]"/>
+                                            <circle cx="50" cy="50" r="38" fill="none" :stroke="getDayStats(day.date).color" stroke-width="8" stroke-linecap="round" :stroke-dasharray="2 * Math.PI * 38" :stroke-dashoffset="2 * Math.PI * 38 * (1 - Math.min(getDayStats(day.date).percent / 100, 1))" style="transition: stroke-dashoffset 0.5s ease"/>
                                         </svg>
                                         <div :class="day.date === new Date().toLocaleDateString('sv-SE') ? 'today-number-circle' : ''" class="relative z-10">
                                             <span class="text-xs sm:text-sm" :class="selectedDate === day.date && day.date !== new Date().toLocaleDateString('sv-SE') ? 'text-indigo-600' : ''">{{ day.dayNum }}</span>
@@ -728,7 +728,7 @@
             <!-- 同步確認 Modal -->
             <div v-if="showSyncModal" class="fixed inset-0 z-[120] flex items-center justify-center p-4">
                 <div class="modal-overlay absolute inset-0"></div>
-                <div class="bg-white rounded-[2.5rem] p-10 relative z-10 w-full max-w-sm text-center shadow-2xl border border-slate-100">
+                <div class="bg-white rounded-[2.5rem] p-10 relative z-10 w-full max-sm text-center shadow-2xl border border-slate-100">
                     <div class="w-20 h-20 bg-amber-50 text-amber-500 rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-inner">
                         <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -947,8 +947,8 @@
                     </div>
                     <div class="flex gap-3">
                         <button @click="showExportModal = false" class="flex-1 py-4 bg-slate-50 text-slate-500 rounded-2xl font-black text-sm">取消</button>
-                        <button @click="exportImage" :disabled="isExporting" class="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-indigo-100 disabled:bg-slate-300">
-                            {{ isExporting ? '生成中...' : '產生圖片報告' }}
+                        <button @click="exportPDF" :disabled="isExporting" class="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-indigo-100 disabled:bg-slate-300">
+                            {{ isExporting ? '生成中...' : '匯出 PDF 報告' }}
                         </button>
                     </div>
                     <button @click="exportCSV" class="w-full mt-4 text-xs font-bold text-slate-300 hover:text-indigo-600 transition-colors">或僅匯出原始 CSV 數據</button>
@@ -958,6 +958,7 @@
             <!-- 隱藏的截圖報表模板 -->
             <div id="export-report" style="display: none; width: 800px; padding: 40px; background-color: #f8f9fb; font-family: sans-serif;">
                 <div style="background-color: white; border-radius: 40px; padding: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.05);">
+                    <!-- Header -->
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 2px solid #f1f5f9; padding-bottom: 30px;">
                         <div>
                             <h1 style="font-size: 32px; font-weight: 900; color: #1e293b; margin: 0;">健康飲食分析報告</h1>
@@ -967,20 +968,60 @@
                             <svg style="width: 30px; height: 30px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                         </div>
                     </div>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px;">
-                        <div style="background-color: #f8fafc; padding: 25px; border-radius: 30px; border: 1px solid #f1f5f9; text-align: center;">
-                            <p style="font-size: 12px; font-weight: 800; color: #94a3b8; margin-bottom: 5px;">平均熱量攝取</p>
-                            <p style="font-size: 28px; font-weight: 900; color: #4f46e5;">{{ getRangeStats().avgCalories }} <span style="font-size: 14px;">kcal</span></p>
+
+                    <!-- Summary Stats -->
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px;">
+                        <div style="background-color: #f8fafc; padding: 20px; border-radius: 25px; border: 1px solid #f1f5f9; text-align: center;">
+                            <p style="font-size: 11px; font-weight: 800; color: #94a3b8; margin-bottom: 5px; text-transform: uppercase;">平均熱量</p>
+                            <p style="font-size: 22px; font-weight: 900; color: #4f46e5;">{{ getRangeStats().avgCalories }} <span style="font-size: 12px;">kcal</span></p>
                         </div>
-                        <div style="background-color: #f8fafc; padding: 25px; border-radius: 30px; border: 1px solid #f1f5f9; text-align: center;">
-                            <p style="font-size: 12px; font-weight: 800; color: #94a3b8; margin-bottom: 5px;">總計攝取熱量</p>
-                            <p style="font-size: 28px; font-weight: 900; color: #1e293b;">{{ getRangeStats().totalCalories }} <span style="font-size: 14px;">kcal</span></p>
+                        <div style="background-color: #f8fafc; padding: 20px; border-radius: 25px; border: 1px solid #f1f5f9; text-align: center;">
+                            <p style="font-size: 11px; font-weight: 800; color: #94a3b8; margin-bottom: 5px; text-transform: uppercase;">碳水比例</p>
+                            <p style="font-size: 22px; font-weight: 900; color: #6366f1;">{{ getRangeStats().nutrientPercents.carbs }}%</p>
                         </div>
-                        <div style="background-color: #f8fafc; padding: 25px; border-radius: 30px; border: 1px solid #f1f5f9; text-align: center;">
-                            <p style="font-size: 12px; font-weight: 800; color: #94a3b8; margin-bottom: 5px;">統計天數</p>
-                            <p style="font-size: 28px; font-weight: 900; color: #1e293b;">{{ getRangeStats().days }} <span style="font-size: 14px;">Days</span></p>
+                        <div style="background-color: #f8fafc; padding: 20px; border-radius: 25px; border: 1px solid #f1f5f9; text-align: center;">
+                            <p style="font-size: 11px; font-weight: 800; color: #94a3b8; margin-bottom: 5px; text-transform: uppercase;">蛋白比例</p>
+                            <p style="font-size: 22px; font-weight: 900; color: #8b5cf6;">{{ getRangeStats().nutrientPercents.protein }}%</p>
+                        </div>
+                        <div style="background-color: #f8fafc; padding: 20px; border-radius: 25px; border: 1px solid #f1f5f9; text-align: center;">
+                            <p style="font-size: 11px; font-weight: 800; color: #94a3b8; margin-bottom: 5px; text-transform: uppercase;">脂肪比例</p>
+                            <p style="font-size: 22px; font-weight: 900; color: #ec4899;">{{ getRangeStats().nutrientPercents.fat }}%</p>
                         </div>
                     </div>
+
+                    <!-- Day Type Distribution -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 40px; justify-content: center;">
+                        <div v-for="(count, type) in getRangeStats().daysByType" :key="type" style="padding: 8px 16px; border-radius: 12px; font-size: 12px; font-weight: 800;" :style="{ backgroundColor: {high:'#eef2ff', med:'#f5f3ff', low:'#fdf2f8', rest:'#f8fafc'}[type], color: {high:'#4338ca', med:'#6d28d9', low:'#be185d', rest:'#64748b'}[type] }">
+                            {{ {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[type] }}: {{ count }}天
+                        </div>
+                    </div>
+
+                    <!-- Plan Goals Table -->
+                    <div style="margin-bottom: 40px;">
+                        <h3 style="font-size: 14px; font-weight: 800; color: #64748b; margin-bottom: 15px; text-transform: uppercase; border-left: 4px solid #4f46e5; padding-left: 10px;">計畫目標概覽</h3>
+                        <table style="width: 100%; border-collapse: collapse; border-radius: 20px; overflow: hidden; border: 1px solid #f1f5f9;">
+                            <thead style="background-color: #f8fafc;">
+                                <tr>
+                                    <th style="padding: 12px; text-align: left; font-size: 12px; font-weight: 900; color: #64748b;">計畫類型</th>
+                                    <th style="padding: 12px; text-align: center; font-size: 12px; font-weight: 900; color: #64748b;">熱量 (kcal)</th>
+                                    <th style="padding: 12px; text-align: center; font-size: 12px; font-weight: 900; color: #64748b;">碳水 (g)</th>
+                                    <th style="padding: 12px; text-align: center; font-size: 12px; font-weight: 900; color: #64748b;">蛋白 (g)</th>
+                                    <th style="padding: 12px; text-align: center; font-size: 12px; font-weight: 900; color: #64748b;">脂肪 (g)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="type in ['high', 'med', 'low']" :key="type" style="border-top: 1px solid #f1f5f9;">
+                                    <td style="padding: 12px; font-size: 13px; font-weight: 800; color: #1e293b;">{{ {high:'高碳日', med:'中碳日', low:'低碳日'}[type] }}</td>
+                                    <td style="padding: 12px; text-align: center; font-size: 13px; font-weight: 700;">{{ getRangeStats().planAverages[type]?.calories || '-' }}</td>
+                                    <td style="padding: 12px; text-align: center; font-size: 13px; font-weight: 700;">{{ getRangeStats().planAverages[type]?.carbs || '-' }}</td>
+                                    <td style="padding: 12px; text-align: center; font-size: 13px; font-weight: 700;">{{ getRangeStats().planAverages[type]?.protein || '-' }}</td>
+                                    <td style="padding: 12px; text-align: center; font-size: 13px; font-weight: 700;">{{ getRangeStats().planAverages[type]?.fat || '-' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Charts Area -->
                     <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; margin-bottom: 40px;">
                         <div style="text-align: center;">
                             <h3 style="font-size: 14px; font-weight: 800; color: #64748b; margin-bottom: 20px; text-transform: uppercase;">三大營養素佔比</h3>
@@ -995,13 +1036,15 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Daily Details -->
                     <div>
                         <h3 style="font-size: 14px; font-weight: 800; color: #64748b; margin-bottom: 25px; text-transform: uppercase; border-left: 4px solid #4f46e5; padding-left: 10px;">每日飲食詳情</h3>
                         <div style="display: flex; flex-direction: column; gap: 30px;">
                             <div v-for="day in getRangeStats().dailyRecords" :key="day.date">
                                 <div v-if="day.meals.length > 0">
                                     <div style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding-bottom: 8px;">
-                                        <span style="font-size: 14px; font-weight: 900; color: #1e293b;">📅 {{ day.date }}</span>
+                                        <span style="font-size: 14px; font-weight: 900; color: #1e293b;">📅 {{ day.date }} ({{ {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[day.planType] || '-' }})</span>
                                         <span style="font-size: 12px; font-weight: 800; color: #6366f1;">當日總計: {{ day.totalCalories }} kcal</span>
                                     </div>
                                     <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -1031,7 +1074,6 @@
         </div>
     </div>
     <script>
-
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
@@ -1069,27 +1111,49 @@
                 const showHistory = ref(false);
                 const showExportModal = ref(false);
                 const isExporting = ref(false);
-                const exportRange = reactive({ start: formatDate(new Date()), end: formatDate(new Date()) });
+                const exportRange = reactive({ start: formatDate(new Date(new Date().setDate(new Date().getDate() - 7))), end: formatDate(new Date()) });
                 const showMonthPicker = ref(false);
                 const historySearch = ref('');
 
-                const exportImage = async () => {
+                const exportPDF = async () => {
                     isExporting.value = true;
                     await Vue.nextTick();
                     const reportEl = document.getElementById('export-report');
                     reportEl.style.display = 'block';
+                    
                     const stats = getRangeStats();
                     renderExportCharts(stats);
-                    await new Promise(r => setTimeout(r, 800));
+                    
+                    await new Promise(r => setTimeout(r, 1000));
+                    
                     try {
-                        const canvas = await html2canvas(reportEl, { scale: 2, useCORS: true, backgroundColor: '#f8f9fb' });
-                        const link = document.createElement('a');
-                        link.download = `健康報告_${exportRange.start}_to_${exportRange.end}.png`;
-                        link.href = canvas.toDataURL('image/png');
-                        link.click();
+                        const { jsPDF } = window.jspdf;
+                        const canvas = await html2canvas(reportEl, { 
+                            scale: 2, 
+                            useCORS: true, 
+                            backgroundColor: '#f8f9fb',
+                            logging: false
+                        });
+                        
+                        const imgData = canvas.toDataURL('image/png');
+                        const pdf = new jsPDF('p', 'mm', 'a4');
+                        
+                        const imgProps = pdf.getImageProperties(imgData);
+                        const pdfWidth = pdf.internal.pageSize.getWidth();
+                        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                        
+                        if (pdfHeight > pdf.internal.pageSize.getHeight()) {
+                            const longPdf = new jsPDF('p', 'mm', [pdfWidth, pdfHeight]);
+                            longPdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                            longPdf.save(`健康報告_${exportRange.start}_to_${exportRange.end}.pdf`);
+                        } else {
+                            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                            pdf.save(`健康報告_${exportRange.start}_to_${exportRange.end}.pdf`);
+                        }
+                        
                         showExportModal.value = false;
                     } catch (e) {
-                        console.error('匯出圖片失敗', e);
+                        console.error('匯出 PDF 失敗', e);
                         alert('匯出失敗，請稍後再試');
                     } finally {
                         reportEl.style.display = 'none';
@@ -1098,14 +1162,39 @@
                 };
 
                 const getRangeStats = () => {
-                    const stats = { days: 0, totalCalories: 0, avgCalories: 0, totalCarbs: 0, totalProtein: 0, totalFat: 0, dailyLabels: [], dailyCals: [], meals: [], dailyRecords: [] };
+                    const stats = { 
+                        days: 0, 
+                        totalCalories: 0, 
+                        avgCalories: 0, 
+                        totalCarbs: 0, 
+                        totalProtein: 0, 
+                        totalFat: 0, 
+                        dailyLabels: [], 
+                        dailyCals: [], 
+                        meals: [], 
+                        dailyRecords: [],
+                        daysByType: { high: 0, med: 0, low: 0, rest: 0 },
+                        planAverages: { high: null, med: null, low: null },
+                        nutrientPercents: { carbs: 0, protein: 0, fat: 0 }
+                    };
                     const start = new Date(exportRange.start);
                     const end = new Date(exportRange.end);
+                    
                     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
                         const dateStr = formatDate(d);
                         const record = allData[dateStr];
                         stats.days++;
                         stats.dailyLabels.push(dateStr.slice(5));
+                        
+                        let dayType = 'med';
+                        if (record && record.planType) {
+                            dayType = record.planType;
+                            stats.daysByType[record.planType]++;
+                            if (!stats.planAverages[record.planType] && record.planType !== 'rest') {
+                                stats.planAverages[record.planType] = record.goals || plans[record.planType];
+                            }
+                        }
+
                         let dayCal = 0;
                         const dayMeals = record && record.meals ? record.meals : [];
                         dayMeals.forEach(m => {
@@ -1120,10 +1209,22 @@
                         stats.dailyRecords.push({
                             date: dateStr,
                             meals: dayMeals,
-                            totalCalories: dayCal
+                            totalCalories: dayCal,
+                            planType: dayType
                         });
                     }
                     stats.avgCalories = stats.days > 0 ? Math.round(stats.totalCalories / stats.days) : 0;
+                    
+                    const cCal = stats.totalCarbs * 4;
+                    const pCal = stats.totalProtein * 4;
+                    const fCal = stats.totalFat * 9;
+                    const totalNutrientCal = cCal + pCal + fCal || 1;
+                    stats.nutrientPercents = {
+                        carbs: Math.round(cCal / totalNutrientCal * 100),
+                        protein: Math.round(pCal / totalNutrientCal * 100),
+                        fat: Math.round(fCal / totalNutrientCal * 100)
+                    };
+
                     return stats;
                 };
 
@@ -1279,11 +1380,6 @@
                     showHistory.value = false;
                 };
 
-                const isTodayOrFuture = (dateStr) => {
-                    const todayStr = formatDate(new Date());
-                    return dateStr >= todayStr;
-                };
-
                 const setPlanType = (type) => {
                     if (!allData[selectedDate.value]) {
                         allData[selectedDate.value] = { meals: [] };
@@ -1320,29 +1416,9 @@
                     updateFutureGoals();
                 };
 
-                const weekDays = computed(() => {
-                    const current = new Date(selectedDate.value);
-                    const dayOfWeek = current.getDay();
-                    const diff = current.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
-                    const monday = new Date(current.setDate(diff));
-                    const days = [];
-                    const labels = ['一', '二', '三', '四', '五', '六', '日'];
-                    for (let i = 0; i < 7; i++) {
-                        const d = new Date(monday);
-                        d.setDate(monday.getDate() + i);
-                        days.push({ date: formatDate(d), dayNum: d.getDate(), label: labels[i] });
-                    }
-                    return days;
-                });
-
                 const currentMonthYearDisplay = computed(() => {
                     return new Date(selectedDate.value).toLocaleDateString('zh-TW', { year: 'numeric', month: 'long' });
                 });
-
-                const getDayDotClass = (dateStr) => {
-                    const record = allData[dateStr];
-                    return record?.planType ? `dot-${record.planType}` : 'bg-transparent';
-                };
 
                 const getMealLabel = (type) => {
                     const map = { breakfast: '🌅 早餐', lunch: '☀️ 午餐', dinner: '🌙 晚餐', snack: '🍰 點心' };
@@ -1399,20 +1475,9 @@
                     pickerMonth.value = new Date(pickerMonth.value.getFullYear(), pickerMonth.value.getMonth() + dir, 1);
                 };
 
-                const selectDateFromPicker = (date) => {
-                    selectedDate.value = date;
-                    showMonthPicker.value = false;
-                };
-
-                const openMonthPicker = () => {
-                    pickerMonth.value = new Date(selectedDate.value);
-                    showMonthPicker.value = true;
-                };
-
                 const goToToday = () => {
                     const now = new Date();
                     selectedDate.value = formatDate(now);
-                    // 強制重設為當月第一天以確保 pickerMonth 視角正確
                     pickerMonth.value = new Date(now.getFullYear(), now.getMonth(), 1);
                 };
 
@@ -1453,12 +1518,9 @@
                                         const order = { breakfast: 1, lunch: 2, dinner: 3, snack: 4 };
                                         Object.values(data.allData).forEach(day => {
                                             if (day.meals) {
-                                                // 自動修正舊資料與補全模板庫
                                                 day.meals.forEach(m => {
                                                     if (m.amount === undefined || m.amount === null) m.amount = 1;
                                                     if (!m.unit) m.unit = '份';
-                                                    
-                                                    // 如果模板不存在，建立初始模板
                                                     const k = m.name?.toLowerCase().trim();
                                                     if (k && !templates[k]) {
                                                         templates[k] = {
@@ -1550,7 +1612,6 @@
 
                 const saveMeal = (syncOption = null) => {
                     if (!editingMeal.name) return;
-                    
                     const k = editingMeal.name.toLowerCase().trim();
                     const currentNormalized = {
                         ...editingMeal,
@@ -1560,29 +1621,21 @@
                         protein: formatNum(editingMeal.protein / (editingMeal.amount || 1)),
                         fat: formatNum(editingMeal.fat / (editingMeal.amount || 1))
                     };
-
                     const existing = templates[k];
-
-                    // 檢查是否需要顯示同步確認 Modal
                     if (syncOption === null && existing) {
                         const isDifferent = 
                             Math.abs(existing.calories - currentNormalized.calories) > 0.1 ||
                             Math.abs(existing.carbs - currentNormalized.carbs) > 0.1 ||
                             Math.abs(existing.protein - currentNormalized.protein) > 0.1 ||
                             Math.abs(existing.fat - currentNormalized.fat) > 0.1;
-
                         if (isDifferent) {
                             showSyncModal.value = true;
                             return;
                         }
                     }
-
-                    // 處理同步邏輯
                     if (syncOption === 'sync' || !existing) {
                         templates[k] = currentNormalized;
                     }
-
-                    // 執行儲存
                     if (editingIndex.value !== null) {
                         allData[selectedDate.value].meals[editingIndex.value] = JSON.parse(JSON.stringify(editingMeal));
                     }
@@ -1613,10 +1666,7 @@
                 };
 
                 const onlyNumber = (e) => {
-                    // 攔截科學記數法常用字元 e, E, +, -
-                    if (['e', 'E', '+', '-'].includes(e.key)) {
-                        e.preventDefault();
-                    }
+                    if (['e', 'E', '+', '-'].includes(e.key)) e.preventDefault();
                 };
 
                 onMounted(initApp);
@@ -1624,9 +1674,8 @@
                 return {
                     initialized, user, saving, showSettings, showHistory, showMonthPicker, historySearch, selectedDate, pickerMonth, loginEmail, loginPassword,
                     editingIndex, isAddingMeal, mealToDelete, nutrientKeys, profile, plans, allData, mealHistory, editingMeal, showSyncModal, templates,
-                    weekDays, currentMonthYearDisplay, calculatedTDEE, formatNum, scaleNutrients, lastAmount, prepareScale,
-                    onlyNumber,
-                    calendarDays, changePickerMonth, selectDateFromPicker, openMonthPicker,
+                    currentMonthYearDisplay, calculatedTDEE, formatNum, scaleNutrients, lastAmount, prepareScale, onlyNumber,
+                    calendarDays, changePickerMonth, goToToday,
                     currentDayRecord: computed(() => {
                         if (!allData[selectedDate.value]) { allData[selectedDate.value] = { planType: 'med', meals: [] }; }
                         return allData[selectedDate.value];
@@ -1636,7 +1685,7 @@
                         if (day?.goals) return day.goals;
                         return plans[day?.planType] || plans.med;
                     }),
-                    getDayDotClass, getMealLabel, getPlanLabel,
+                    getMealLabel, getPlanLabel,
                     getDailySum: (type) => (allData[selectedDate.value]?.meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0),
                     getGap: (type) => {
                         const day = allData[selectedDate.value];
@@ -1648,25 +1697,12 @@
                         const d = new Date(selectedDate.value);
                         const oldDay = d.getDate();
                         d.setMonth(d.getMonth() + dir);
-                        // 處理月底溢位問題 (如 3/31 跳 4/30 而非 5/1)
                         if (d.getDate() !== oldDay) d.setDate(0);
-                        
                         selectedDate.value = formatDate(d);
                         pickerMonth.value = new Date(d.getFullYear(), d.getMonth(), 1);
                     },
-                    changeDay: (dir) => {
-                        const d = new Date(selectedDate.value);
-                        d.setDate(d.getDate() + dir);
-                        selectedDate.value = formatDate(d);
-                        // 如果跨月，也更新月曆視角
-                        if (d.getMonth() !== pickerMonth.value.getMonth()) {
-                            pickerMonth.value = new Date(d.getFullYear(), d.getMonth(), 1);
-                        }
-                    },
-                    goToToday,
                     mealTypes, getMealsByType,
-                    addMeal, startEdit, cancelEdit, saveMeal,
-                    addFromHistory,
+                    addMeal, startEdit, cancelEdit, saveMeal, addFromHistory,
                     confirmDelete: (i) => { mealToDelete.value = i; },
                     executeDelete: () => {
                         allData[selectedDate.value].meals.splice(mealToDelete.value, 1);
@@ -1676,10 +1712,9 @@
                     getDayStats: (date) => {
                         const record = allData[date];
                         if (!record || !record.planType) return null;
-                        const plan = plans[record.planType];
+                        const plan = record.goals || plans[record.planType] || plans.med;
                         const intake = (record.meals || []).reduce((s, m) => s + (Number(m.calories) || 0), 0);
                         const goal = plan.calories || 1;
-                        // 差距百分比邏輯: Gap 0 -> 100%, Gap 100% -> 0%
                         const gapPercent = (Math.abs(goal - intake) / goal) * 100;
                         const progress = Math.max(0, 100 - gapPercent);
                         const colorMap = { high: '#6366f1', med: '#8b5cf6', low: '#ec4899', rest: '#64748b' };
@@ -1687,52 +1722,6 @@
                     },
                     autoCalculatePlans, exportCSV, saveData,
                     showExportModal, isExporting, exportRange, exportPDF, getRangeStats,
-                    isCalendarExpanded, toggleCalendar, showMonthJump, jumpYear, jumpToMonth,
-                    handleAuth: async (mode) => {
-                        try {
-                            mode === 'login'
-                                ? await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value)
-                                : await createUserWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
-                        } catch (e) { alert('驗證失敗'); }
-                    },
-                    handleAnonymous: () => signInAnonymously(auth),
-                    handleLogout: () => signOut(auth)
-                };
-            }
-        }).mount('#app');
-    </script>
-</body>
-
-</html>onst goal = plan.calories || 1;
-                        // 差距百分比邏輯: Gap 0 -> 100%, Gap 100% -> 0%
-                        const gapPercent = (Math.abs(goal - intake) / goal) * 100;
-                        const progress = Math.max(0, 100 - gapPercent);
-                        const colorMap = { high: '#6366f1', med: '#8b5cf6', low: '#ec4899', rest: '#64748b' };
-                        return { percent: progress, color: colorMap[record.planType] };
-                    },
-                    autoCalculatePlans, exportCSV, saveData,
-                    showExportModal, isExporting, exportRange, exportImage, getRangeStats,
-                    isCalendarExpanded, toggleCalendar, showMonthJump, jumpYear, jumpToMonth,
-                    handleAuth: async (mode) => {
-                        try {
-                            mode === 'login'
-                                ? await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value)
-                                : await createUserWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
-                        } catch (e) { alert('驗證失敗'); }
-                    },
-                    handleAnonymous: () => signInAnonymously(auth),
-                    handleLogout: () => signOut(auth)
-                };
-            }
-        }).mount('#app');
-    </script>
-</body>
-
-</html>'#ec4899', rest: '#64748b' };
-                        return { percent: progress, color: colorMap[record.planType] };
-                    },
-                    autoCalculatePlans, exportCSV, saveData,
-                    showExportModal, isExporting, exportRange, exportImage, getRangeStats,
                     isCalendarExpanded, toggleCalendar, showMonthJump, jumpYear, jumpToMonth,
                     handleAuth: async (mode) => {
                         try {
