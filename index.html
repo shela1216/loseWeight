@@ -1344,12 +1344,13 @@
                                     <div class="text-base font-black text-slate-900">{{ getPlanLabel(key) }}</div>
                                 </div>
                                 <span
-                                    class="text-[10px] sm:text-xs text-slate-300 font-black uppercase tracking-widest">熱量
+                                    class="hidden sm:inline text-[10px] sm:text-xs text-slate-300 font-black uppercase tracking-widest">熱量
                                     • 碳水 • 蛋白 • 脂肪</span>
                             </div>
-                            <div class="grid grid-cols-4 gap-3">
-                                <div v-for="n in ['calories', 'carbs', 'protein', 'fat']" :key="n" class="space-y-1.5">
-                                    <input type="number" v-model.number="p[n]"
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <div v-for="n in [{k:'calories',l:'熱量',u:'kcal'},{k:'carbs',l:'碳水',u:'g'},{k:'protein',l:'蛋白',u:'g'},{k:'fat',l:'脂肪',u:'g'}]" :key="n.k" class="space-y-1.5">
+                                    <label class="sm:hidden text-[9px] font-black text-slate-400 pl-1 uppercase">{{ n.l }} ({{ n.u }})</label>
+                                    <input type="number" v-model.number="p[n.k]"
                                         class="w-full text-center text-sm p-3.5 bg-slate-50 border border-slate-100 rounded-xl font-black outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all">
                                 </div>
                             </div>
