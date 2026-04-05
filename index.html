@@ -1298,7 +1298,7 @@
                                 <input type="number" v-model.number="profile.age"
                                     class="w-full bg-white px-4 py-3.5 rounded-2xl text-sm border border-slate-100 shadow-sm font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
                             </div>
-                            <div class="space-y-2">
+                            <div class="col-span-2 md:col-span-2 space-y-2">
                                 <label class="text-xs font-black text-slate-400 pl-1">體重目標</label>
                                 <select v-model="profile.goal"
                                     class="w-full bg-white px-4 py-3.5 rounded-2xl text-sm border border-slate-100 shadow-sm font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
@@ -1306,7 +1306,7 @@
                                     <option value="maintain">維持身材 (TDEE)</option>
                                 </select>
                             </div>
-                            <div class="col-span-1 md:col-span-2 space-y-2">
+                            <div class="col-span-2 md:col-span-3 space-y-2">
                                 <label class="text-xs font-black text-slate-400 pl-1">活動程度</label>
                                 <select v-model="profile.activity"
                                     class="w-full bg-white px-4 py-3.5 rounded-2xl text-sm border border-slate-100 shadow-sm font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
@@ -2073,7 +2073,22 @@
                     
                     // 根據目標調整基準熱量 (減重通常減少 300-500 kcal，維持則與 TDEE 相當)
                     const base = goal === 'lose' ? tdee - 400 : tdee;
-                    const pGrams = formatNum(weight * 2.2); // 保持較高蛋白以維持肌肉
+                    
+                    // 動態計算蛋白質倍數 (根據活動量與目標)
+                    let pMultiplier = 1.6;
+                    if (goal === 'lose') {
+                        if (activity <= 1.2) pMultiplier = 1.6;
+                        else if (activity <= 1.375) pMultiplier = 1.9;
+                        else if (activity <= 1.55) pMultiplier = 2.2;
+                        else pMultiplier = 2.4;
+                    } else {
+                        if (activity <= 1.2) pMultiplier = 1.2;
+                        else if (activity <= 1.375) pMultiplier = 1.5;
+                        else if (activity <= 1.55) pMultiplier = 1.8;
+                        else pMultiplier = 2.0;
+                    }
+                    
+                    const pGrams = formatNum(weight * pMultiplier); 
                     
                     // 根據目標計算各計畫數值
                     if (goal === 'lose') {
