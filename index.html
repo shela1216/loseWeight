@@ -535,7 +535,7 @@
                                     <span
                                         class="lg:absolute lg:right-20 lg:bg-slate-900 lg:text-white lg:px-3 lg:py-1.5 lg:rounded-lg lg:text-[10px] lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 lg:pointer-events-none lg:transition-all lg:duration-300 lg:whitespace-nowrap lg:shadow-xl lg:after:content-[''] lg:after:absolute lg:after:top-1/2 lg:after:-translate-y-1/2 lg:after:-right-1.5 lg:after:border-y-[6px] lg:after:border-y-transparent lg:after:border-l-[6px] lg:after:border-l-slate-900">匯出報告</span>
                                 </button>
-                                <button @click="showSettings = true" class="btn-circular group" title="設定目標">
+                                <button @click="openSettings" class="btn-circular group" title="設定目標">
                                     <div class="icon-wrapper">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
                                             viewBox="0 0 24 24">
@@ -1298,7 +1298,15 @@
                                 <input type="number" v-model.number="profile.age"
                                     class="w-full bg-white px-4 py-3.5 rounded-2xl text-sm border border-slate-100 shadow-sm font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
                             </div>
-                            <div class="col-span-2 space-y-2">
+                            <div class="space-y-2">
+                                <label class="text-xs font-black text-slate-400 pl-1">體重目標</label>
+                                <select v-model="profile.goal"
+                                    class="w-full bg-white px-4 py-3.5 rounded-2xl text-sm border border-slate-100 shadow-sm font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
+                                    <option value="lose">減重 (-500 kcal)</option>
+                                    <option value="maintain">維持身材 (TDEE)</option>
+                                </select>
+                            </div>
+                            <div class="col-span-1 md:col-span-2 space-y-2">
                                 <label class="text-xs font-black text-slate-400 pl-1">活動程度</label>
                                 <select v-model="profile.activity"
                                     class="w-full bg-white px-4 py-3.5 rounded-2xl text-sm border border-slate-100 shadow-sm font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
@@ -1326,9 +1334,9 @@
                     <div class="space-y-4">
                         <div class="px-2 mb-2 flex items-center gap-2">
                             <div class="w-1.5 h-4 bg-slate-200 rounded-full"></div>
-                            <h4 class="text-xs font-black text-slate-400 uppercase tracking-widest">目標數值設定</h4>
+                            <h4 class="text-xs font-black text-slate-400 uppercase tracking-widest">目標數值設定 (點擊自動計算後可手動微調)</h4>
                         </div>
-                        <div v-for="(p, key) in plans" :key="key"
+                        <div v-for="(p, key) in tempPlans" :key="key"
                             class="p-6 bg-white border border-slate-100 rounded-[1.5rem] shadow-sm hover:shadow-md transition-shadow">
                             <div class="flex justify-between items-center mb-5">
                                 <div class="flex items-center gap-2">
@@ -1341,15 +1349,15 @@
                             </div>
                             <div class="grid grid-cols-4 gap-3">
                                 <div v-for="n in ['calories', 'carbs', 'protein', 'fat']" :key="n" class="space-y-1.5">
-                                    <input type="number" v-model.number="p[n]" @change="saveData"
+                                    <input type="number" v-model.number="p[n]"
                                         class="w-full text-center text-sm p-3.5 bg-slate-50 border border-slate-100 rounded-xl font-black outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all">
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <button @click="showSettings = false"
-                        class="w-full mt-10 py-5 bg-slate-900 text-white rounded-[1.5rem] font-black text-base shadow-2xl hover:bg-black active:scale-95 transition-all tracking-tight shrink-0">確定並關閉</button>
+                    <button @click="saveSettings"
+                        class="w-full mt-10 py-5 bg-slate-900 text-white rounded-[1.5rem] font-black text-base shadow-2xl hover:bg-black active:scale-95 transition-all tracking-tight shrink-0">確定並儲存變更</button>
                 </div>
             </div>
         </div>
@@ -1941,6 +1949,13 @@
                     rest: { calories: 1400, carbs: 35, protein: 140, fat: 77 }
                 });
 
+                const tempPlans = reactive({
+                    high: { calories: 0, carbs: 0, protein: 0, fat: 0 },
+                    med: { calories: 0, carbs: 0, protein: 0, fat: 0 },
+                    low: { calories: 0, carbs: 0, protein: 0, fat: 0 },
+                    rest: { calories: 0, carbs: 0, protein: 0, fat: 0 }
+                });
+
                 const allData = reactive({});
                 let db, auth, unsubscribe = null;
                 const appId = typeof __app_id !== 'undefined' ? __app_id : 'diet-tracker-v2';
@@ -2051,17 +2066,42 @@
                 };
 
                 const autoCalculatePlans = () => {
-                    const { gender, weight, height, age, activity } = profile;
+                    const { gender, weight, height, age, activity, goal } = profile;
                     let bmr = (10 * weight) + (6.25 * height) - (5 * age);
                     bmr = gender === 'male' ? bmr + 5 : bmr - 161;
                     const tdee = Math.round(bmr * activity);
-                    const base = tdee - 300;
-                    const pGrams = formatNum(weight * 2);
-                    plans.high = { calories: base + 200, protein: pGrams, carbs: formatNum((base + 200) * 0.5 / 4), fat: formatNum((base + 200) * 0.2 / 9) };
-                    plans.med = { calories: base, protein: pGrams, carbs: formatNum(base * 0.3 / 4), fat: formatNum(base * 0.3 / 9) };
-                    plans.low = { calories: base - 100, protein: pGrams, carbs: formatNum((base - 100) * 0.15 / 4), fat: formatNum((base - 100) * 0.4 / 9) };
-                    plans.rest = { calories: base - 300, protein: pGrams, carbs: formatNum((base - 300) * 0.05 / 4), fat: formatNum((base - 300) * 0.5 / 9) };
+                    
+                    // 根據目標調整基準熱量 (減重通常減少 300-500 kcal，維持則與 TDEE 相當)
+                    const base = goal === 'lose' ? tdee - 400 : tdee;
+                    const pGrams = formatNum(weight * 2.2); // 保持較高蛋白以維持肌肉
+                    
+                    // 根據目標計算各計畫數值
+                    if (goal === 'lose') {
+                        tempPlans.high = { calories: base + 200, protein: pGrams, carbs: formatNum((base + 200) * 0.45 / 4), fat: formatNum((base + 200) * 0.25 / 9) };
+                        tempPlans.med = { calories: base, protein: pGrams, carbs: formatNum(base * 0.3 / 4), fat: formatNum(base * 0.3 / 9) };
+                        tempPlans.low = { calories: base - 200, protein: pGrams, carbs: formatNum((base - 200) * 0.15 / 4), fat: formatNum((base - 200) * 0.45 / 9) };
+                        // 自由日：高碳熱量、高碳碳水、低碳脂肪
+                        tempPlans.rest = { calories: tempPlans.high.calories, protein: pGrams, carbs: tempPlans.high.carbs, fat: tempPlans.low.fat };
+                    } else {
+                        // 維持身材邏輯：熱量較高，碳水比例適中
+                        tempPlans.high = { calories: base + 300, protein: pGrams, carbs: formatNum((base + 300) * 0.55 / 4), fat: formatNum((base + 300) * 0.2 / 9) };
+                        tempPlans.med = { calories: base, protein: pGrams, carbs: formatNum(base * 0.4 / 4), fat: formatNum(base * 0.4 / 9) };
+                        tempPlans.low = { calories: base - 200, protein: pGrams, carbs: formatNum((base - 200) * 0.25 / 4), fat: formatNum((base - 200) * 0.45 / 9) };
+                        // 自由日：高碳熱量、高碳碳水、低碳脂肪
+                        tempPlans.rest = { calories: tempPlans.high.calories, protein: pGrams, carbs: tempPlans.high.carbs, fat: tempPlans.low.fat };
+                    }
+                };
+
+                const saveSettings = () => {
+                    Object.assign(plans, JSON.parse(JSON.stringify(tempPlans)));
                     updateFutureGoals();
+                    showSettings.value = false;
+                    saveData();
+                };
+
+                const openSettings = () => {
+                    Object.assign(tempPlans, JSON.parse(JSON.stringify(plans)));
+                    showSettings.value = true;
                 };
 
                 const currentMonthYearDisplay = computed(() => {
