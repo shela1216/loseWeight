@@ -52,41 +52,41 @@
 
         /* === 顏色點 (柔和精緻版) === */
         .dot-high {
+            background-color: #f59e0b;
+        }
+
+        /* Amber */
+        .dot-med {
             background-color: #6366f1;
         }
 
         /* Indigo */
-        .dot-med {
-            background-color: #8b5cf6;
-        }
-
-        /* Violet */
         .dot-low {
-            background-color: #ec4899;
+            background-color: #f43f5e;
         }
 
-        /* Pink */
+        /* Rose */
         .dot-rest {
-            background-color: #94a3b8;
+            background-color: #64748b;
         }
 
         /* Slate */
 
         /* === 計畫卡漸層 (現代簡約) === */
         .plan-high {
-            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         }
 
         .plan-med {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
         }
 
         .plan-low {
-            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
         }
 
         .plan-rest {
-            background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
         }
 
         /* === 計畫噪點紋理 (降低透明度) === */
@@ -587,7 +587,7 @@
                                             Date(selectedDate).getDate() }}日</span>
                                         <span
                                             class="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold text-white uppercase"
-                                            :class="{'bg-indigo-500': currentDayRecord.planType === 'high','bg-violet-500': currentDayRecord.planType === 'med','bg-pink-500':currentDayRecord.planType === 'low','bg-slate-400': currentDayRecord.planType === 'rest'}">{{
+                                            :class="{'bg-amber-500': currentDayRecord.planType === 'high','bg-indigo-600': currentDayRecord.planType === 'med','bg-rose-500':currentDayRecord.planType === 'low','bg-slate-400': currentDayRecord.planType === 'rest'}">{{
                                             {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[currentDayRecord.planType]
                                             }}</span>
                                     </div>
@@ -720,7 +720,7 @@
                         </div>
                         <div class="segmented-control relative">
                             <div class="segment-indicator"
-                                :style="{ width: 'calc((100% - 12px) / 4 - 8px)', transform: `translateX(calc(${Object.keys(plans).indexOf(currentDayRecord.planType)} * (100% + 8px) + 4px))`, backgroundColor: {high:'#6366f1', med:'#8b5cf6', low:'#ec4899', rest:'#64748b'}[currentDayRecord.planType] }">
+                                :style="{ width: 'calc((100% - 12px) / 4 - 8px)', transform: `translateX(calc(${Object.keys(plans).indexOf(currentDayRecord.planType)} * (100% + 8px) + 4px))`, backgroundColor: {high:'#f59e0b', med:'#6366f1', low:'#f43f5e', rest:'#64748b'}[currentDayRecord.planType] }">
                             </div>
                             <div v-for="(p, key) in {high:{l:'高碳', i:'💪'}, med:{l:'中碳', i:'🥗'}, low:{l:'低碳', i:'🔥'}, rest:{l:'自由', i:'🧘'}}"
                                 :key="key" @click="setPlanType(key)" class="segment-item"
@@ -744,9 +744,9 @@
                             <div class="relative shrink-0 w-[130px] h-[130px] sm:w-[220px] sm:h-[220px]">
                                 <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
                                     <circle cx="50" cy="50" r="38" fill="none" stroke-width="6"
-                                        :stroke="{high:'#e0e7ff', med:'#ede9fe', low:'#fce7f3', rest:'#f1f5f9'}[currentDayRecord.planType] || '#f1f5f9'" />
+                                        :stroke="{high:'#fef3c7', med:'#e0e7ff', low:'#ffe4e6', rest:'#f1f5f9'}[currentDayRecord.planType] || '#f1f5f9'" />
                                     <circle cx="50" cy="50" r="38" fill="none" stroke-width="6" stroke-linecap="round"
-                                        :stroke="getGap('calories') < 0 ? '#ef4444' : ({high:'#6366f1', med:'#8b5cf6', low:'#ec4899', rest:'#64748b'}[currentDayRecord.planType] || '#6366f1')"
+                                        :stroke="getGap('calories') < 0 ? '#ef4444' : ({high:'#f59e0b', med:'#6366f1', low:'#f43f5e', rest:'#64748b'}[currentDayRecord.planType] || '#6366f1')"
                                         :stroke-dasharray="`${2 * 3.14159 * 38}`"
                                         :stroke-dashoffset="2 * 3.14159 * 38 * (1 - Math.min(getDailySum('calories') / (currentPlan.calories || 1), 1))"
                                         style="transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s ease" />
@@ -2307,7 +2307,7 @@
                         const colorMap = { high: '#f59e0b', med: '#6366f1', low: '#f43f5e', rest: '#64748b' };
                         return { percent: progress, color: colorMap[record.planType] };
                     },
-                    autoCalculatePlans, exportCSV, saveData,
+                    setPlanType, autoCalculatePlans, exportCSV, saveData,
                     showExportModal, isExporting, exportRange, exportPDF, getRangeStats,
                     excludedDates, exportDateList, toggleExcludedDate, toggleAllExportDates, setQuickRange,
                     isCalendarExpanded, toggleCalendar, showMonthJump, jumpYear, jumpToMonth,
