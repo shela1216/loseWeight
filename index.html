@@ -1027,6 +1027,43 @@
                         </button>
                     </div>
 
+                    <!-- 品項組合區 (組合餐功能) -->
+                    <div class="space-y-4 border-t border-slate-50 pt-6">
+                        <div class="flex justify-between items-center px-1">
+                            <div>
+                                <label class="text-xs font-black text-slate-400 uppercase tracking-widest">餐點組成品項 (選填)</label>
+                                <p class="text-[9px] text-slate-300 font-bold uppercase mt-0.5">Components & Details</p>
+                            </div>
+                            <button @click="addItem" class="flex items-center gap-1.5 text-[10px] font-black text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-xl hover:bg-indigo-100 transition-all shadow-sm">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+                                <span>新增品項</span>
+                            </button>
+                        </div>
+                        <div v-if="editingMeal.items && editingMeal.items.length > 0" class="space-y-3">
+                            <div v-for="(item, idx) in editingMeal.items" :key="idx" class="bg-slate-50/80 rounded-2xl p-4 border border-slate-100/50 space-y-3 relative group">
+                                <button @click="removeItem(idx)" class="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-lg bg-white text-slate-300 hover:text-rose-500 hover:shadow-sm transition-all">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+                                </button>
+                                <div class="flex gap-2">
+                                    <input v-model="item.name" @input="updateTotalsFromItems" class="flex-1 bg-white px-4 py-2.5 rounded-xl text-sm font-black outline-none border border-transparent focus:border-indigo-200 shadow-sm transition-all" placeholder="品項名稱 (如：蔥花蛋)">
+                                    <div class="flex items-center bg-white px-3 py-2 rounded-xl border border-transparent focus-within:border-indigo-200 shadow-sm transition-all">
+                                        <input type="number" v-model.number="item.amount" @input="updateTotalsFromItems" class="w-10 bg-transparent text-sm font-black outline-none text-center" placeholder="份量">
+                                        <span class="text-[10px] font-bold text-slate-300 ml-1">份</span>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-4 gap-2">
+                                    <div v-for="n in [{k:'calories',l:'熱量',u:'kcal'},{k:'carbs',l:'碳水',u:'g'},{k:'protein',l:'蛋白',u:'g'},{k:'fat',l:'脂肪',u:'g'}]" :key="n.k" class="flex flex-col gap-1">
+                                        <label class="text-[9px] font-black text-slate-400 text-center uppercase">{{ n.l }}</label>
+                                        <div class="relative">
+                                            <input type="number" v-model.number="item[n.k]" @input="updateTotalsFromItems" class="w-full bg-white px-1 py-2 rounded-xl text-xs font-black text-center outline-none border border-transparent focus:border-indigo-200 shadow-sm transition-all" :placeholder="n.u">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-center text-[9px] font-bold text-slate-300 uppercase tracking-widest py-2">總計數值將自動同步至下方主欄位</p>
+                        </div>
+                    </div>
+
                     <!-- 第3排: 份量 + 單位 -->
                     <div class="flex items-center gap-3">
                         <div
@@ -1859,8 +1896,32 @@
 
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
-                const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0 });
+                const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
+
+                const updateTotalsFromItems = () => {
+                    if (!editingMeal.items || editingMeal.items.length === 0) return;
+                    editingMeal.calories = formatNum(editingMeal.items.reduce((sum, item) => sum + (Number(item.calories) || 0), 0));
+                    editingMeal.carbs = formatNum(editingMeal.items.reduce((sum, item) => sum + (Number(item.carbs) || 0), 0));
+                    editingMeal.protein = formatNum(editingMeal.items.reduce((sum, item) => sum + (Number(item.protein) || 0), 0));
+                    editingMeal.fat = formatNum(editingMeal.items.reduce((sum, item) => sum + (Number(item.fat) || 0), 0));
+                    
+                    // 自動生成名稱
+                    const names = editingMeal.items.map(i => i.name).filter(n => n).join(' + ');
+                    if (names && (editingMeal.name === '' || editingMeal.items.some(i => i.name && editingMeal.name.includes(i.name)))) {
+                        editingMeal.name = names;
+                    }
+                };
+
+                const addItem = () => {
+                    if (!editingMeal.items) editingMeal.items = [];
+                    editingMeal.items.push({ name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0 });
+                };
+
+                const removeItem = (idx) => {
+                    editingMeal.items.splice(idx, 1);
+                    updateTotalsFromItems();
+                };
                 const mealToDelete = ref(null);
                 const showSyncModal = ref(false);
                 const lastAmount = ref(1);
@@ -2166,18 +2227,20 @@
 
                 const startEdit = (index) => {
                     const meal = allData[selectedDate.value].meals[index];
-                    Object.assign(editingMeal, JSON.parse(JSON.stringify(meal)));
+                    const copiedMeal = JSON.parse(JSON.stringify(meal));
+                    if (!copiedMeal.items) copiedMeal.items = [];
+                    Object.assign(editingMeal, copiedMeal);
                     editingIndex.value = index;
                     isAddingMeal.value = false;
                     lastAmount.value = editingMeal.amount;
-                    tempMealBackup.value = JSON.parse(JSON.stringify(meal));
+                    tempMealBackup.value = JSON.parse(JSON.stringify(copiedMeal));
                 };
 
                 const addMeal = () => {
                     if (!allData[selectedDate.value]) {
                         allData[selectedDate.value] = { planType: 'med', meals: [] };
                     }
-                    const newMeal = { type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0 };
+                    const newMeal = { type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] };
                     Object.assign(editingMeal, newMeal);
                     const newIndex = allData[selectedDate.value].meals.push(newMeal) - 1;
                     editingIndex.value = newIndex;
@@ -2308,6 +2371,7 @@
                         return { percent: progress, color: colorMap[record.planType] };
                     },
                     setPlanType, autoCalculatePlans, exportCSV, saveData,
+                    addItem, removeItem, updateTotalsFromItems,
                     showExportModal, isExporting, exportRange, exportPDF, getRangeStats,
                     excludedDates, exportDateList, toggleExcludedDate, toggleAllExportDates, setQuickRange,
                     isCalendarExpanded, toggleCalendar, showMonthJump, jumpYear, jumpToMonth,
