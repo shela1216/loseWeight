@@ -1044,14 +1044,22 @@
                                 <button @click="removeItem(idx)" class="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-lg bg-white text-slate-300 hover:text-rose-500 hover:shadow-sm transition-all">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
                                 </button>
-                                <div class="flex gap-2">
+                                <div class="flex flex-col sm:flex-row gap-2">
                                     <input v-model="item.name" @input="updateTotalsFromItems" class="flex-1 bg-white px-4 py-2.5 rounded-xl text-sm font-black outline-none border border-transparent focus:border-indigo-200 shadow-sm transition-all" placeholder="品項名稱 (如：蔥花蛋)">
-                                    <div class="flex items-center bg-white px-3 py-2 rounded-xl border border-transparent focus-within:border-indigo-200 shadow-sm transition-all">
-                                        <input type="number" v-model.number="item.amount" @input="updateTotalsFromItems" class="w-10 bg-transparent text-sm font-black outline-none text-center" placeholder="份量">
-                                        <span class="text-[10px] font-bold text-slate-300 ml-1">份</span>
+                                    <div class="flex items-center gap-2">
+                                        <div class="flex items-center bg-white px-3 py-2 rounded-xl border border-transparent focus-within:border-indigo-200 shadow-sm transition-all">
+                                            <input type="number" v-model.number="item.amount" @input="updateTotalsFromItems" class="w-12 bg-transparent text-sm font-black outline-none text-center" placeholder="份量">
+                                        </div>
+                                        <div class="flex items-center bg-white px-2 py-2 rounded-xl border border-transparent focus-within:border-indigo-200 shadow-sm transition-all">
+                                            <select v-model="item.unit" @change="updateTotalsFromItems" class="bg-transparent text-xs font-black text-slate-600 outline-none cursor-pointer">
+                                                <option value="份">份</option>
+                                                <option value="g">g</option>
+                                                <option value="ml">ml</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="grid grid-cols-4 gap-2">
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                                     <div v-for="n in [{k:'calories',l:'熱量',u:'kcal'},{k:'carbs',l:'碳水',u:'g'},{k:'protein',l:'蛋白',u:'g'},{k:'fat',l:'脂肪',u:'g'}]" :key="n.k" class="flex flex-col gap-1">
                                         <label class="text-[9px] font-black text-slate-400 text-center uppercase">{{ n.l }}</label>
                                         <div class="relative">
