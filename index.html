@@ -1962,12 +1962,10 @@
                 const appId = typeof __app_id !== 'undefined' ? __app_id : 'diet-tracker-v2';
 
 
-                // 數值格式化：處理 JavaScript 浮點數問題，四捨五入至小數點後 1 位
+                // 數值格式化：四捨五入至整數
                 const formatNum = (val) => {
                     if (val === undefined || val === null || isNaN(val)) return 0;
-                    const n = Number(val);
-                    // 如果是整數直接回傳，否則保留一位小數並四捨五入
-                    return Number(n.toFixed(1));
+                    return Math.round(Number(val));
                 };
 
                 const scaleNutrients = () => {
