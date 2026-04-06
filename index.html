@@ -11,11 +11,10 @@
     <link rel="icon" type="image/png" sizes="16x16" href="https://img.icons8.com/fluent/16/leaf.png">
     <meta name="apple-mobile-web-app-title" content="WeightTrack">
     <meta name="application-name" content="WeightTrack">
-    <meta name="theme-color" content="#5e5ce6">
+    <meta name="theme-color" content="#6366f1">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <!-- 引入圖表、截圖與 PDF 庫 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -29,14 +28,6 @@
                         indigo: {
                             500: '#6366f1',
                             600: '#4f46e5',
-                        },
-                        premium: {
-                            darkBg: '#09090b',
-                            darkCard: '#18181b',
-                            darkBorder: '#27272a',
-                            lightBg: '#f4f4f5',
-                            lightCard: '#ffffff',
-                            lightBorder: '#e4e4e7'
                         }
                     },
                     borderRadius: {
@@ -53,30 +44,38 @@
         :root {
             --bg-main: #f4f4f5;
             --bg-card: #ffffff;
+            --bg-sub: #ffffff;
             --text-main: #09090b;
             --text-muted: #71717a;
             --border-color: #e4e4e7;
             --accent-primary: #6366f1;
-            --accent-secondary: #a78bfa;
             --card-radius-main: 3rem;
             --card-radius-sub: 2rem;
+            --btn-bg: #ffffff;
+            --btn-bg-hover: #f4f4f5;
+            --ring-color: rgba(99, 102, 241, 0.1);
+            --shadow-subtle: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
         }
 
         .dark {
-            --bg-main: #09090b;
-            --bg-card: #18181b;
-            --text-main: #fafafa;
+            --bg-main: #000000;
+            --bg-card: #121212;
+            --bg-sub: #121212;
+            --text-main: #ffffff;
             --text-muted: #a1a1aa;
             --border-color: #27272a;
             --accent-primary: #818cf8;
-            --accent-secondary: #c084fc;
+            --btn-bg: #18181b;
+            --btn-bg-hover: #27272a;
+            --ring-color: rgba(129, 140, 248, 0.15);
+            --shadow-subtle: none;
         }
 
         body {
             font-family: "Inter", system-ui, -apple-system, sans-serif;
             background-color: var(--bg-main);
             color: var(--text-main);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s;
             -webkit-font-smoothing: antialiased;
         }
 
@@ -86,6 +85,7 @@
             border: 1px solid var(--border-color);
             border-radius: var(--card-radius-main);
             padding: 2.5rem;
+            box-shadow: var(--shadow-subtle);
             transition: all 0.3s ease;
         }
 
@@ -93,15 +93,16 @@
             background-color: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--card-radius-sub);
-            transition: all 0.2s ease;
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.3s ease;
         }
 
-        .dark .premium-card-main, 
+        .dark .premium-card-main,
         .dark .premium-card-sub {
-            box-shadow: none;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
         }
 
-        /* === 修正內容樣式 === */
+        /* === Typography & Colors === */
         .text-main { color: var(--text-main); }
         .text-muted { color: var(--text-muted); }
 
@@ -118,17 +119,73 @@
             padding: 0.75rem 1.25rem;
             outline: none;
             font-weight: 600;
+            transition: border-color 0.2s;
         }
 
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent-primary);
+        }
+
+        /* === Tailwind 暗色模式強制覆寫 === */
         .dark .bg-white { background-color: var(--bg-card) !important; }
+        .dark .bg-slate-50 { background-color: var(--btn-bg) !important; }
+        .dark .bg-slate-100 { background-color: var(--border-color) !important; }
+        .dark .bg-\[#f8f9fb\] { background-color: var(--bg-main) !important; }
+        .dark .bg-\[#fcfdfe\] { background-color: var(--btn-bg) !important; }
+        .dark .bg-indigo-50 { background-color: rgba(99, 102, 241, 0.08) !important; }
+
         .dark .text-slate-900 { color: var(--text-main) !important; }
         .dark .text-slate-800 { color: var(--text-main) !important; }
         .dark .text-slate-700 { color: var(--text-muted) !important; }
         .dark .text-slate-600 { color: var(--text-muted) !important; }
         .dark .text-slate-500 { color: var(--text-muted) !important; }
-        .dark .bg-slate-50 { background-color: #0c0c0e !important; }
-        .dark .border-slate-100, .dark .border-slate-50 { border-color: var(--border-color) !important; }
+        .dark .text-slate-400 { color: var(--text-muted) !important; }
+        .dark .text-slate-300 { color: #52525b !important; }
+        .dark .text-slate-200 { color: var(--border-color) !important; }
 
+        .dark .border-slate-100 { border-color: var(--border-color) !important; }
+        .dark .border-slate-50 { border-color: var(--border-color) !important; }
+        .dark .border-slate-200 { border-color: var(--border-color) !important; }
+        .dark .border-indigo-100 { border-color: rgba(99, 102, 241, 0.2) !important; }
+
+        .dark .text-indigo-600 { color: var(--accent-primary) !important; }
+        .dark .text-indigo-500 { color: var(--accent-primary) !important; }
+        .dark .text-indigo-400 { color: var(--accent-primary) !important; }
+        .dark .bg-indigo-600 { background-color: var(--accent-primary) !important; }
+        .dark .hover\:bg-indigo-50:hover { background-color: rgba(99, 102, 241, 0.08) !important; }
+        .dark .hover\:bg-indigo-100:hover { background-color: rgba(99, 102, 241, 0.15) !important; }
+        .dark .bg-indigo-500\/10 { background-color: rgba(99, 102, 241, 0.1) !important; }
+        .dark .shadow-indigo-500\/20 { box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15) !important; }
+        .dark .shadow-indigo-100 { box-shadow: 0 4px 20px rgba(99, 102, 241, 0.1) !important; }
+        .dark .group-hover\:bg-indigo-100:hover { background-color: rgba(99, 102, 241, 0.15) !important; }
+        .dark .group-hover\:text-indigo-500 { color: var(--accent-primary) !important; }
+
+        /* Modal 背景遮罩 */
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+        }
+        .dark .modal-overlay {
+            background: rgba(0, 0, 0, 0.85);
+        }
+
+        /* Dark mode input overrides */
+        .dark input,
+        .dark select,
+        .dark textarea {
+            background-color: var(--btn-bg) !important;
+            color: var(--text-main) !important;
+            border-color: var(--border-color) !important;
+        }
+        .dark input::placeholder,
+        .dark textarea::placeholder {
+            color: var(--text-muted) !important;
+            opacity: 0.5;
+        }
+        .dark .focus\:border-indigo-500:focus { border-color: var(--accent-primary) !important; }
+        .dark .focus\:ring-indigo-500\/10:focus { box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important; }
+
+        /* Today circle */
         .today-number-circle {
             width: 28px;
             height: 28px;
@@ -148,6 +205,7 @@
             letter-spacing: -0.05em;
         }
 
+        /* === 圓型按鈕 === */
         .btn-circular .icon-wrapper {
             width: 48px;
             height: 48px;
@@ -155,7 +213,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--bg-card);
+            background: var(--btn-bg);
             border: 1px solid var(--border-color);
             color: var(--text-muted);
             transition: all 0.2s;
@@ -165,19 +223,23 @@
             border-color: var(--accent-primary);
             color: var(--accent-primary);
             transform: translateY(-2px);
+            background: var(--btn-bg-hover);
         }
 
         .btn-circular.btn-primary .icon-wrapper {
             background: var(--accent-primary);
             color: white;
             border: none;
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
         }
 
+        /* 選中日期 */
         .selected-day-ring {
             box-shadow: inset 0 0 0 2px var(--accent-primary);
-            background-color: var(--bg-main);
+            background-color: var(--ring-color);
         }
 
+        /* 營養素標籤 */
         .nutrient-label {
             font-size: 0.875rem;
             font-weight: 800;
@@ -185,6 +247,7 @@
             letter-spacing: 0.02em;
         }
 
+        /* === Segmented Control === */
         .segmented-control {
             background: var(--bg-main);
             padding: 6px;
@@ -222,8 +285,64 @@
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 0;
         }
-    </style>
 
+        /* === 日曆格子 === */
+        .calendar-day-cell {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .day-progress-svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* === 餐點卡片 === */
+        .meal-card {
+            background: var(--btn-bg);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .meal-card:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.1);
+        }
+
+        /* === Floating Action Bar === */
+        .dark .lg\:bg-indigo-50\/10 {
+            background: rgba(18, 18, 18, 0.8) !important;
+        }
+
+        /* === 捲軸 === */
+        .custom-scroll { scrollbar-width: thin; scrollbar-color: var(--border-color) transparent; }
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 4px; }
+
+        /* === 亮色模式 modal 輸入框 === */
+        .modal-input {
+            background: var(--btn-bg);
+            border: 1.5px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 0.75rem 1.25rem;
+            color: var(--text-main);
+            font-weight: 700;
+            outline: none;
+            width: 100%;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .modal-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+        }
+    </style>
 </head>
 
 <body class="min-h-screen font-sans transition-colors duration-500">
@@ -370,59 +489,61 @@
                     <!-- 月曆 (撐開式) -->
                     <div class="premium-card-sub p-5 transition-all duration-500 overflow-hidden"
                         :class="isCalendarExpanded ? 'max-h-[1000px]' : 'max-h-[110px]'">
-                        <div class="flex flex-wrap lg:flex-col justify-between items-center px-1 mb-4 lg:mb-6 gap-y-4">
-                            <div class="flex items-center gap-3 min-w-0 order-2 lg:order-1 lg:w-full lg:justify-center">
-                                <div class="relative cursor-pointer group text-center min-w-0">
-                                    <div class="flex items-center justify-center gap-2"
-                                        @click="showMonthJump = !showMonthJump; jumpYear = pickerMonth.getFullYear(); toggleCalendar(true)">
-                                        <h2
-                                            class="text-sm font-black group-hover:text-indigo-600 transition-colors truncate">
-                                            {{ currentMonthYearDisplay }}</h2>
-                                        <svg class="w-3.5 h-3.5 text-muted group-hover:text-indigo-500 transition-colors shrink-0"
-                                            :class="showMonthJump ? 'rotate-180' : ''" fill="none" stroke="currentColor"
-                                            stroke-width="2.5" viewBox="0 0 24 24">
-                                            <path d="M19 9l-7 7-7-7" />
-                                        </svg>
+                        <!-- 日曆標題列（修正跑版問題） -->
+                        <div class="flex flex-wrap justify-between items-center px-1 mb-4 lg:mb-6 gap-y-3">
+                            <!-- 左側：月份與日期 -->
+                            <div class="flex items-center gap-3 min-w-0 flex-1">
+                                <div class="cursor-pointer group flex flex-col min-w-0"
+                                    @click="showMonthJump = !showMonthJump; jumpYear = pickerMonth.getFullYear(); toggleCalendar(true)">
+                                    <div class="flex items-center gap-1.5">
+                                        <h2 class="text-sm font-black transition-colors truncate" style="color:var(--text-main)">{{ currentMonthYearDisplay }}</h2>
+                                        <svg class="w-3.5 h-3.5 shrink-0 transition-transform duration-300" :class="showMonthJump ? 'rotate-180' : ''"
+                                            fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"
+                                            style="color:var(--text-muted)"><path d="M19 9l-7 7-7-7"/></svg>
                                     </div>
-                                    <div v-if="!isCalendarExpanded" class="flex items-center justify-center gap-2 mt-1">
-                                        <span class="text-lg font-black text-indigo-600">{{ new
-                                            Date(selectedDate).getDate() }}日</span>
-                                        <span
-                                            class="px-2 py-0.5 rounded-full text-[10px] font-bold text-white uppercase"
-                                            :class="{'bg-amber-500': currentDayRecord.planType === 'high','bg-indigo-600': currentDayRecord.planType === 'med','bg-rose-500':currentDayRecord.planType === 'low','bg-slate-400': currentDayRecord.planType === 'rest'}">{{
-                                            {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[currentDayRecord.planType]
-                                            }}</span>
+                                    <div v-if="!isCalendarExpanded" class="flex items-center gap-2 mt-0.5">
+                                        <span class="text-base font-black" style="color:var(--accent-primary)">{{ new Date(selectedDate).getDate() }}日</span>
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold text-white uppercase"
+                                            :class="{'bg-amber-500': currentDayRecord.planType === 'high','bg-indigo-500': currentDayRecord.planType === 'med','bg-rose-500': currentDayRecord.planType === 'low','bg-slate-400': currentDayRecord.planType === 'rest'}">
+                                            {{ {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[currentDayRecord.planType] }}
+                                        </span>
                                     </div>
                                 </div>
-                                <button @click="goToToday()"
-                                    class="h-9 px-3 flex items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-600 hover:bg-indigo-500/20 transition-all shrink-0"><span
-                                        class="text-xs font-black">今日</span></button>
+                            </div>
 
+                            <!-- 右側：操作按鈕 -->
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <button @click="goToToday()"
+                                    class="h-9 px-3 shrink-0 flex items-center justify-center rounded-xl font-black text-xs transition-all hover:opacity-80"
+                                    style="background:color-mix(in srgb, var(--accent-primary) 12%, transparent); color:var(--accent-primary);">
+                                    今日
+                                </button>
                                 <button @click="toggleCalendar()"
-                                    class="w-9 h-9 flex items-center justify-center rounded-xl bg-theme text-muted hover:text-indigo-600 transition-all"
+                                    class="w-9 h-9 shrink-0 flex items-center justify-center rounded-xl text-muted transition-all hover:bg-slate-100 dark:hover:bg-slate-800"
+                                    style="background:var(--bg-main); border:1px solid var(--border-color);"
                                     :title="isCalendarExpanded ? '收合日曆' : '展開日曆'">
-                                    <svg class="w-5 h-5 transition-transform duration-300"
-                                        :class="isCalendarExpanded ? 'rotate-180' : ''" fill="none"
-                                        stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                        <path d="M19 9l-7 7-7-7" />
+                                    <svg class="w-4 h-4 transition-transform duration-300"
+                                        :class="isCalendarExpanded ? 'rotate-180' : ''"
+                                        fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                        <path d="M19 9l-7 7-7-7"/>
                                     </svg>
                                 </button>
                             </div>
 
-                            <div
-                                class="flex gap-1.5 order-1 lg:order-2 lg:w-full lg:justify-center lg:gap-8 lg:border-t lg:border-theme lg:pt-4">
+                            <!-- 底部：前後月切換 (手機版獨占一行，電腦版併入) -->
+                            <div class="flex gap-1.5 w-full lg:w-auto lg:ml-auto pt-3 lg:pt-0 border-t border-slate-100 dark:border-slate-800 lg:border-0 justify-center">
                                 <button @click="changeMonth(-1)"
-                                    class="w-9 h-9 flex items-center justify-center rounded-xl text-muted hover:text-indigo-600 transition-all"
-                                    title="上個月"><svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                        stroke-width="2.5" viewBox="0 0 24 24">
-                                        <path d="M15 19l-7-7 7-7"></path>
-                                    </svg></button>
+                                    class="w-full lg:w-9 h-9 flex items-center justify-center rounded-xl text-muted transition-all hover:bg-slate-100 dark:hover:bg-slate-800"
+                                    style="background:var(--bg-main); border:1px solid var(--border-color);"
+                                    title="上個月">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+                                </button>
                                 <button @click="changeMonth(1)"
-                                    class="w-9 h-9 flex items-center justify-center rounded-xl text-muted hover:text-indigo-600 transition-all"
-                                    title="下個月"><svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                        stroke-width="2.5" viewBox="0 0 24 24">
-                                        <path d="M9 5l7 7-7 7"></path>
-                                    </svg></button>
+                                    class="w-full lg:w-9 h-9 flex items-center justify-center rounded-xl text-muted transition-all hover:bg-slate-100 dark:hover:bg-slate-800"
+                                    style="background:var(--bg-main); border:1px solid var(--border-color);"
+                                    title="下個月">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+                                </button>
                             </div>
                         </div>
                         <div v-if="isCalendarExpanded" class="relative">
@@ -450,7 +571,8 @@
                                         v-for="(m, idx) in ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月']"
                                         :key="idx" @click="jumpToMonth(idx)"
                                         class="py-3.5 rounded-xl text-sm font-bold transition-all"
-                                        :class="idx === pickerMonth.getMonth() && jumpYear === pickerMonth.getFullYear() ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'bg-theme text-muted hover:text-indigo-600'">
+                                        :class="idx === pickerMonth.getMonth() && jumpYear === pickerMonth.getFullYear() ? 'bg-teal-600 text-white shadow-lg' : 'text-muted hover:text-teal-600'"
+                                        :style="!(idx === pickerMonth.getMonth() && jumpYear === pickerMonth.getFullYear()) ? 'background:var(--bg-main)' : ''">
                                         {{ m }}
                                     </button>
                                 </div>
@@ -483,7 +605,7 @@
                                         <div :class="day.date === new Date().toLocaleDateString('sv-SE') ? 'today-number-circle' : ''"
                                             class="relative z-10 flex items-center justify-center">
                                             <span class="text-xs sm:text-sm"
-                                                :class="selectedDate === day.date && day.date !== new Date().toLocaleDateString('sv-SE') ? 'text-indigo-600' : ''">{{
+                                                :class="selectedDate === day.date && day.date !== new Date().toLocaleDateString('sv-SE') ? 'text-teal-600' : ''">{{
                                                 day.dayNum }}</span>
                                         </div>
                                     </div>
@@ -500,7 +622,7 @@
                         </div>
                         <div class="segmented-control relative">
                             <div class="segment-indicator shadow-xl shadow-indigo-500/30"
-                                :style="{ width: 'calc((100% - 12px) / 4 - 8px)', transform: `translateX(calc(${Object.keys(plans).indexOf(currentDayRecord.planType)} * (100% + 8px) + 4px))`, backgroundColor: {high:'#f59e0b', med:'#6366f1', low:'#f43f5e', rest:'#64748b'}[currentDayRecord.planType] }">
+                                :style="{ width: 'calc((100% - 12px) / 4 - 8px)', transform: `translateX(calc(${Object.keys(plans).indexOf(currentDayRecord.planType)} * (100% + 8px) + 4px))`, backgroundColor: {high:'#f59e0b', med:'#0d9488', low:'#f43f5e', rest:'#64748b'}[currentDayRecord.planType] }">
                             </div>
                             <div v-for="(p, key) in {high:{l:'高碳', i:'💪'}, med:{l:'中碳', i:'🥗'}, low:{l:'低碳', i:'🔥'}, rest:{l:'自由', i:'🧘'}}"
                                 :key="key" @click="setPlanType(key)" class="segment-item"
