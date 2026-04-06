@@ -441,7 +441,8 @@
                             <!-- 手機版懸浮主選單按鈕 -->
                             <div class="lg:hidden fixed bottom-6 right-6 z-[95]">
                                 <button @click="showMobileMenu = !showMobileMenu" class="w-14 h-14 bg-indigo-600 text-white rounded-[1.5rem] shadow-2xl shadow-indigo-500/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-all">
-                                    <svg class="w-6 h-6 transition-transform duration-300" :class="showMobileMenu ? 'rotate-45' : ''" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                                    <svg v-if="!showMobileMenu" class="w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                                    <svg v-else class="w-6 h-6 transition-transform duration-300 rotate-90" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                                 </button>
                             </div>
 
