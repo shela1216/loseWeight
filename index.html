@@ -20,9 +20,57 @@
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="manifest" href='manifest.json'>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        indigo: {
+                            50: '#f5f7ff',
+                            100: '#ebf0fe',
+                            200: '#ced9fd',
+                            300: '#a1b6fb',
+                            400: '#6d8df7',
+                            500: '#5e5ce6', // Primary
+                            600: '#4a48d1',
+                            700: '#3a38a8',
+                            800: '#2d2c83',
+                            900: '#1d1c55',
+                        },
+                        dark: {
+                            bg: '#0b0a1d',
+                            card: '#1a1930',
+                            accent: '#a78bfa',
+                            text: '#f1f1f1',
+                            muted: '#94a3b8'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         [v-cloak] {
             display: none;
+        }
+
+        :root {
+            --bg-main: #f8f9fb;
+            --bg-card: #ffffff;
+            --text-main: #1a1c1e;
+            --text-muted: #64748b;
+            --border-color: #f1f5f9;
+            --shadow-color: rgba(26, 28, 30, 0.06);
+        }
+
+        .dark {
+            --bg-main: #0b0a1d;
+            --bg-card: #1a1930;
+            --text-main: #f1f1f1;
+            --text-muted: #94a3b8;
+            --border-color: #2d2c55;
+            --shadow-color: rgba(0, 0, 0, 0.3);
         }
 
         /* === 防止行動端自動縮放與位移 === */
@@ -30,174 +78,109 @@
         select,
         textarea {
             font-size: 16px !important;
-            /* 強制 16px 以上防止 iOS 自動縮放 */
         }
 
-        /* 移除 iOS 預設的輸入框圓角與陰影，提升視覺一致性 */
-        input,
-        textarea,
-        select {
-            -webkit-appearance: none;
-            border-radius: 0;
-        }
-
-        /* === 全域字型與背景設定 === */
         body {
             font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang TC", "Apple LiGothic Medium", "Noto Sans TC", "Microsoft JhengHei", "sans-serif";
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            background-color: #f8f9fb;
-            color: #1a1c1e;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* === 顏色點 (柔和精緻版) === */
-        .dot-high {
-            background-color: #f59e0b;
-        }
+        .bg-card { background-color: var(--bg-card); }
+        .text-main { color: var(--text-main); }
+        .text-muted { color: var(--text-muted); }
+        .border-theme { border-color: var(--border-color); }
 
-        /* Amber */
-        .dot-med {
-            background-color: #6366f1;
-        }
+        /* === 顏色點 === */
+        .dot-high { background-color: #f59e0b; }
+        .dot-med { background-color: #6366f1; }
+        .dot-low { background-color: #f43f5e; }
+        .dot-rest { background-color: #64748b; }
 
-        /* Indigo */
-        .dot-low {
-            background-color: #f43f5e;
-        }
+        /* === 計畫卡漸層 === */
+        .plan-high { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .plan-med { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
+        .plan-low { background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); }
+        .plan-rest { background: linear-gradient(135deg, #64748b 0%, #475569 100%); }
 
-        /* Rose */
-        .dot-rest {
-            background-color: #64748b;
-        }
-
-        /* Slate */
-
-        /* === 計畫卡漸層 (現代簡約) === */
-        .plan-high {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        }
-
-        .plan-med {
-            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-        }
-
-        .plan-low {
-            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
-        }
-
-        .plan-rest {
-            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
-        }
-
-        /* === 計畫噪點紋理 (降低透明度) === */
-        .plan-high::before,
-        .plan-med::before,
-        .plan-low::before,
-        .plan-rest::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
-            pointer-events: none;
-        }
-
-        /* === 餐點類型邊框 (與 Indigo 搭配) === */
-        .meal-breakfast {
-            border-left: 4px solid #6366f1;
-        }
-
-        .meal-lunch {
-            border-left: 4px solid #8b5cf6;
-        }
-
-        .meal-dinner {
-            border-left: 4px solid #3b82f6;
-        }
-
-        .meal-snack {
-            border-left: 4px solid #ec4899;
-        }
-
-        /* === 餐點類型標籤顏色 === */
-        .badge-breakfast {
-            background: #eef2ff;
-            color: #4338ca;
-        }
-
-        .badge-lunch {
-            background: #f5f3ff;
-            color: #6d28d9;
-        }
-
-        .badge-dinner {
-            background: #eff6ff;
-            color: #1d4ed8;
-        }
-
-        .badge-snack {
-            background: #fdf2f8;
-            color: #be185d;
-        }
-
-        /* === Modal (更深更柔和的背景) === */
+        /* === Modal === */
         .modal-overlay {
-            background-color: rgba(26, 28, 30, 0.45);
-            backdrop-filter: blur(8px);
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
         }
 
         /* === 自定義捲軸 === */
-        .custom-scroll::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .custom-scroll::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .custom-scroll::-webkit-scrollbar-thumb {
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb {
             background: #e2e8f0;
-            border-radius: 999px;
+            border-radius: 10px;
         }
+        .dark ::-webkit-scrollbar-thumb { background: #2d2c55; }
 
-        .custom-scroll::-webkit-scrollbar-thumb:hover {
-            background: #cbd5e1;
-        }
-
-        /* === 日期 picker === */
-        .date-input-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            width: auto;
-            height: auto;
-            color: transparent;
-            background: transparent;
-            cursor: pointer;
-        }
-
-        /* === 按鈕漸層 (Indigo 風格) === */
+        /* === 按鈕漸層 === */
         .btn-gradient {
             background: linear-gradient(135deg, #5e5ce6 0%, #4f46e5 100%);
         }
 
-        /* === 陰影覆寫 (更輕盈的現代感) === */
-        .shadow-md {
-            box-shadow: 0 4px 20px -2px rgba(26, 28, 30, 0.06), 0 2px 8px -2px rgba(26, 28, 30, 0.04);
+        /* === 陰影覆寫 === */
+        .shadow-md { box-shadow: 0 4px 20px -2px var(--shadow-color); }
+        .shadow-lg { box-shadow: 0 10px 30px -5px var(--shadow-color); }
+
+        .meal-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
         }
 
-        .shadow-lg {
-            box-shadow: 0 10px 30px -5px rgba(26, 28, 30, 0.08), 0 4px 12px -2px rgba(26, 28, 30, 0.04);
+        .dark .meal-card {
+            background: #232245;
         }
 
-        .shadow-xl {
-            box-shadow: 0 20px 50px -12px rgba(26, 28, 30, 0.12);
+        .meal-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px var(--shadow-color);
         }
 
-        .rounded-xl {
-            border-radius: 1rem;
+        /* === 今日日期圈 === */
+        .today-badge {
+            background: linear-gradient(135deg, #5e5ce6, #8b5cf6);
+            color: #fff;
+            border-radius: 9999px;
+            box-shadow: 0 4px 12px rgba(94, 92, 230, 0.4);
         }
+
+        /* === 進度圈動畫 === */
+        .progress-circle {
+            transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* === 主題切換按鈕動畫 === */
+        .theme-toggle-btn {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .theme-toggle-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* === 深色模式下的文字顏色微調 === */
+        .dark .text-slate-900 { color: #f1f1f1 !important; }
+        .dark .text-slate-800 { color: #e2e8f0 !important; }
+        .dark .text-slate-700 { color: #cbd5e1 !important; }
+        .dark .text-slate-500 { color: #94a3b8 !important; }
+        .dark .text-slate-400 { color: #64748b !important; }
+        .dark .bg-white { background-color: var(--bg-card) !important; }
+        .dark .bg-slate-50 { background-color: #232245 !important; }
+        .dark .border-slate-100 { border-color: #2d2c55 !important; }
+        .dark .border-slate-50 { border-color: #232245 !important; }
+        .dark .shadow-indigo-100 { shadow-color: rgba(94, 92, 230, 0.1); }
+    </style>
+
 
         .rounded-2xl {
             border-radius: 1.5rem;
@@ -525,6 +508,17 @@
                             <!-- 功能按鈕區 (圓型樣式：大螢幕改為右下角浮動) -->
                             <div
                                 class="flex gap-3 sm:gap-4 items-center shrink-0 lg:fixed lg:bottom-8 lg:right-8 lg:flex-col lg:gap-6 lg:z-[90] lg:bg-indigo-50/90 lg:backdrop-blur-xl lg:p-6 lg:rounded-[3rem] lg:shadow-2xl lg:border lg:border-indigo-100/50">
+                                <button @click="toggleTheme" class="btn-circular group" title="切換主題">
+                                    <div class="icon-wrapper">
+                                        <svg v-if="!isDark" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                                        </svg>
+                                        <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z" />
+                                        </svg>
+                                    </div>
+                                    <span class="lg:absolute lg:right-20 lg:bg-slate-900 lg:text-white lg:px-3 lg:py-1.5 lg:rounded-lg lg:text-[10px] lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 lg:pointer-events-none lg:transition-all lg:duration-300 lg:whitespace-nowrap lg:shadow-xl lg:after:content-[''] lg:after:absolute lg:after:top-1/2 lg:after:-translate-y-1/2 lg:after:-right-1.5 lg:after:border-y-[6px] lg:after:border-y-transparent lg:after:border-l-[6px] lg:after:border-l-slate-900">{{ isDark ? '淺色模式' : '深色模式' }}</span>
+                                </button>
                                 <button @click="showExportModal = true" class="btn-circular group" title="匯出報告與分析">
                                     <div class="icon-wrapper">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
@@ -1691,6 +1685,20 @@
                     return `${y}-${m}-${day}`;
                 };
 
+                const isDark = ref(localStorage.getItem('theme') === 'dark');
+                const updateTheme = () => {
+                    if (isDark.value) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
+                };
+                const toggleTheme = () => {
+                    isDark.value = !isDark.value;
+                    localStorage.setItem('theme', isDark.value ? 'dark' : 'light');
+                    updateTheme();
+                };
+
                 const initialized = ref(false);
                 const user = ref(null);
                 const saving = ref(false);
@@ -2381,9 +2389,13 @@
                     if (['e', 'E', '+', '-'].includes(e.key)) e.preventDefault();
                 };
 
-                onMounted(initApp);
+                onMounted(() => {
+                    updateTheme();
+                    initApp();
+                });
 
                 return {
+                    isDark, toggleTheme,
                     initialized, user, saving, showSettings, showHistory, showMonthPicker, historySearch, selectedDate, pickerMonth, loginEmail, loginPassword,
                     editingIndex, isAddingMeal, mealToDelete, nutrientKeys, profile, plans, tempPlans, allData, mealHistory, editingMeal, showSyncModal, templates,
                     currentMonthYearDisplay, calculatedTDEE, formatNum, scaleNutrients, lastAmount, prepareScale, onlyNumber,
