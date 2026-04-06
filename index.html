@@ -226,33 +226,33 @@
 
 </head>
 
-<body class="bg-[#f8fafc] min-h-screen font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-700">
-    <div id="app" v-cloak>
+<body class="min-h-screen font-sans transition-colors duration-500">
+    <div id="app" v-cloak class="min-h-screen">
 
         <!-- 載入中狀態 -->
-        <div v-if="!initialized" class="fixed inset-0 bg-[#f8f9fb] flex flex-col items-center justify-center z-[100]">
+        <div v-if="!initialized" class="fixed inset-0 flex flex-col items-center justify-center z-[100]" style="background-color: var(--bg-main)">
             <div class="w-10 h-10 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
             <p class="mt-4 text-indigo-600 font-bold text-sm">數據加載中...</p>
         </div>
 
         <!-- 登入頁面 -->
-        <div v-if="!user && initialized" class="min-h-screen flex items-center justify-center p-4 login-bg">
+        <div v-if="!user && initialized" class="min-h-screen flex items-center justify-center p-4">
             <div class="w-full max-w-md space-y-8">
                 <!-- 品牌 Header -->
                 <div class="text-center pb-2">
                     <div
-                        class="w-20 h-20 bg-indigo-600 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-indigo-200">
+                        class="w-20 h-20 bg-indigo-600 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-indigo-500/20">
                         <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
                             </path>
                         </svg>
                     </div>
-                    <h1 class="text-4xl font-black text-slate-900 tracking-tight">輕盈飲食</h1>
-                    <p class="text-slate-500 mt-3 text-base font-medium">追蹤每日營養，邁向健康體態</p>
+                    <h1 class="text-4xl font-black tracking-tight">輕盈飲食</h1>
+                    <p class="text-muted mt-3 text-base font-medium">追蹤每日營養，邁向健康體態</p>
                 </div>
                 <!-- 表單卡片 -->
-                <div class="bg-white rounded-[2.5rem] shadow-xl p-8 sm:p-10 space-y-6 border border-slate-100/50">
+                <div class="premium-card-main p-8 sm:p-10 space-y-6">
                     <div class="space-y-4">
                         <div class="relative">
                             <svg class="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"
@@ -261,7 +261,7 @@
                                     d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                             </svg>
                             <input type="email" v-model="loginEmail"
-                                class="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 border border-slate-100 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 focus:bg-white text-sm font-bold transition-all"
+                                class="w-full pl-12 pr-4 py-4 focus:border-indigo-500 transition-all"
                                 placeholder="電子郵件">
                         </div>
                         <div class="relative">
@@ -271,20 +271,20 @@
                                     d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                             </svg>
                             <input type="password" v-model="loginPassword"
-                                class="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 border border-slate-100 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 focus:bg-white text-sm font-bold transition-all"
+                                class="w-full pl-12 pr-4 py-4 focus:border-indigo-500 transition-all"
                                 placeholder="密碼">
                         </div>
                     </div>
                     <div class="space-y-3">
                         <button @click="handleAuth('login')"
-                            class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-sm shadow-xl shadow-indigo-100 hover:bg-indigo-700 active:scale-[0.98] transition-all">登入</button>
+                            class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-sm shadow-xl shadow-indigo-500/20 hover:bg-indigo-700 active:scale-[0.98] transition-all">登入</button>
                         <button @click="handleAuth('signup')"
-                            class="w-full border border-indigo-100 text-indigo-600 font-bold py-4 rounded-2xl text-sm hover:bg-indigo-50 transition-all">建立新帳號</button>
+                            class="w-full border border-theme text-indigo-600 font-bold py-4 rounded-2xl text-sm hover:bg-indigo-50/10 transition-all">建立新帳號</button>
                     </div>
                 </div>
                 <div class="text-center">
                     <button @click="handleAnonymous"
-                        class="text-slate-400 text-xs font-bold hover:text-indigo-600 transition-colors underline underline-offset-8">直接開始體驗（訪客模式）</button>
+                        class="text-muted text-xs font-bold hover:text-indigo-600 transition-colors underline underline-offset-8">直接開始體驗（訪客模式）</button>
                 </div>
             </div>
         </div>
@@ -296,29 +296,29 @@
 
                 <!-- 左側欄位 (1/3) -->
                 <aside class="lg:col-span-4 space-y-6 lg:sticky lg:top-10">
-                    <header class="mb-8">
+                    <header class="mb-8 px-2">
                         <div class="flex justify-between items-center">
-                            <div class="flex items-center gap-3 min-w-0">
+                            <div class="flex items-center gap-4 min-w-0">
                                 <div
-                                    class="bg-indigo-600 p-2.5 rounded-[1.25rem] text-white shadow-xl shadow-indigo-100">
+                                    class="bg-indigo-600 p-3 rounded-2xl text-white shadow-xl shadow-indigo-500/20">
                                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                             d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
                                         </path>
                                     </svg>
                                 </div>
                                 <div class="min-w-0">
                                     <h1
-                                        class="text-xl sm:text-2xl font-black tracking-tight text-slate-900 leading-none truncate">
+                                        class="text-2xl font-black tracking-tight leading-none truncate">
                                         輕盈飲食</h1>
                                     <p
-                                        class="text-[9px] sm:text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest truncate">
-                                        Health Record</p>
+                                        class="text-[10px] font-bold text-muted mt-1 uppercase tracking-widest truncate">
+                                        Premium tracker</p>
                                 </div>
                             </div>
                             <!-- 功能按鈕區 (圓型樣式：大螢幕改為右下角浮動) -->
                             <div
-                                class="flex gap-3 sm:gap-4 items-center shrink-0 lg:fixed lg:bottom-8 lg:right-8 lg:flex-col lg:gap-6 lg:z-[90] lg:bg-indigo-50/90 lg:backdrop-blur-xl lg:p-6 lg:rounded-[3rem] lg:shadow-2xl lg:border lg:border-indigo-100/50">
+                                class="flex gap-3 sm:gap-4 items-center shrink-0 lg:fixed lg:bottom-8 lg:right-8 lg:flex-col lg:gap-6 lg:z-[90] lg:bg-indigo-50/10 lg:backdrop-blur-xl lg:p-6 lg:rounded-[3rem] lg:shadow-2xl lg:border lg:border-theme">
                                 <button @click="toggleTheme" class="btn-circular group" title="切換主題">
                                     <div class="icon-wrapper">
                                         <svg v-if="!isDark" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -328,7 +328,7 @@
                                             <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z" />
                                         </svg>
                                     </div>
-                                    <span class="lg:absolute lg:right-20 lg:bg-slate-900 lg:text-white lg:px-3 lg:py-1.5 lg:rounded-lg lg:text-[10px] lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 lg:pointer-events-none lg:transition-all lg:duration-300 lg:whitespace-nowrap lg:shadow-xl lg:after:content-[''] lg:after:absolute lg:after:top-1/2 lg:after:-translate-y-1/2 lg:after:-right-1.5 lg:after:border-y-[6px] lg:after:border-y-transparent lg:after:border-l-[6px] lg:after:border-l-slate-900">{{ isDark ? '淺色模式' : '深色模式' }}</span>
+                                    <span class="lg:absolute lg:right-20 lg:bg-slate-900 lg:text-white lg:px-3 lg:py-1.5 lg:rounded-lg lg:text-[10px] lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 lg:pointer-events-none lg:transition-all lg:duration-300 lg:whitespace-nowrap lg:shadow-xl">{{ isDark ? '淺色模式' : '深色模式' }}</span>
                                 </button>
                                 <button @click="showExportModal = true" class="btn-circular group" title="匯出報告與分析">
                                     <div class="icon-wrapper">
@@ -338,7 +338,7 @@
                                         </svg>
                                     </div>
                                     <span
-                                        class="lg:absolute lg:right-20 lg:bg-slate-900 lg:text-white lg:px-3 lg:py-1.5 lg:rounded-lg lg:text-[10px] lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 lg:pointer-events-none lg:transition-all lg:duration-300 lg:whitespace-nowrap lg:shadow-xl lg:after:content-[''] lg:after:absolute lg:after:top-1/2 lg:after:-translate-y-1/2 lg:after:-right-1.5 lg:after:border-y-[6px] lg:after:border-y-transparent lg:after:border-l-[6px] lg:after:border-l-slate-900">匯出報告</span>
+                                        class="lg:absolute lg:right-20 lg:bg-slate-900 lg:text-white lg:px-3 lg:py-1.5 lg:rounded-lg lg:text-[10px] lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 lg:pointer-events-none lg:transition-all lg:duration-300 lg:whitespace-nowrap lg:shadow-xl">匯出報告</span>
                                 </button>
                                 <button @click="openSettings" class="btn-circular group" title="設定目標">
                                     <div class="icon-wrapper">
@@ -350,7 +350,7 @@
                                         </svg>
                                     </div>
                                     <span
-                                        class="lg:absolute lg:right-20 lg:bg-slate-900 lg:text-white lg:px-3 lg:py-1.5 lg:rounded-lg lg:text-[10px] lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 lg:pointer-events-none lg:transition-all lg:duration-300 lg:whitespace-nowrap lg:shadow-xl lg:after:content-[''] lg:after:absolute lg:after:top-1/2 lg:after:-translate-y-1/2 lg:after:-right-1.5 lg:after:border-y-[6px] lg:after:border-y-transparent lg:after:border-l-[6px] lg:after:border-l-slate-900">設定</span>
+                                        class="lg:absolute lg:right-20 lg:bg-slate-900 lg:text-white lg:px-3 lg:py-1.5 lg:rounded-lg lg:text-[10px] lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 lg:pointer-events-none lg:transition-all lg:duration-300 lg:whitespace-nowrap lg:shadow-xl">設定</span>
                                 </button>
                                 <button @click="handleLogout" class="btn-circular group" title="登出帳號">
                                     <div class="icon-wrapper">
@@ -361,49 +361,45 @@
                                         </svg>
                                     </div>
                                     <span
-                                        class="lg:absolute lg:right-20 lg:bg-slate-900 lg:text-white lg:px-3 lg:py-1.5 lg:rounded-lg lg:text-[10px] lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 lg:pointer-events-none lg:transition-all lg:duration-300 lg:whitespace-nowrap lg:shadow-xl lg:after:content-[''] lg:after:absolute lg:after:top-1/2 lg:after:-translate-y-1/2 lg:after:-right-1.5 lg:after:border-y-[6px] lg:after:border-y-transparent lg:after:border-l-[6px] lg:after:border-l-slate-900">登出</span>
+                                        class="lg:absolute lg:right-20 lg:bg-slate-900 lg:text-white lg:px-3 lg:py-1.5 lg:rounded-lg lg:text-[10px] lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 lg:pointer-events-none lg:transition-all lg:duration-300 lg:whitespace-nowrap lg:shadow-xl">登出</span>
                                 </button>
                             </div>
                         </div>
                     </header>
 
                     <!-- 月曆 (撐開式) -->
-                    <div class="bg-white rounded-[2rem] p-5 shadow-md border border-slate-100/50 transition-all duration-500 overflow-hidden"
-                        :class="isCalendarExpanded ? 'max-h-[1000px]' : 'max-h-[100px]'">
+                    <div class="premium-card-sub p-5 transition-all duration-500 overflow-hidden"
+                        :class="isCalendarExpanded ? 'max-h-[1000px]' : 'max-h-[110px]'">
                         <div class="flex flex-wrap lg:flex-col justify-between items-center px-1 mb-4 lg:mb-6 gap-y-4">
-                            <!-- 日期顯示與今日按鈕 (電腦版置頂，手機版居中) -->
                             <div class="flex items-center gap-3 min-w-0 order-2 lg:order-1 lg:w-full lg:justify-center">
                                 <div class="relative cursor-pointer group text-center min-w-0">
-                                    <!-- 點擊月份標題：僅觸發快速跳月 -->
                                     <div class="flex items-center justify-center gap-2"
                                         @click="showMonthJump = !showMonthJump; jumpYear = pickerMonth.getFullYear(); toggleCalendar(true)">
                                         <h2
-                                            class="text-sm font-black text-slate-800 group-hover:text-indigo-600 transition-colors truncate">
+                                            class="text-sm font-black group-hover:text-indigo-600 transition-colors truncate">
                                             {{ currentMonthYearDisplay }}</h2>
-                                        <svg class="w-3.5 h-3.5 text-slate-300 group-hover:text-indigo-500 transition-colors shrink-0"
+                                        <svg class="w-3.5 h-3.5 text-muted group-hover:text-indigo-500 transition-colors shrink-0"
                                             :class="showMonthJump ? 'rotate-180' : ''" fill="none" stroke="currentColor"
                                             stroke-width="2.5" viewBox="0 0 24 24">
                                             <path d="M19 9l-7 7-7-7" />
                                         </svg>
                                     </div>
-                                    <!-- 精簡模式下的日期資訊 (僅在收合時顯示) -->
                                     <div v-if="!isCalendarExpanded" class="flex items-center justify-center gap-2 mt-1">
                                         <span class="text-lg font-black text-indigo-600">{{ new
                                             Date(selectedDate).getDate() }}日</span>
                                         <span
-                                            class="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold text-white uppercase"
+                                            class="px-2 py-0.5 rounded-full text-[10px] font-bold text-white uppercase"
                                             :class="{'bg-amber-500': currentDayRecord.planType === 'high','bg-indigo-600': currentDayRecord.planType === 'med','bg-rose-500':currentDayRecord.planType === 'low','bg-slate-400': currentDayRecord.planType === 'rest'}">{{
                                             {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[currentDayRecord.planType]
                                             }}</span>
                                     </div>
                                 </div>
                                 <button @click="goToToday()"
-                                    class="h-9 px-3 flex items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-all shrink-0"><span
+                                    class="h-9 px-3 flex items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-600 hover:bg-indigo-500/20 transition-all shrink-0"><span
                                         class="text-xs font-black">今日</span></button>
 
-                                <!-- 獨立收合/展開按鈕 -->
                                 <button @click="toggleCalendar()"
-                                    class="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:bg-slate-100 transition-all"
+                                    class="w-9 h-9 flex items-center justify-center rounded-xl bg-theme text-muted hover:text-indigo-600 transition-all"
                                     :title="isCalendarExpanded ? '收合日曆' : '展開日曆'">
                                     <svg class="w-5 h-5 transition-transform duration-300"
                                         :class="isCalendarExpanded ? 'rotate-180' : ''" fill="none"
@@ -413,17 +409,16 @@
                                 </button>
                             </div>
 
-                            <!-- 簡化後的導覽按鈕 (僅上個月、下個月) -->
                             <div
-                                class="flex gap-1.5 order-1 lg:order-2 lg:w-full lg:justify-center lg:gap-8 lg:border-t lg:border-slate-50 lg:pt-4">
+                                class="flex gap-1.5 order-1 lg:order-2 lg:w-full lg:justify-center lg:gap-8 lg:border-t lg:border-theme lg:pt-4">
                                 <button @click="changeMonth(-1)"
-                                    class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+                                    class="w-9 h-9 flex items-center justify-center rounded-xl text-muted hover:text-indigo-600 transition-all"
                                     title="上個月"><svg class="w-5 h-5" fill="none" stroke="currentColor"
                                         stroke-width="2.5" viewBox="0 0 24 24">
                                         <path d="M15 19l-7-7 7-7"></path>
                                     </svg></button>
                                 <button @click="changeMonth(1)"
-                                    class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+                                    class="w-9 h-9 flex items-center justify-center rounded-xl text-muted hover:text-indigo-600 transition-all"
                                     title="下個月"><svg class="w-5 h-5" fill="none" stroke="currentColor"
                                         stroke-width="2.5" viewBox="0 0 24 24">
                                         <path d="M9 5l7 7-7 7"></path>
@@ -431,20 +426,20 @@
                             </div>
                         </div>
                         <div v-if="isCalendarExpanded" class="relative">
-                            <!-- 快速跳月選取器 (層次高於月曆網格) -->
+                            <!-- 快速跳月選取器 -->
                             <div v-if="showMonthJump"
-                                class="absolute inset-0 z-20 bg-white/95 backdrop-blur-md animate-in fade-in zoom-in-95 duration-200 flex flex-col p-4 rounded-2xl border border-slate-100 shadow-xl">
+                                class="absolute inset-0 z-20 bg-card/95 backdrop-blur-md animate-in fade-in zoom-in-95 duration-200 flex flex-col p-4 rounded-2xl border border-theme shadow-xl">
                                 <div class="flex justify-between items-center mb-6 px-2">
                                     <button @click="jumpYear--"
-                                        class="p-2 text-slate-400 hover:text-indigo-600 transition-colors"><svg
+                                        class="p-2 text-muted hover:text-indigo-600 transition-colors"><svg
                                             class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3"
                                             viewBox="0 0 24 24">
                                             <path d="M15 19l-7-7 7-7" />
                                         </svg></button>
-                                    <span class="text-lg font-black text-slate-900 tracking-tight">{{ jumpYear
+                                    <span class="text-lg font-black tracking-tight">{{ jumpYear
                                         }}年</span>
                                     <button @click="jumpYear++"
-                                        class="p-2 text-slate-400 hover:text-indigo-600 transition-colors"><svg
+                                        class="p-2 text-muted hover:text-indigo-600 transition-colors"><svg
                                             class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3"
                                             viewBox="0 0 24 24">
                                             <path d="M9 5l7 7-7 7" />
@@ -455,26 +450,25 @@
                                         v-for="(m, idx) in ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月']"
                                         :key="idx" @click="jumpToMonth(idx)"
                                         class="py-3.5 rounded-xl text-sm font-bold transition-all"
-                                        :class="idx === pickerMonth.getMonth() && jumpYear === pickerMonth.getFullYear() ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'bg-slate-50 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600'">
+                                        :class="idx === pickerMonth.getMonth() && jumpYear === pickerMonth.getFullYear() ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'bg-theme text-muted hover:text-indigo-600'">
                                         {{ m }}
                                     </button>
                                 </div>
                                 <button @click="showMonthJump = false"
-                                    class="mt-6 py-3 bg-slate-100 text-slate-500 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-200 transition-all">取消選取</button>
+                                    class="mt-6 py-3 bg-theme text-muted rounded-xl text-xs font-black uppercase tracking-widest hover:text-indigo-600 transition-all">取消選取</button>
                             </div>
 
-                            <!-- 月曆網格與圖例 -->
                             <div class="animate-in fade-in slide-in-from-top-4 duration-500 pb-2">
-                                <div class="grid grid-cols-7 gap-1 mb-2 px-1">
+                                <div class="grid grid-cols-7 gap-1 mb-2 px-1 text-center">
                                     <div v-for="d in ['一','二','三','四','五','六','日']"
-                                        class="text-[10px] sm:text-xs font-black text-slate-300 text-center py-2 uppercase tracking-tighter">
+                                        class="text-[10px] font-black text-muted py-2 uppercase tracking-tighter">
                                         {{ d }}</div>
                                 </div>
                                 <div class="grid grid-cols-7 gap-1.5">
                                     <div v-for="day in calendarDays" :key="day.date"
                                         @click="selectedDate = day.date; toggleCalendar(true)"
                                         class="calendar-day-cell rounded-2xl cursor-pointer transition-all"
-                                        :class="[day.currentMonth ? 'text-slate-900' : 'text-slate-200', selectedDate === day.date ? 'selected-day-ring font-black' : 'hover:bg-slate-50']">
+                                        :class="[day.currentMonth ? 'text-main' : 'opacity-20', selectedDate === day.date ? 'selected-day-ring font-black' : 'hover:bg-indigo-50/5']">
                                         <svg v-if="getDayStats(day.date)" class="day-progress-svg p-1.5"
                                             viewBox="0 0 100 100">
                                             <circle cx="50" cy="50" r="38" fill="none"
@@ -487,44 +481,25 @@
                                                 style="transition: stroke-dashoffset 0.5s ease" />
                                         </svg>
                                         <div :class="day.date === new Date().toLocaleDateString('sv-SE') ? 'today-number-circle' : ''"
-                                            class="relative z-10">
+                                            class="relative z-10 flex items-center justify-center">
                                             <span class="text-xs sm:text-sm"
                                                 :class="selectedDate === day.date && day.date !== new Date().toLocaleDateString('sv-SE') ? 'text-indigo-600' : ''">{{
                                                 day.dayNum }}</span>
                                         </div>
                                     </div>
                                 </div>
-                                <!-- 底部說明圖例 (優化字級與佈局) -->
-                                <div class="mt-6 pt-6 border-t border-slate-50">
-                                    <div class="grid grid-cols-2 gap-x-3 gap-y-5">
-                                        <div v-for="p in [{k:'high',l:'高碳日',c:'#f59e0b',d:'💪 重點訓練'},{k:'med',l:'中碳日',c:'#6366f1',d:'🥗 一般運動'},{k:'low',l:'低碳日',c:'#f43f5e',d:'🔥 燃脂休息'},{k:'rest',l:'自由日',c:'#64748b',d:'🧘 身心平衡'}]"
-                                            :key="p.k" class="flex items-start gap-2.5">
-                                            <span class="w-2.5 h-2.5 rounded-full shrink-0 mt-1"
-                                                :style="{background:p.c}"></span>
-                                            <div class="flex flex-col min-w-0">
-                                                <span
-                                                    class="text-xs font-black text-slate-700 leading-none truncate">{{p.l}}</span>
-                                                <span
-                                                    class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mt-1.5 leading-tight">{{p.d}}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <p
-                                        class="text-center text-[9px] sm:text-xs font-bold text-slate-300 mt-6 uppercase tracking-widest leading-relaxed">
-                                        圓環進度：攝取與目標差距越小，圓環越完整</p>
-                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- 計畫選擇卡片 -->
-                    <div class="bg-white rounded-[2rem] p-5 shadow-sm border border-slate-100/50">
-                        <div class="flex items-center gap-2 mb-4 px-1">
-                            <div class="w-1 h-4 bg-indigo-500 rounded-full"></div>
-                            <h3 class="text-xs font-black text-slate-800 uppercase tracking-widest">今日計劃切換</h3>
+                    <div class="premium-card-sub p-6">
+                        <div class="flex items-center gap-2 mb-6 px-1">
+                            <div class="w-1.5 h-4 bg-indigo-500 rounded-full"></div>
+                            <h3 class="text-xs font-black text-muted uppercase tracking-widest">今日計劃切換</h3>
                         </div>
                         <div class="segmented-control relative">
-                            <div class="segment-indicator"
+                            <div class="segment-indicator shadow-xl shadow-indigo-500/30"
                                 :style="{ width: 'calc((100% - 12px) / 4 - 8px)', transform: `translateX(calc(${Object.keys(plans).indexOf(currentDayRecord.planType)} * (100% + 8px) + 4px))`, backgroundColor: {high:'#f59e0b', med:'#6366f1', low:'#f43f5e', rest:'#64748b'}[currentDayRecord.planType] }">
                             </div>
                             <div v-for="(p, key) in {high:{l:'高碳', i:'💪'}, med:{l:'中碳', i:'🥗'}, low:{l:'低碳', i:'🔥'}, rest:{l:'自由', i:'🧘'}}"
@@ -532,7 +507,7 @@
                                 :class="{ active: currentDayRecord.planType === key }">
                                 <span class="text-base transition-transform"
                                     :class="currentDayRecord.planType === key ? 'scale-110' : ''">{{ p.i }}</span>
-                                <span class="text-[10px] sm:text-xs uppercase">{{ p.l }}</span>
+                                <span class="text-[10px] uppercase">{{ p.l }}</span>
                             </div>
                         </div>
                     </div>
@@ -542,37 +517,37 @@
                 <div class="lg:col-span-8 space-y-8 mt-10 lg:mt-0">
 
                     <!-- 核心數據卡片 -->
-                    <section class="bg-white rounded-[2.5rem] p-4 sm:p-10 shadow-md border border-slate-100/50">
+                    <section class="premium-card-main p-4 sm:p-10">
                         <!-- 熱量主區塊 -->
-                        <div class="flex flex-row items-center justify-center gap-4 sm:gap-20 mb-6 sm:mb-10">
+                        <div class="flex flex-row items-center justify-center gap-4 sm:gap-20 mb-6 sm:mb-14">
                             <!-- 進度圈 -->
-                            <div class="relative shrink-0 w-[130px] h-[130px] sm:w-[220px] sm:h-[220px]">
+                            <div class="relative shrink-0 w-[140px] h-[140px] sm:w-[240px] sm:h-[240px]">
                                 <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                                    <circle cx="50" cy="50" r="38" fill="none" stroke-width="6"
-                                        :stroke="{high:'#fef3c7', med:'#e0e7ff', low:'#ffe4e6', rest:'#f1f5f9'}[currentDayRecord.planType] || '#f1f5f9'" />
+                                    <circle cx="50" cy="50" r="38" fill="none" stroke-width="5" class="opacity-10"
+                                        :stroke="{high:'#f59e0b', med:'#6366f1', low:'#f43f5e', rest:'#64748b'}[currentDayRecord.planType]" />
                                     <circle cx="50" cy="50" r="38" fill="none" stroke-width="6" stroke-linecap="round"
-                                        :stroke="getGap('calories') < 0 ? '#ef4444' : ({high:'#f59e0b', med:'#6366f1', low:'#f43f5e', rest:'#64748b'}[currentDayRecord.planType] || '#6366f1')"
+                                        :stroke="getGap('calories') < 0 ? '#ef4444' : ({high:'#f59e0b', med:'#6366f1', low:'#f43f5e', rest:'#64748b'}[currentDayRecord.planType])"
                                         :stroke-dasharray="`${2 * 3.14159 * 38}`"
                                         :stroke-dashoffset="2 * 3.14159 * 38 * (1 - Math.min(getDailySum('calories') / (currentPlan.calories || 1), 1))"
                                         style="transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s ease" />
                                 </svg>
                                 <div
                                     class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none px-2 sm:px-4">
-                                    <div class="text-[10px] sm:text-xs font-bold text-slate-400 mb-0.5 sm:mb-1">{{
+                                    <div class="text-[10px] sm:text-xs font-bold text-muted mb-0.5 sm:mb-1">{{
                                         getGap('calories') >= 0 ? '還可以吃' : '已超出' }}</div>
                                     <div class="calorie-num truncate w-full">{{ formatNum(Math.abs(getGap('calories')))
                                         }}</div>
-                                    <div class="text-[10px] sm:text-xs font-bold text-slate-400 mt-0.5 sm:mt-1">kcal
+                                    <div class="text-[10px] sm:text-xs font-bold text-muted mt-0.5 sm:mt-1">kcal
                                     </div>
                                 </div>
                             </div>
 
                             <!-- 目標與已攝取 -->
-                            <div class="flex flex-col justify-center gap-4 sm:gap-10 w-auto">
+                            <div class="flex flex-col justify-center gap-6 sm:gap-12 w-auto">
                                 <div class="flex flex-col items-center md:items-start min-w-0">
-                                    <div class="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-3">
+                                    <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-4">
                                         <div
-                                            class="w-7 h-7 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center bg-indigo-50 text-indigo-500 shadow-sm border border-indigo-100/50 p-1.5 sm:p-2">
+                                            class="w-7 h-7 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 p-1.5 sm:p-2.5">
                                             <svg class="w-full h-full" fill="none" stroke="currentColor"
                                                 stroke-width="2.5" viewBox="0 0 24 24">
                                                 <path
@@ -580,68 +555,63 @@
                                                 </path>
                                             </svg></div>
                                         <span
-                                            class="text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-wider">已攝取</span>
+                                            class="text-[10px] sm:text-xs font-black text-muted uppercase tracking-wider">已攝取</span>
                                     </div>
                                     <div class="flex items-baseline gap-1">
-                                        <span class="text-xl sm:text-4xl font-black text-slate-900 leading-none">{{
+                                        <span class="text-xl sm:text-5xl font-black leading-none">{{
                                             formatNum(getDailySum('calories')) }}</span>
                                         <span
-                                            class="text-[10px] sm:text-xs font-bold text-slate-300 uppercase">kcal</span>
+                                            class="text-[10px] sm:text-xs font-bold text-muted uppercase">kcal</span>
                                     </div>
                                 </div>
                                 <div class="flex flex-col items-center md:items-start min-w-0">
-                                    <div class="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-3">
+                                    <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-4">
                                         <div
-                                            class="w-7 h-7 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center border border-slate-100 bg-white shadow-sm p-1.5 sm:p-2">
-                                            <svg class="w-full h-full text-slate-300" fill="none" stroke="currentColor"
+                                            class="w-7 h-7 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center bg-theme border border-theme text-muted p-1.5 sm:p-2.5">
+                                            <svg class="w-full h-full" fill="none" stroke="currentColor"
                                                 stroke-width="2.5" viewBox="0 0 24 24">
                                                 <path
                                                     d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm0-4a6 6 0 100-12 6 6 0 000 12zm0-2a2 2 0 100-4 2 2 0 000 4z">
                                                 </path>
                                             </svg></div>
                                         <span
-                                            class="text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-wider">目標值</span>
+                                            class="text-[10px] sm:text-xs font-black text-muted uppercase tracking-wider">目標值</span>
                                     </div>
                                     <div class="flex items-baseline gap-1">
-                                        <span class="text-xl sm:text-4xl font-black text-slate-900 leading-none">{{
+                                        <span class="text-xl sm:text-5xl font-black leading-none opacity-50">{{
                                             currentPlan.calories }}</span>
                                         <span
-                                            class="text-[10px] sm:text-xs font-bold text-slate-300 uppercase">kcal</span>
+                                            class="text-[10px] sm:text-xs font-bold text-muted uppercase">kcal</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- 三大營養素 -->
-                        <div class="grid grid-cols-3 gap-2 sm:gap-10 pt-4 sm:pt-10 border-t border-slate-50">
+                        <div class="grid grid-cols-3 gap-3 sm:gap-10 pt-10 border-t border-theme">
                             <div v-for="n in nutrientKeys" :key="n.key" class="min-w-0">
-                                <!-- 頂部：還差多少 (較大) -->
-                                <div class="flex flex-col items-center sm:items-start mb-1 sm:mb-3">
+                                <div class="flex flex-col items-center sm:items-start mb-3 sm:mb-4">
                                     <div
-                                        class="nutrient-label truncate uppercase tracking-widest text-[9px] sm:text-xs mb-0.5 sm:mb-2">
+                                        class="nutrient-label truncate uppercase tracking-widest text-[10px] sm:text-xs mb-1 sm:mb-3">
                                         {{ n.label }}</div>
-                                    <div class="flex items-baseline gap-0.5 sm:gap-1">
-                                        <span
-                                            class="text-[8px] sm:text-xs sm:text-[9px] sm:text-xs font-bold text-slate-400 uppercase leading-none">{{
-                                            getGap(n.key) >= 0 ? '還差' : '超出' }}</span>
-                                        <span class="text-base sm:text-xl font-black leading-none"
-                                            :class="getGap(n.key) < 0 ? 'text-rose-500' : 'text-slate-800'">{{
+                                    <div class="flex items-baseline gap-1">
+                                        <span class="text-base sm:text-2xl font-black leading-none"
+                                            :class="getGap(n.key) < 0 ? 'text-rose-500' : ''">{{
                                             formatNum(Math.abs(getGap(n.key))) }}<span
-                                                class="text-[9px] sm:text-xs font-bold text-slate-300 ml-0.5 uppercase">g</span></span>
+                                                class="text-[10px] sm:text-xs font-bold text-muted ml-0.5 uppercase">g</span></span>
                                     </div>
                                 </div>
-                                <div class="bg-slate-50 rounded-full overflow-hidden h-1 sm:h-2 mb-1.5 sm:mb-3">
+                                <div class="bg-theme rounded-full overflow-hidden h-1.5 sm:h-2 mb-3 sm:mb-4">
                                     <div class="h-full rounded-full transition-all duration-1000"
                                         :class="n.key === 'carbs' ? 'bg-indigo-500' : n.key === 'protein' ? 'bg-violet-500' : 'bg-pink-500'"
                                         :style="{ width: Math.min((getDailySum(n.key) / (currentPlan[n.key] || 1)) * 100, 100) + '%' }">
                                     </div>
                                 </div>
-                                <!-- 底部：攝取/目標 (較小) -->
                                 <div class="text-center sm:text-left">
                                     <div class="flex items-center justify-center sm:justify-start gap-1">
-                                        <span class="text-[10px] sm:text-xs font-black text-slate-700">{{
+                                        <span class="text-[10px] sm:text-xs font-black">{{
                                             formatNum(getDailySum(n.key)) }}</span>
-                                        <span class="text-[9px] sm:text-xs font-bold text-slate-300 uppercase">/ {{
+                                        <span class="text-[9px] sm:text-xs font-bold text-muted uppercase">/ {{
                                             currentPlan[n.key] }}g</span>
                                     </div>
                                 </div>
@@ -651,14 +621,14 @@
 
                     <!-- 餐點紀錄區塊 -->
                     <section>
-                        <div class="flex justify-between items-center mb-4 sm:mb-6 px-2">
+                        <div class="flex justify-between items-center mb-6 sm:mb-8 px-4">
                             <div>
-                                <h3 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">餐點紀錄</h3>
-                                <p class="text-[10px] sm:text-xs text-slate-400 font-bold mt-1 uppercase tracking-widest"
-                                    v-if="currentDayRecord.meals.length > 0">Today's Meals ({{
+                                <h3 class="text-2xl sm:text-3xl font-black tracking-tight">餐點紀錄</h3>
+                                <p class="text-[10px] sm:text-xs text-muted font-bold mt-1 uppercase tracking-widest"
+                                    v-if="currentDayRecord.meals.length > 0">Daily log ({{
                                     currentDayRecord.meals.length }})</p>
                             </div>
-                            <div class="flex gap-4 sm:gap-6 shrink-0 items-start pt-1">
+                            <div class="flex gap-4 sm:gap-6 items-center">
                                 <button @click="showHistory = true" class="btn-circular" title="查看歷史紀錄">
                                     <div class="icon-wrapper">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
@@ -667,7 +637,6 @@
                                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                     </div>
-                                    <span>歷史</span>
                                 </button>
                                 <button @click="addMeal" class="btn-circular btn-primary" title="新增餐點紀錄">
                                     <div class="icon-wrapper">
@@ -676,74 +645,70 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                                         </svg>
                                     </div>
-                                    <span>新增</span>
                                 </button>
                             </div>
                         </div>
 
-                        <!-- 餐點類別卡片清單 (右側) -->
-                        <div class="space-y-4 sm:space-y-6">
+                        <div class="space-y-6 sm:space-y-8">
                             <div v-for="typeObj in mealTypes" :key="typeObj.key">
                                 <div v-if="getMealsByType(typeObj.key).length > 0"
-                                    class="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-4 sm:p-8 shadow-md border border-slate-100/50">
-                                    <div class="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6 px-1">
-                                        <span class="w-1.5 h-5 sm:w-2 sm:h-6 rounded-full"
+                                    class="premium-card-sub p-6 sm:p-10">
+                                    <div class="flex items-center gap-4 mb-6 sm:mb-10 px-1">
+                                        <span class="w-2 h-7 rounded-full"
                                             :style="{ backgroundColor: {breakfast:'#6366f1', lunch:'#8b5cf6', dinner:'#3b82f6', snack:'#ec4899'}[typeObj.key] }"></span>
                                         <h4
-                                            class="text-sm sm:text-base font-black text-slate-800 tracking-wider uppercase">
+                                            class="text-base sm:text-lg font-black tracking-wider uppercase">
                                             {{ typeObj.label }}</h4>
                                         <span
-                                            class="text-[10px] sm:text-xs font-bold text-slate-300 ml-auto uppercase tracking-widest">{{
-                                            getMealsByType(typeObj.key).length }} 筆</span>
+                                            class="text-[11px] font-black text-muted ml-auto uppercase tracking-widest">{{
+                                            getMealsByType(typeObj.key).length }} items</span>
                                     </div>
-                                    <div class="space-y-3 sm:space-y-4">
+                                    <div class="space-y-4 sm:space-y-6">
                                         <div v-for="meal in getMealsByType(typeObj.key)" :key="meal.originalIndex"
-                                            class="meal-card rounded-2xl sm:rounded-3xl border border-slate-100 bg-[#fcfdfe] relative overflow-hidden group">
+                                            class="meal-card rounded-[2rem] relative overflow-hidden group">
                                             <div v-if="editingIndex !== meal.originalIndex"
-                                                class="p-3 pr-20 sm:p-5 sm:pr-24">
-                                                <div class="flex items-center gap-2 mb-1 sm:mb-3 min-w-0">
+                                                class="p-5 pr-24 sm:p-7 sm:pr-32">
+                                                <div class="flex items-center gap-3 mb-2 min-w-0">
                                                     <span
-                                                        class="text-base sm:text-lg font-black text-slate-900 break-words min-w-0 leading-tight">{{
+                                                        class="text-lg sm:text-xl font-black break-words min-w-0 leading-tight">{{
                                                         meal.name || '未命名餐點' }}</span>
                                                 </div>
-                                                <!-- 第一行：份量 | 熱量 -->
                                                 <div
-                                                    class="flex items-center text-xs sm:text-sm font-black mb-1 sm:mb-2">
+                                                    class="flex items-center text-sm font-black mb-3">
                                                     <span
-                                                        class="text-indigo-500 bg-indigo-50 px-1.5 py-0.5 rounded-lg">{{
+                                                        class="text-indigo-600 bg-indigo-500/10 px-2 py-1 rounded-xl">{{
                                                         meal.amount }}{{ meal.unit || '份' }}</span>
-                                                    <span class="mx-2 text-slate-200">|</span>
-                                                    <span class="text-slate-900">{{ formatNum(meal.calories) }} <span
-                                                            class="text-[9px] sm:text-xs text-slate-400 uppercase ml-0.5">kcal</span></span>
+                                                    <span class="mx-3 opacity-20">•</span>
+                                                    <span class="">{{ formatNum(meal.calories) }} <span
+                                                            class="text-[10px] text-muted uppercase ml-0.5">kcal</span></span>
                                                 </div>
-                                                <!-- 第二行：三大營養素 -->
-                                                <div class="flex items-center gap-3 sm:gap-4">
+                                                <div class="flex items-center gap-5">
                                                     <span
-                                                        class="text-[9px] sm:text-xs font-bold text-slate-400 uppercase tracking-tighter">碳:<span
-                                                            class="text-slate-900 font-black ml-0.5">{{
+                                                        class="text-[10px] font-bold text-muted uppercase tracking-widest">C:<span
+                                                            class="text-main font-black ml-1">{{
                                                             formatNum(meal.carbs) }}g</span></span>
                                                     <span
-                                                        class="text-[9px] sm:text-xs font-bold text-slate-400 uppercase tracking-tighter">蛋:<span
-                                                            class="text-slate-900 font-black ml-0.5">{{
+                                                        class="text-[10px] font-bold text-muted uppercase tracking-widest">P:<span
+                                                            class="text-main font-black ml-1">{{
                                                             formatNum(meal.protein) }}g</span></span>
                                                     <span
-                                                        class="text-[9px] sm:text-xs font-bold text-slate-400 uppercase tracking-tighter">脂:<span
-                                                            class="text-slate-900 font-black ml-0.5">{{
+                                                        class="text-[10px] font-bold text-muted uppercase tracking-widest">F:<span
+                                                            class="text-main font-black ml-1">{{
                                                             formatNum(meal.fat) }}g</span></span>
                                                 </div>
                                             </div>
                                             <div v-if="editingIndex !== meal.originalIndex"
-                                                class="absolute top-1/2 -translate-y-1/2 right-2 sm:right-4 flex gap-0.5 sm:gap-1">
+                                                class="absolute top-1/2 -translate-y-1/2 right-4 flex gap-1">
                                                 <button @click="startEdit(meal.originalIndex)"
-                                                    class="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl sm:rounded-2xl text-slate-300 hover:text-indigo-600 hover:bg-white hover:shadow-sm active:scale-90 transition-all"><svg
-                                                        class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor"
+                                                    class="w-10 h-10 flex items-center justify-center rounded-2xl bg-theme text-muted hover:text-indigo-600 hover:shadow-lg transition-all"><svg
+                                                        class="w-5 h-5" fill="none" stroke="currentColor"
                                                         stroke-width="2.2" viewBox="0 0 24 24">
                                                         <path
                                                             d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                                     </svg></button>
                                                 <button @click="confirmDelete(meal.originalIndex)"
-                                                    class="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl sm:rounded-2xl text-slate-200 hover:text-rose-500 hover:bg-white hover:shadow-sm active:scale-90 transition-all"><svg
-                                                        class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor"
+                                                    class="w-10 h-10 flex items-center justify-center rounded-2xl bg-theme text-muted hover:text-rose-500 hover:shadow-lg transition-all"><svg
+                                                        class="w-5 h-5" fill="none" stroke="currentColor"
                                                         stroke-width="2.2" viewBox="0 0 24 24">
                                                         <path
                                                             d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -755,26 +720,27 @@
                             </div>
                             <!-- 右側空白狀態 -->
                             <div v-if="currentDayRecord.meals.length === 0"
-                                class="bg-white rounded-[2.5rem] py-32 text-center shadow-md border border-slate-100/50">
+                                class="premium-card-main py-32 text-center">
                                 <div
-                                    class="w-24 h-24 bg-indigo-50 rounded-[3rem] flex items-center justify-center mx-auto mb-8 shadow-inner">
-                                    <svg class="w-12 h-12 text-indigo-200" fill="none" stroke="currentColor"
+                                    class="w-24 h-24 bg-indigo-500/10 rounded-[3rem] flex items-center justify-center mx-auto mb-8 shadow-inner">
+                                    <svg class="w-12 h-12 text-indigo-500/30" fill="none" stroke="currentColor"
                                         stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                             d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                                     </svg></div>
-                                <p class="text-2xl font-black text-slate-900 tracking-tight">尚未記錄任何餐點</p>
+                                <p class="text-3xl font-black tracking-tight">尚未記錄任何餐點</p>
                                 <p
-                                    class="text-sm text-slate-400 font-medium mt-3 max-w-[280px] mx-auto leading-relaxed">
+                                    class="text-sm text-muted font-medium mt-4 max-w-[300px] mx-auto leading-relaxed">
                                     讓今天成為達成目標的第一步，點擊「新增餐點」開始記錄。</p>
                                 <button @click="addMeal"
-                                    class="mt-10 px-10 py-4 btn-gradient text-white rounded-2xl font-black shadow-xl shadow-indigo-100 hover:scale-105 active:scale-95 transition-all">開始記錄第一餐</button>
+                                    class="mt-12 px-12 py-5 bg-indigo-600 text-white rounded-[1.5rem] font-black shadow-2xl shadow-indigo-500/20 hover:scale-105 active:scale-95 transition-all">開始記錄第一餐</button>
                             </div>
                         </div>
                     </section>
                 </div>
             </div>
         </div>
+
 
         <!-- 餐點編輯彈窗 (Cal AI 風格) -->
         <div v-if="editingIndex !== null" class="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
