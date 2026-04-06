@@ -817,6 +817,11 @@
                                                         class="text-lg sm:text-xl font-black break-words min-w-0 leading-tight">{{
                                                         meal.name || '未命名餐點' }}</span>
                                                 </div>
+                                                <div v-if="meal.items && meal.items.length > 0" class="flex flex-wrap gap-2 mb-3">
+                                                    <span v-for="item in meal.items" :key="item.name" class="text-[10px] font-black bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md">
+                                                        {{ item.name }} ({{ item.amount }}{{ item.unit }})
+                                                    </span>
+                                                </div>
                                                 <div
                                                     class="flex items-center text-sm font-black mb-3">
                                                     <span
@@ -1561,6 +1566,11 @@
                                             <span style="font-size: 11px; font-weight: 700; color: #94a3b8;">{{ m.amount
                                                 }}{{ m.unit }}</span>
                                         </div>
+                                        <div v-if="m.items && m.items.length > 0" style="margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; padding-left: 45px;">
+                                            <span v-for="item in m.items" :key="item.name" style="font-size: 10px; font-weight: 700; color: #64748b; background-color: #f1f5f9; padding: 2px 8px; border-radius: 6px;">
+                                                {{ item.name }} ({{ item.amount }}{{ item.unit }})
+                                            </span>
+                                        </div>
                                         <div style="font-weight: 900; color: #1e293b; font-size: 13px;">
                                             {{ m.calories }} <span style="font-size: 10px; color: #cbd5e1;">kcal</span>
                                         </div>
@@ -2276,7 +2286,15 @@
                             Math.abs(existing.carbs - currentNormalized.carbs) > 0.1 ||
                             Math.abs(existing.protein - currentNormalized.protein) > 0.1 ||
                             Math.abs(existing.fat - currentNormalized.fat) > 0.1;
-                        if (isDifferent) {
+
+                        const nutrientsChangedFromBackup = !tempMealBackup.value || (
+                            Math.abs(tempMealBackup.value.calories - editingMeal.calories) > 0.1 ||
+                            Math.abs(tempMealBackup.value.carbs - editingMeal.carbs) > 0.1 ||
+                            Math.abs(tempMealBackup.value.protein - editingMeal.protein) > 0.1 ||
+                            Math.abs(tempMealBackup.value.fat - editingMeal.fat) > 0.1
+                        );
+
+                        if (isDifferent && nutrientsChangedFromBackup) {
                             showSyncModal.value = true;
                             return;
                         }
@@ -2295,12 +2313,13 @@
                 };
 
                 const exportCSV = () => {
-                    let csvContent = "data:text/csv;charset=utf-8,日期,計畫類型,餐點名稱,餐點類型,份量,單位,熱量,碳水,蛋白質,脂肪\n";
+                    let csvContent = "data:text/csv;charset=utf-8,日期,計畫類型,餐點名稱,餐點類型,份量,單位,熱量,碳水,蛋白質,脂肪,品項內容\n";
                     Object.keys(allData).sort().forEach(date => {
                         const day = allData[date];
                         if (day.meals && day.meals.length > 0) {
                             day.meals.forEach(m => {
-                                csvContent += `${date},${getPlanLabel(day.planType)},${m.name},${getMealLabel(m.type)},${m.amount},${m.unit || '份'},${m.calories},${m.carbs},${m.protein},${m.fat}\n`;
+                                const itemsStr = m.items ? m.items.map(i => `${i.name}(${i.amount}${i.unit})`).join('; ') : '';
+                                csvContent += `${date},${getPlanLabel(day.planType)},${m.name},${getMealLabel(m.type)},${m.amount},${m.unit || '份'},${m.calories},${m.carbs},${m.protein},${m.fat},"${itemsStr}"\n`;
                             });
                         }
                     });
