@@ -938,7 +938,7 @@
                             v-for="t in [{k:'breakfast', l:'早餐', i:'🌅'}, {k:'lunch', l:'午餐', i:'☀️'}, {k:'dinner', l:'晚餐', i:'🌙'}, {k:'snack', l:'點心', i:'🍰'}]"
                             :key="t.k" @click="editingMeal.type = t.k"
                             class="flex flex-col items-center gap-2 group transition-all">
-                            <div class="w-16 h-16 rounded-full flex items-center justify-center text-3xl transition-all duration-300"
+                            <div class="w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300"
                                 :class="editingMeal.type === t.k ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-100 scale-110' : 'bg-slate-50 text-slate-400 grayscale opacity-50 hover:opacity-100 hover:grayscale-0'">
                                 {{ t.i }}
                             </div>
