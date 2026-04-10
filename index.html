@@ -921,7 +921,7 @@
                     <!-- 第1排: 餐點內容 -->
                     <div class="flex justify-between items-start gap-4">
                         <div class="flex-1 relative">
-                            <textarea v-model="editingMeal.name"
+                            <textarea v-model="editingMeal.name" @input="isNameAuto = false"
                                 class="w-full px-3 py-1 text-2xl font-black placeholder:text-slate-200 text-slate-900 bg-transparent border-none outline-none resize-none min-h-[60px] leading-tight"
                                 placeholder="食物名稱..."></textarea>
                             <div class="absolute -bottom-1 left-0 w-10 h-1 bg-indigo-500 rounded-full"></div>
@@ -1839,6 +1839,7 @@
                 const loginPassword = ref('');
 
                 const isCalendarExpanded = ref(window.innerWidth >= 1024);
+                const isNameAuto = ref(true);
                 const showMonthJump = ref(false);
                 const jumpYear = ref(new Date().getFullYear());
                 const showMobileMenu = ref(false);
@@ -1983,6 +1984,7 @@
 
                     if (editingIndex.value !== null) {
                         Object.assign(editingMeal, newMeal);
+                        isNameAuto.value = false;
                         prepareScale();
                     } else {
                         newMeal.type = 'lunch';
@@ -2238,6 +2240,11 @@
                     const copiedMeal = JSON.parse(JSON.stringify(meal));
                     if (!copiedMeal.items) copiedMeal.items = [];
                     Object.assign(editingMeal, copiedMeal);
+                    
+                    // 檢查名稱是否與品項串接相符，判斷是否為自動生成
+                    const names = editingMeal.items.map(i => i.name).filter(n => n).join(' + ');
+                    isNameAuto.value = !editingMeal.name || editingMeal.name === names;
+
                     editingIndex.value = index;
                     isAddingMeal.value = false;
                     lastAmount.value = editingMeal.amount;
@@ -2250,6 +2257,7 @@
                     }
                     const newMeal = { type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] };
                     Object.assign(editingMeal, newMeal);
+                    isNameAuto.value = true;
                     const newIndex = allData[selectedDate.value].meals.push(newMeal) - 1;
                     editingIndex.value = newIndex;
                     isAddingMeal.value = true;
