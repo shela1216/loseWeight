@@ -758,6 +758,13 @@
                                         <span class="text-[9px] sm:text-xs font-bold text-muted uppercase">/ {{
                                             currentPlan[n.key] }}g</span>
                                     </div>
+                                    <!-- 新增：比例輔助顯示 -->
+                                    <div class="flex flex-col sm:flex-row justify-between items-center text-[9px] font-bold mt-1.5 opacity-60 leading-tight">
+                                        <span>目標: {{ getNutrientPercent(n.key, true) }}%</span>
+                                        <span :class="Math.abs(getNutrientPercent(n.key, true) - getNutrientPercent(n.key, false)) > 5 ? 'text-indigo-600' : ''">
+                                            實際: {{ getNutrientPercent(n.key, false) }}%
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2401,6 +2408,24 @@
                         const progress = Math.max(0, 100 - gapPercent);
                         const colorMap = { high: '#f59e0b', med: '#6366f1', low: '#f43f5e', rest: '#64748b' };
                         return { percent: progress, color: colorMap[record.planType] };
+                    },
+                    getNutrientPercent: (key, isTarget) => {
+                        const multipliers = { carbs: 4, protein: 4, fat: 9 };
+                        const mult = multipliers[key];
+                        if (isTarget) {
+                            const plan = allData[selectedDate.value]?.goals || plans[allData[selectedDate.value]?.planType] || plans.med;
+                            const total = plan.calories || 1;
+                            return Math.round((plan[key] * mult / total) * 100);
+                        } else {
+                            const meals = allData[selectedDate.value]?.meals || [];
+                            const c = meals.reduce((s, m) => s + (Number(m.carbs) || 0), 0);
+                            const p = meals.reduce((s, m) => s + (Number(m.protein) || 0), 0);
+                            const f = meals.reduce((s, m) => s + (Number(m.fat) || 0), 0);
+                            const totalCal = (c * 4) + (p * 4) + (f * 9);
+                            if (totalCal === 0) return 0;
+                            const val = meals.reduce((s, m) => s + (Number(m[key]) || 0), 0);
+                            return Math.round((val * mult / totalCal) * 100);
+                        }
                     },
                     setPlanType, autoCalculatePlans, exportCSV, saveData,
                     openSettings, saveSettings,
