@@ -753,13 +753,13 @@
                                 </div>
                                 <div class="text-center sm:text-left">
                                     <div class="flex items-center justify-center sm:justify-start gap-1">
-                                        <span class="text-[10px] sm:text-xs font-black">{{
+                                        <span class="text-xs sm:text-xs font-black">{{
                                             formatNum(getDailySum(n.key)) }}</span>
-                                        <span class="text-[9px] sm:text-xs font-bold text-muted uppercase">/ {{
+                                        <span class="text-[10px] sm:text-xs font-bold text-muted uppercase">/ {{
                                             currentPlan[n.key] }}g</span>
                                     </div>
                                     <!-- 新增：比例輔助顯示 -->
-                                    <div class="flex flex-col sm:flex-row justify-between items-center text-[9px] font-bold mt-1.5 opacity-60 leading-tight">
+                                    <div class="flex flex-col sm:flex-row justify-between items-center text-[11px] font-bold mt-1.5 opacity-70 leading-tight">
                                         <span>目標: {{ getNutrientPercent(n.key, true) }}%</span>
                                         <span :class="Math.abs(getNutrientPercent(n.key, true) - getNutrientPercent(n.key, false)) > 5 ? 'text-indigo-600' : ''">
                                             實際: {{ getNutrientPercent(n.key, false) }}%
@@ -1933,6 +1933,11 @@
                     return Math.round(Number(val));
                 };
 
+                const formatFloat = (val) => {
+                    if (val === undefined || val === null || isNaN(val)) return 0;
+                    return Math.round(Number(val) * 100) / 100;
+                };
+
                 const scaleNutrients = () => {
                     const newAmount = editingMeal.amount || 0;
                     if (lastAmount.value > 0 && newAmount >= 0) {
@@ -2191,13 +2196,14 @@
                                                     if (!m.unit) m.unit = '份';
                                                     const k = m.name?.toLowerCase().trim();
                                                     if (k && !templates[k]) {
+                                                        const amt = m.amount || 1;
                                                         templates[k] = {
                                                             ...m,
                                                             amount: 1,
-                                                            calories: formatNum(m.calories / m.amount),
-                                                            carbs: formatNum(m.carbs / m.amount),
-                                                            protein: formatNum(m.protein / m.amount),
-                                                            fat: formatNum(m.fat / m.amount)
+                                                            calories: formatFloat(m.calories / amt),
+                                                            carbs: formatFloat(m.carbs / amt),
+                                                            protein: formatFloat(m.protein / amt),
+                                                            fat: formatFloat(m.fat / amt)
                                                         };
                                                     }
                                                 });
@@ -2292,10 +2298,10 @@
                     const currentNormalized = {
                         ...editingMeal,
                         amount: 1,
-                        calories: formatNum(editingMeal.calories / (editingMeal.amount || 1)),
-                        carbs: formatNum(editingMeal.carbs / (editingMeal.amount || 1)),
-                        protein: formatNum(editingMeal.protein / (editingMeal.amount || 1)),
-                        fat: formatNum(editingMeal.fat / (editingMeal.amount || 1))
+                        calories: formatFloat(editingMeal.calories / (editingMeal.amount || 1)),
+                        carbs: formatFloat(editingMeal.carbs / (editingMeal.amount || 1)),
+                        protein: formatFloat(editingMeal.protein / (editingMeal.amount || 1)),
+                        fat: formatFloat(editingMeal.fat / (editingMeal.amount || 1))
                     };
                     const existing = templates[k];
                     if (syncOption === null && existing) {
