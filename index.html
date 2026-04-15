@@ -835,22 +835,22 @@
                                                         class="text-indigo-600 bg-indigo-500/10 px-2 py-1 rounded-xl">{{
                                                         meal.amount }}{{ meal.unit || '份' }}</span>
                                                     <span class="mx-3 opacity-20">•</span>
-                                                    <span class="">{{ formatNum(meal.calories) }} <span
+                                                    <span class="">{{ formatFloat(meal.calories) }} <span
                                                             class="text-[10px] text-muted uppercase ml-0.5">kcal</span></span>
                                                 </div>
                                                 <div class="flex items-center gap-5">
                                                     <span
                                                         class="text-[10px] font-bold text-muted uppercase tracking-widest">C:<span
                                                             class="text-main font-black ml-1">{{
-                                                            formatNum(meal.carbs) }}g</span></span>
+                                                            formatFloat(meal.carbs) }}g</span></span>
                                                     <span
                                                         class="text-[10px] font-bold text-muted uppercase tracking-widest">P:<span
                                                             class="text-main font-black ml-1">{{
-                                                            formatNum(meal.protein) }}g</span></span>
+                                                            formatFloat(meal.protein) }}g</span></span>
                                                     <span
                                                         class="text-[10px] font-bold text-muted uppercase tracking-widest">F:<span
                                                             class="text-main font-black ml-1">{{
-                                                            formatNum(meal.fat) }}g</span></span>
+                                                            formatFloat(meal.fat) }}g</span></span>
                                                 </div>
                                             </div>
                                             <div v-if="editingIndex !== meal.originalIndex"
@@ -1144,12 +1144,12 @@
                                     <span class="font-black text-indigo-500">{{ item.amount }}{{ item.unit || '份'
                                         }}</span>
                                     <span class="text-slate-200">•</span>
-                                    <span class="font-black text-slate-900">{{ formatNum(item.calories) }}kcal</span>
+                                    <span class="font-black text-slate-900">{{ formatFloat(item.calories) }}kcal</span>
                                 </p>
                                 <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-tighter">
-                                    碳:<span class="text-slate-900 font-black mr-2">{{ formatNum(item.carbs) }}</span>
-                                    蛋:<span class="text-slate-900 font-black mr-2">{{ formatNum(item.protein) }}</span>
-                                    脂:<span class="text-slate-900 font-black">{{ formatNum(item.fat) }}</span>
+                                    碳:<span class="text-slate-900 font-black mr-2">{{ formatFloat(item.carbs) }}</span>
+                                    蛋:<span class="text-slate-900 font-black mr-2">{{ formatFloat(item.protein) }}</span>
+                                    脂:<span class="text-slate-900 font-black">{{ formatFloat(item.fat) }}</span>
                                 </p>
                             </div>
                         </div>
