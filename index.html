@@ -1935,17 +1935,17 @@
 
                 const formatFloat = (val) => {
                     if (val === undefined || val === null || isNaN(val)) return 0;
-                    return Math.round(Number(val) * 100) / 100;
+                    return Number(Number(val).toFixed(2));
                 };
 
                 const scaleNutrients = () => {
                     const newAmount = editingMeal.amount || 0;
                     if (lastAmount.value > 0 && newAmount >= 0) {
                         const ratio = newAmount / lastAmount.value;
-                        editingMeal.calories = formatNum(originalNutrients.calories * ratio);
-                        editingMeal.carbs = formatNum(originalNutrients.carbs * ratio);
-                        editingMeal.protein = formatNum(originalNutrients.protein * ratio);
-                        editingMeal.fat = formatNum(originalNutrients.fat * ratio);
+                        editingMeal.calories = formatFloat(originalNutrients.calories * ratio);
+                        editingMeal.carbs = formatFloat(originalNutrients.carbs * ratio);
+                        editingMeal.protein = formatFloat(originalNutrients.protein * ratio);
+                        editingMeal.fat = formatFloat(originalNutrients.fat * ratio);
                     }
                 };
 
