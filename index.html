@@ -1139,6 +1139,11 @@
                                     class="text-[10px] sm:text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-lg font-black uppercase group-hover:bg-indigo-100 group-hover:text-indigo-500 transition-colors shrink-0 whitespace-nowrap">{{
                                     item.count }} 次記錄</span>
                             </div>
+                            <div v-if="item.items && item.items.length > 0" class="flex flex-wrap gap-1.5 mb-2.5">
+                                <span v-for="sub in item.items" :key="sub.name" class="text-[9px] font-bold bg-slate-50 text-slate-400 px-2 py-0.5 rounded-md border border-slate-100/50">
+                                    {{ sub.name }} {{ sub.amount }}{{ sub.unit }}
+                                </span>
+                            </div>
                             <div class="space-y-1">
                                 <p class="flex items-center gap-2 text-sm">
                                     <span class="font-black text-indigo-500">{{ item.amount }}{{ item.unit || '份'
