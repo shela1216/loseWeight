@@ -1621,7 +1621,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, updateDoc, onSnapshot, collection, query, where, getDocs, writeBatch, deleteField, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const { createApp, ref, reactive, computed, onMounted } = Vue;
 
@@ -2159,67 +2159,88 @@
                     pickerMonth.value = new Date(now.getFullYear(), now.getMonth(), 1);
                 };
 
+                // 分月載入資料 (按需載入)
+                const loadMonthData = async (date) => {
+                    if (!user.value) return;
+                    const year = date.getFullYear();
+                    const month = date.getMonth();
+                    const start = formatDate(new Date(year, month, 1));
+                    const end = formatDate(new Date(year, month + 1, 0));
+
+                    const q = query(
+                        collection(db, 'artifacts', appId, 'users', user.value.uid, 'dailyRecords'),
+                        where('date', '>=', start),
+                        where('date', '<=', end)
+                    );
+
+                    const snap = await getDocs(q);
+                    snap.forEach(doc => {
+                        allData[doc.id] = doc.data();
+                    });
+                };
+
                 const initApp = async () => {
                     let firebaseConfig;
                     try {
                         const response = await fetch('/firebase-config.json');
-                        if (response.ok) {
-                            firebaseConfig = await response.json();
-                        } else {
-                            throw new Error('遠端 config.json 不存在');
-                        }
+                        if (response.ok) firebaseConfig = await response.json();
+                        else throw new Error();
                     } catch (e) {
-                        if (typeof __firebase_config !== 'undefined') {
-                            firebaseConfig = JSON.parse(__firebase_config);
-                        } else {
-                            console.error("找不到 Firebase 配置路徑。");
-                            return;
-                        }
+                        if (typeof __firebase_config !== 'undefined') firebaseConfig = JSON.parse(__firebase_config);
+                        else return;
                     }
 
                     const app = initializeApp(firebaseConfig);
                     auth = getAuth(app);
                     db = getFirestore(app);
 
-                    onAuthStateChanged(auth, (u) => {
+                    // 點 2: 啟用離線快取 (IndexedDB Persistence)
+                    try {
+                        await enableIndexedDbPersistence(db);
+                    } catch (err) {
+                        console.warn("Offline persistence failed", err.code);
+                    }
+
+                    onAuthStateChanged(auth, async (u) => {
                         user.value = u;
                         if (u) {
-                            const docRef = doc(db, 'artifacts', appId, 'users', u.uid, 'settings', 'dietData');
-                            unsubscribe = onSnapshot(docRef, (snap) => {
+                            const settingsRef = doc(db, 'artifacts', appId, 'users', u.uid, 'settings', 'dietData');
+                            
+                            // 監聽全局設定
+                            onSnapshot(settingsRef, async (snap) => {
                                 if (snap.exists()) {
                                     const data = snap.data();
                                     if (data.plans) Object.assign(plans, data.plans);
                                     if (data.profile) Object.assign(profile, data.profile);
                                     if (data.templates) Object.assign(templates, data.templates);
 
+                                    // 點 1: 資料遷移 (Migration) - 如果發現舊的大型 allData
                                     if (data.allData) {
-                                        const order = { breakfast: 1, lunch: 2, dinner: 3, snack: 4 };
-                                        Object.values(data.allData).forEach(day => {
-                                            if (day.meals) {
-                                                day.meals.forEach(m => {
-                                                    if (m.amount === undefined || m.amount === null) m.amount = 1;
-                                                    if (!m.unit) m.unit = '份';
-                                                    const k = m.name?.toLowerCase().trim();
-                                                    if (k && !templates[k]) {
-                                                        const amt = m.amount || 1;
-                                                        templates[k] = {
-                                                            ...m,
-                                                            amount: 1,
-                                                            calories: formatFloat(m.calories / amt),
-                                                            carbs: formatFloat(m.carbs / amt),
-                                                            protein: formatFloat(m.protein / amt),
-                                                            fat: formatFloat(m.fat / amt)
-                                                        };
-                                                    }
-                                                });
-                                                day.meals.sort((a, b) => (order[a.type] || 99) - (order[b.type] || 99));
-                                            }
+                                        console.log("偵測到舊架構，開始資料遷移...");
+                                        const batch = writeBatch(db);
+                                        const dailyCol = collection(db, 'artifacts', appId, 'users', u.uid, 'dailyRecords');
+                                        
+                                        Object.keys(data.allData).forEach(date => {
+                                            const dayRef = doc(dailyCol, date);
+                                            batch.set(dayRef, { ...data.allData[date], date });
+                                            // 同時同步到本地快取
+                                            allData[date] = data.allData[date];
                                         });
-                                        Object.assign(allData, data.allData);
+                                        
+                                        // 遷移完成後移除舊欄位
+                                        batch.update(settingsRef, { allData: deleteField() });
+                                        await batch.commit();
+                                        console.log("資料遷移完成。");
                                     }
                                 }
                                 initialized.value = true;
-                            }, () => { initialized.value = true; });
+                            });
+
+                            // 初始載入：本月與前後一月資料
+                            await loadMonthData(new Date());
+                            const prevMonth = new Date(); prevMonth.setMonth(prevMonth.getMonth() - 1);
+                            const nextMonth = new Date(); nextMonth.setMonth(nextMonth.getMonth() + 1);
+                            await Promise.all([loadMonthData(prevMonth), loadMonthData(nextMonth)]);
                         } else {
                             initialized.value = true;
                         }
@@ -2232,13 +2253,24 @@
                     window.saveTimer = setTimeout(async () => {
                         saving.value = true;
                         try {
-                            const docRef = doc(db, 'artifacts', appId, 'users', user.value.uid, 'settings', 'dietData');
-                            await setDoc(docRef, {
+                            const batch = writeBatch(db);
+                            
+                            // 1. 儲存全局設定
+                            const settingsRef = doc(db, 'artifacts', appId, 'users', user.value.uid, 'settings', 'dietData');
+                            batch.set(settingsRef, {
                                 plans: JSON.parse(JSON.stringify(plans)),
                                 profile: JSON.parse(JSON.stringify(profile)),
-                                allData: JSON.parse(JSON.stringify(allData)),
                                 templates: JSON.parse(JSON.stringify(templates))
-                            });
+                            }, { merge: true });
+
+                            // 2. 僅儲存「目前選中日期」的紀錄 (點 1: 分片寫入)
+                            const todayData = allData[selectedDate.value];
+                            if (todayData) {
+                                const dayRef = doc(db, 'artifacts', appId, 'users', user.value.uid, 'dailyRecords', selectedDate.value);
+                                batch.set(dayRef, { ...JSON.parse(JSON.stringify(todayData)), date: selectedDate.value });
+                            }
+
+                            await batch.commit();
                         } catch (e) {
                             console.error("同步失敗", e);
                         } finally {
