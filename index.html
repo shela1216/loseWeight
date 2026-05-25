@@ -2457,8 +2457,8 @@
                         const mult = multipliers[key];
                         if (isTarget) {
                             const plan = allData[selectedDate.value]?.goals || plans[allData[selectedDate.value]?.planType] || plans.med;
-                            const total = plan.calories || 1;
-                            return Math.round((plan[key] * mult / total) * 100);
+                            const total = (Number(plan.carbs) * 4) + (Number(plan.protein) * 4) + (Number(plan.fat) * 9) || 1;
+                            return Math.round((Number(plan[key]) * mult / total) * 100);
                         } else {
                             const meals = allData[selectedDate.value]?.meals || [];
                             const c = meals.reduce((s, m) => s + (Number(m.carbs) || 0), 0);
