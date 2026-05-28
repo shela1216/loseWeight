@@ -964,11 +964,17 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                    <div v-for="n in [{k:'calories',l:'熱量',u:'kcal'},{k:'carbs',l:'淨碳水',u:'g'},{k:'protein',l:'蛋白',u:'g'},{k:'fat',l:'脂肪',u:'g'}]" :key="n.k" class="flex flex-col gap-1">
-                                        <label class="text-[9px] font-black text-slate-400 text-center uppercase">{{ n.l }}</label>
-                                        <div class="relative">
-                                            <input type="number" v-model.number="item[n.k]" @input="updateTotalsFromItems" class="w-full bg-white px-2 py-2 rounded-xl text-xs font-black text-center outline-none border border-transparent focus:border-indigo-200 shadow-sm transition-all" :placeholder="n.u">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div class="space-y-1">
+                                        <label class="text-[9px] font-black text-indigo-400 uppercase tracking-widest pl-1">快速輸入 (熱/碳/蛋/脂)</label>
+                                        <input v-model="item.qInput" @input="updateTotalsFromItems" 
+                                            class="w-full bg-white px-4 py-2.5 rounded-xl text-sm font-black outline-none border border-transparent focus:border-indigo-300 shadow-sm transition-all" 
+                                            placeholder="70/7/5/1">
+                                    </div>
+                                    <div class="grid grid-cols-4 gap-1.5 bg-white/50 rounded-xl p-2 border border-slate-100">
+                                        <div v-for="n in [{k:'calories',l:'熱',u:'k'},{k:'carbs',l:'碳',u:'g'},{k:'protein',l:'蛋',u:'g'},{k:'fat',l:'脂',u:'g'}]" :key="n.k" class="text-center">
+                                            <div class="text-[8px] font-bold text-slate-300 uppercase leading-none mb-1">{{ n.l }}</div>
+                                            <div class="text-[11px] font-black text-slate-700 leading-none">{{ item[n.k] || 0 }}<span class="text-[7px] ml-0.5 opacity-50">{{ n.u }}</span></div>
                                         </div>
                                     </div>
                                 </div>
@@ -977,28 +983,45 @@
                         </div>
                     </div>
 
-                    <!-- 快速營養素輸入 -->
-                    <div class="bg-indigo-50/30 rounded-2xl p-4 border border-indigo-100/50">
-                        <div class="flex justify-between items-center mb-2 px-1">
-                            <label class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">快速輸入 (熱量/碳水/蛋白/脂肪)</label>
-                            <span class="text-[9px] font-bold text-indigo-300 uppercase">Quick Batch Input</span>
+                    <!-- 快速營養素輸入 (核心輸入區) -->
+                    <div class="bg-indigo-50/30 rounded-3xl p-5 border border-indigo-100/50 shadow-inner">
+                        <div class="flex justify-between items-center mb-3 px-1">
+                            <div>
+                                <label class="text-xs font-black text-indigo-500 uppercase tracking-widest">營養素快速輸入</label>
+                                <p class="text-[9px] text-indigo-300 font-bold uppercase">Batch Nutrient Entry</p>
+                            </div>
+                            <span v-if="editingMeal.items && editingMeal.items.length > 0" class="text-[10px] font-black text-amber-500 bg-amber-50 px-2 py-1 rounded-lg border border-amber-100">已啟用組合餐同步</span>
                         </div>
-                        <div class="flex gap-2">
+                        
+                        <!-- 輸入框 -->
+                        <div class="flex gap-2 mb-5">
                             <input v-model="quickNutrientInput" @keyup.enter="parseQuickInput"
-                                class="flex-1 bg-white px-4 py-3 rounded-xl text-sm font-black outline-none border border-transparent focus:border-indigo-300 shadow-sm transition-all"
-                                placeholder="範例：70/7/5/1">
+                                :disabled="editingMeal.items && editingMeal.items.length > 0"
+                                class="flex-1 bg-white px-5 py-3.5 rounded-2xl text-base font-black outline-none border border-transparent focus:border-indigo-400 shadow-md transition-all disabled:opacity-50 disabled:bg-slate-50 disabled:cursor-not-allowed"
+                                :placeholder="editingMeal.items && editingMeal.items.length > 0 ? '請直接修改上方品項內容' : '範例：70/7/5/1'">
                             <button @click="parseQuickInput" 
-                                class="px-4 bg-indigo-600 text-white rounded-xl text-xs font-black hover:bg-indigo-700 transition-all shadow-md">
+                                :disabled="editingMeal.items && editingMeal.items.length > 0"
+                                class="px-6 bg-indigo-600 text-white rounded-2xl text-sm font-black hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 active:scale-95 disabled:opacity-50 disabled:shadow-none">
                                 解析
                             </button>
                         </div>
+
+                        <!-- 數值預覽格 (取代舊的大輸入框) -->
+                        <div class="grid grid-cols-4 gap-2">
+                            <div v-for="n in [{k:'calories',l:'熱量',u:'kcal',c:'orange'},{k:'carbs',l:'淨碳水',u:'g',c:'indigo'},{k:'protein',l:'蛋白',u:'g',c:'violet'},{k:'fat',l:'脂肪',u:'g',c:'pink'}]" 
+                                :key="n.k" class="bg-white rounded-2xl p-3 border border-slate-50 text-center shadow-sm">
+                                <div class="text-[10px] font-black text-slate-400 uppercase mb-1">{{ n.l }}</div>
+                                <div class="text-lg font-black leading-none" :class="'text-'+n.c+'-600'">{{ editingMeal[n.k] || 0 }}</div>
+                                <div class="text-[8px] font-bold text-slate-300 uppercase mt-1">{{ n.u }}</div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- 第3排: 份量 + 單位 -->
+                    <!-- 第3排: 份量 + 單位 (保留，因為份量會連動縮放) -->
                     <div class="flex items-center gap-3">
                         <div
                             class="flex-1 bg-slate-50 rounded-2xl px-5 py-4 flex flex-col border border-transparent focus-within:border-indigo-100 focus-within:bg-white transition-all">
-                            <label class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">份量數值</label>
+                            <label class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">份量數值 (調整會縮放營養素)</label>
                             <input type="number" inputmode="decimal" pattern="[0-9]*"
                                 v-model.number="editingMeal.amount" @focus="prepareScale" @input="scaleNutrients"
                                 class="bg-transparent px-3 py-1 text-2xl font-black outline-none w-full" step="any"
@@ -1013,42 +1036,6 @@
                                 <option value="g">公克</option>
                                 <option value="ml">毫升</option>
                             </select>
-                        </div>
-                    </div>
-
-                    <!-- 第4排: 熱量 -->
-                    <div
-                        class="bg-slate-50 rounded-[2rem] px-6 py-5 flex items-center justify-between border border-transparent focus-within:border-orange-100 focus-within:bg-white transition-all">
-                        <div class="flex flex-col">
-                            <label
-                                class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-1">預估熱量</label>
-                            <div class="flex items-baseline gap-1 text-slate-900">
-                                <input type="number" inputmode="decimal" pattern="[0-9]*"
-                                    v-model.number="editingMeal.calories"
-                                    class="bg-transparent px-2 text-3xl font-black outline-none w-32" @keypress="onlyNumber">
-                                <span class="text-sm font-bold text-slate-300 uppercase">kcal</span>
-                            </div>
-                        </div>
-                        <div
-                            class="w-12 h-12 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center text-2xl">
-                            🔥</div>
-                    </div>
-
-                    <!-- 第5排: 淨碳水 蛋白 脂肪 -->
-                    <div class="grid grid-cols-3 gap-3">
-                        <div v-for="n in [{key:'carbs', label:'淨碳水', color:'#6366f1'}, {key:'protein', label:'蛋白', color:'#8b5cf6'}, {key:'fat', label:'脂肪', color:'#ec4899'}]"
-                            :key="n.key"
-                            class="bg-slate-50/50 border border-slate-100 rounded-3xl p-4 flex flex-col items-center gap-2 focus-within:bg-white focus-within:ring-2 focus-within:ring-indigo-500/10 transition-all">
-                            <div class="text-xs font-black text-slate-400 uppercase tracking-tighter">{{ n.label }}
-                            </div>
-                            <div class="flex items-baseline gap-0.5">
-                                <input type="number" inputmode="decimal" pattern="[0-9]*"
-                                    v-model.number="editingMeal[n.key]"
-                                    class="w-12 text-center text-lg font-black bg-transparent outline-none text-slate-900"
-                                    @keypress="onlyNumber">
-                                <span class="text-xs font-bold text-slate-300">g</span>
-                            </div>
-                            <div class="w-6 h-1 rounded-full" :style="{ backgroundColor: n.color }"></div>
                         </div>
                     </div>
                 </div>
@@ -1783,18 +1770,19 @@
                 const historySearch = ref('');
                 const quickNutrientInput = ref('');
 
+                // 通用營養素解析工具
+                const parseNutrients = (target, inputStr) => {
+                    if (!inputStr) return;
+                    const parts = inputStr.split(/[\/\s,，。.]+/).filter(p => p !== '');
+                    if (parts.length >= 1) target.calories = formatFloat(parts[0]);
+                    if (parts.length >= 2) target.carbs = formatFloat(parts[1]);
+                    if (parts.length >= 3) target.protein = formatFloat(parts[2]);
+                    if (parts.length >= 4) target.fat = formatFloat(parts[3]);
+                };
+
                 const parseQuickInput = () => {
-                    const input = quickNutrientInput.value.trim();
-                    // 支援多種分隔符號: / , . 空格
-                    const parts = input.split(/[\/\s,，。.]+/).filter(p => p !== '');
-                    
-                    if (parts.length >= 1) editingMeal.calories = formatFloat(parts[0]);
-                    if (parts.length >= 2) editingMeal.carbs = formatFloat(parts[1]);
-                    if (parts.length >= 3) editingMeal.protein = formatFloat(parts[2]);
-                    if (parts.length >= 4) editingMeal.fat = formatFloat(parts[3]);
-                    
-                    // 解析完後清空
-                    if (parts.length > 0) quickNutrientInput.value = '';
+                    parseNutrients(editingMeal, quickNutrientInput.value);
+                    if (quickNutrientInput.value) quickNutrientInput.value = '';
                 };
 
                 const exportPDF = async () => {
