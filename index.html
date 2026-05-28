@@ -2169,22 +2169,68 @@
                         else pMultiplier = 2.0;
                     }
                     
-                    const pGrams = formatNum(weight * pMultiplier); 
+                    const pGrams = weight * pMultiplier; 
+
+                    // 輔助函式：將單一數值轉換為範圍物件
+                    const makeRange = (val, type) => {
+                        const num = formatNum(val);
+                        if (type === 'calories') return { min: Math.max(0, num - 100), max: num + 100 };
+                        if (type === 'carbs') return { min: Math.max(0, num - 10), max: num + 10 };
+                        return { min: Math.max(0, num - 5), max: num + 5 };
+                    };
                     
                     // 根據目標計算各計畫數值
                     if (goal === 'lose') {
-                        tempPlans.high = { calories: base + 200, protein: pGrams, carbs: formatNum((base + 200) * 0.45 / 4), fat: formatNum((base + 200) * 0.25 / 9) };
-                        tempPlans.med = { calories: base, protein: pGrams, carbs: formatNum(base * 0.3 / 4), fat: formatNum(base * 0.3 / 9) };
-                        tempPlans.low = { calories: base - 200, protein: pGrams, carbs: formatNum((base - 200) * 0.15 / 4), fat: formatNum((base - 200) * 0.45 / 9) };
-                        // 自由日：高碳熱量、高碳淨碳水、低碳脂肪
-                        tempPlans.rest = { calories: tempPlans.high.calories, protein: pGrams, carbs: tempPlans.high.carbs, fat: tempPlans.low.fat };
+                        tempPlans.high = { 
+                            calories: makeRange(base + 200, 'calories'), 
+                            protein: makeRange(pGrams, 'protein'), 
+                            carbs: makeRange((base + 200) * 0.45 / 4, 'carbs'), 
+                            fat: makeRange((base + 200) * 0.25 / 9, 'fat') 
+                        };
+                        tempPlans.med = { 
+                            calories: makeRange(base, 'calories'), 
+                            protein: makeRange(pGrams, 'protein'), 
+                            carbs: makeRange(base * 0.3 / 4, 'carbs'), 
+                            fat: makeRange(base * 0.3 / 9, 'fat') 
+                        };
+                        tempPlans.low = { 
+                            calories: makeRange(base - 200, 'calories'), 
+                            protein: makeRange(pGrams, 'protein'), 
+                            carbs: makeRange((base - 200) * 0.15 / 4, 'carbs'), 
+                            fat: makeRange((base - 200) * 0.45 / 9, 'fat') 
+                        };
+                        tempPlans.rest = { 
+                            calories: JSON.parse(JSON.stringify(tempPlans.high.calories)), 
+                            protein: JSON.parse(JSON.stringify(tempPlans.high.protein)), 
+                            carbs: JSON.parse(JSON.stringify(tempPlans.high.carbs)), 
+                            fat: JSON.parse(JSON.stringify(tempPlans.low.fat)) 
+                        };
                     } else {
-                        // 維持身材邏輯：熱量較高，淨碳水比例適中
-                        tempPlans.high = { calories: base + 300, protein: pGrams, carbs: formatNum((base + 300) * 0.55 / 4), fat: formatNum((base + 300) * 0.2 / 9) };
-                        tempPlans.med = { calories: base, protein: pGrams, carbs: formatNum(base * 0.4 / 4), fat: formatNum(base * 0.4 / 9) };
-                        tempPlans.low = { calories: base - 200, protein: pGrams, carbs: formatNum((base - 200) * 0.25 / 4), fat: formatNum((base - 200) * 0.45 / 9) };
-                        // 自由日：高碳熱量、高碳淨碳水、低碳脂肪
-                        tempPlans.rest = { calories: tempPlans.high.calories, protein: pGrams, carbs: tempPlans.high.carbs, fat: tempPlans.low.fat };
+                        // 維持身材邏輯
+                        tempPlans.high = { 
+                            calories: makeRange(base + 300, 'calories'), 
+                            protein: makeRange(pGrams, 'protein'), 
+                            carbs: makeRange((base + 300) * 0.55 / 4, 'carbs'), 
+                            fat: makeRange((base + 300) * 0.2 / 9, 'fat') 
+                        };
+                        tempPlans.med = { 
+                            calories: makeRange(base, 'calories'), 
+                            protein: makeRange(pGrams, 'protein'), 
+                            carbs: makeRange(base * 0.4 / 4, 'carbs'), 
+                            fat: makeRange(base * 0.4 / 9, 'fat') 
+                        };
+                        tempPlans.low = { 
+                            calories: makeRange(base - 200, 'calories'), 
+                            protein: makeRange(pGrams, 'protein'), 
+                            carbs: makeRange((base - 200) * 0.25 / 4, 'carbs'), 
+                            fat: makeRange((base - 200) * 0.45 / 9, 'fat') 
+                        };
+                        tempPlans.rest = { 
+                            calories: JSON.parse(JSON.stringify(tempPlans.high.calories)), 
+                            protein: JSON.parse(JSON.stringify(tempPlans.high.protein)), 
+                            carbs: JSON.parse(JSON.stringify(tempPlans.high.carbs)), 
+                            fat: JSON.parse(JSON.stringify(tempPlans.low.fat)) 
+                        };
                     }
                 };
 
