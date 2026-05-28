@@ -988,7 +988,7 @@
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                    <div v-for="n in [{k:'calories',l:'熱量',u:'kcal'},{k:'carbs',l:'碳水',u:'g'},{k:'protein',l:'蛋白',u:'g'},{k:'fat',l:'脂肪',u:'g'}]" :key="n.k" class="flex flex-col gap-1">
+                                    <div v-for="n in [{k:'calories',l:'熱量',u:'kcal'},{k:'carbs',l:'淨碳水',u:'g'},{k:'protein',l:'蛋白',u:'g'},{k:'fat',l:'脂肪',u:'g'}]" :key="n.k" class="flex flex-col gap-1">
                                         <label class="text-[9px] font-black text-slate-400 text-center uppercase">{{ n.l }}</label>
                                         <div class="relative">
                                             <input type="number" v-model.number="item[n.k]" @input="updateTotalsFromItems" class="w-full bg-white px-2 py-2 rounded-xl text-xs font-black text-center outline-none border border-transparent focus:border-indigo-200 shadow-sm transition-all" :placeholder="n.u">
@@ -1040,9 +1040,9 @@
                             🔥</div>
                     </div>
 
-                    <!-- 第5排: 碳水 蛋白 脂肪 -->
+                    <!-- 第5排: 淨碳水 蛋白 脂肪 -->
                     <div class="grid grid-cols-3 gap-3">
-                        <div v-for="n in [{key:'carbs', label:'碳水', color:'#6366f1'}, {key:'protein', label:'蛋白', color:'#8b5cf6'}, {key:'fat', label:'脂肪', color:'#ec4899'}]"
+                        <div v-for="n in [{key:'carbs', label:'淨碳水', color:'#6366f1'}, {key:'protein', label:'蛋白', color:'#8b5cf6'}, {key:'fat', label:'脂肪', color:'#ec4899'}]"
                             :key="n.key"
                             class="bg-slate-50/50 border border-slate-100 rounded-3xl p-4 flex flex-col items-center gap-2 focus-within:bg-white focus-within:ring-2 focus-within:ring-indigo-500/10 transition-all">
                             <div class="text-xs font-black text-slate-400 uppercase tracking-tighter">{{ n.label }}
@@ -1292,10 +1292,10 @@
                                 </div>
                                 <span
                                     class="hidden sm:inline text-[10px] sm:text-xs text-slate-300 font-black uppercase tracking-widest">熱量
-                                    • 碳水 • 蛋白 • 脂肪</span>
+                                    • 淨碳水 • 蛋白 • 脂肪</span>
                             </div>
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                                <div v-for="n in [{k:'calories',l:'熱量',u:'kcal'},{k:'carbs',l:'碳水',u:'g'},{k:'protein',l:'蛋白',u:'g'},{k:'fat',l:'脂肪',u:'g'}]" :key="n.k" class="space-y-1.5">
+                                <div v-for="n in [{k:'calories',l:'熱量',u:'kcal'},{k:'carbs',l:'淨碳水',u:'g'},{k:'protein',l:'蛋白',u:'g'},{k:'fat',l:'脂肪',u:'g'}]" :key="n.k" class="space-y-1.5">
                                     <label class="sm:hidden text-[9px] font-black text-slate-400 pl-1 uppercase">{{ n.l }} ({{ n.u }})</label>
                                     <input type="number" v-model.number="p[n.k]"
                                         class="w-full text-center text-sm p-3.5 bg-slate-50 border border-slate-100 rounded-xl font-black outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all">
@@ -1457,7 +1457,7 @@
                         style="background-color: #f8fafc; padding: 20px; border-radius: 25px; border: 1px solid #f1f5f9; text-align: center;">
                         <p
                             style="font-size: 11px; font-weight: 800; color: #94a3b8; margin-bottom: 5px; text-transform: uppercase;">
-                            碳水比例</p>
+                            淨碳水比例</p>
                         <p style="font-size: 22px; font-weight: 900; color: #6366f1;">{{
                             getRangeStats().nutrientPercents.carbs }}%</p>
                     </div>
@@ -1505,7 +1505,7 @@
                                     熱量 (kcal)</th>
                                 <th
                                     style="padding: 12px; text-align: center; font-size: 12px; font-weight: 900; color: #64748b;">
-                                    碳水 (g)</th>
+                                    淨碳水 (g)</th>
                                 <th
                                     style="padding: 12px; text-align: center; font-size: 12px; font-weight: 900; color: #64748b;">
                                     蛋白 (g)</th>
@@ -1835,7 +1835,7 @@
                     const ctx1 = document.getElementById('nutrientChart').getContext('2d');
                     nutrientChart = new Chart(ctx1, {
                         type: 'doughnut',
-                        data: { labels: ['碳水', '蛋白', '脂肪'], datasets: [{ data: [stats.totalCarbs, stats.totalProtein, stats.totalFat], backgroundColor: ['#6366f1', '#8b5cf6', '#ec4899'], borderWidth: 0 }] },
+                        data: { labels: ['淨碳水', '蛋白', '脂肪'], datasets: [{ data: [stats.totalCarbs, stats.totalProtein, stats.totalFat], backgroundColor: ['#6366f1', '#8b5cf6', '#ec4899'], borderWidth: 0 }] },
                         options: { responsive: false, animation: false, plugins: { legend: { position: 'bottom', labels: { font: { weight: 'bold' } } } } }
                     });
                     const ctx2 = document.getElementById('trendChart').getContext('2d');
@@ -1907,7 +1907,7 @@
                 const originalNutrients = reactive({ calories: 0, carbs: 0, protein: 0, fat: 0 });
                 const templates = reactive({});
 
-                const nutrientKeys = [{ key: 'carbs', label: '碳水' }, { key: 'protein', label: '蛋白質' }, { key: 'fat', label: '脂肪' }];
+                const nutrientKeys = [{ key: 'carbs', label: '淨碳水' }, { key: 'protein', label: '蛋白質' }, { key: 'fat', label: '脂肪' }];
 
                 const profile = reactive({
                     gender: 'male', weight: 70, height: 175, age: 30, activity: 1.2, goal: 'lose'
@@ -2070,14 +2070,14 @@
                         tempPlans.high = { calories: base + 200, protein: pGrams, carbs: formatNum((base + 200) * 0.45 / 4), fat: formatNum((base + 200) * 0.25 / 9) };
                         tempPlans.med = { calories: base, protein: pGrams, carbs: formatNum(base * 0.3 / 4), fat: formatNum(base * 0.3 / 9) };
                         tempPlans.low = { calories: base - 200, protein: pGrams, carbs: formatNum((base - 200) * 0.15 / 4), fat: formatNum((base - 200) * 0.45 / 9) };
-                        // 自由日：高碳熱量、高碳碳水、低碳脂肪
+                        // 自由日：高碳熱量、高碳淨碳水、低碳脂肪
                         tempPlans.rest = { calories: tempPlans.high.calories, protein: pGrams, carbs: tempPlans.high.carbs, fat: tempPlans.low.fat };
                     } else {
-                        // 維持身材邏輯：熱量較高，碳水比例適中
+                        // 維持身材邏輯：熱量較高，淨碳水比例適中
                         tempPlans.high = { calories: base + 300, protein: pGrams, carbs: formatNum((base + 300) * 0.55 / 4), fat: formatNum((base + 300) * 0.2 / 9) };
                         tempPlans.med = { calories: base, protein: pGrams, carbs: formatNum(base * 0.4 / 4), fat: formatNum(base * 0.4 / 9) };
                         tempPlans.low = { calories: base - 200, protein: pGrams, carbs: formatNum((base - 200) * 0.25 / 4), fat: formatNum((base - 200) * 0.45 / 9) };
-                        // 自由日：高碳熱量、高碳碳水、低碳脂肪
+                        // 自由日：高碳熱量、高碳淨碳水、低碳脂肪
                         tempPlans.rest = { calories: tempPlans.high.calories, protein: pGrams, carbs: tempPlans.high.carbs, fat: tempPlans.low.fat };
                     }
                 };
@@ -2374,7 +2374,7 @@
                 };
 
                 const exportCSV = () => {
-                    let csvContent = "data:text/csv;charset=utf-8,日期,計畫類型,餐點名稱,餐點類型,份量,單位,熱量,碳水,蛋白質,脂肪,品項內容\n";
+                    let csvContent = "data:text/csv;charset=utf-8,日期,計畫類型,餐點名稱,餐點類型,份量,單位,熱量,淨碳水,蛋白質,脂肪,品項內容\n";
                     Object.keys(allData).sort().forEach(date => {
                         const day = allData[date];
                         if (day.meals && day.meals.length > 0) {
