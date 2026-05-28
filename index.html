@@ -499,10 +499,11 @@
                     </header>
 
                     <!-- 月曆 (電腦版側邊 / 手機版點擊展開) -->
-                    <div class="premium-card-sub p-5 transition-all duration-500 overflow-hidden"
-                        :class="isCalendarExpanded ? 'max-h-[1000px]' : 'max-h-[84px] sm:max-h-[92px]'">
+                    <div class="premium-card-sub p-4 sm:p-5 transition-all duration-500 overflow-hidden"
+                        :class="isCalendarExpanded ? 'max-h-[1000px]' : 'max-h-[76px] sm:max-h-[92px]'">
                         <!-- 日曆標題列 -->
-                        <div class="flex flex-wrap justify-between items-center px-1 mb-4 lg:mb-6 gap-y-3">
+                        <div class="flex flex-wrap justify-between items-center px-1 gap-y-3"
+                            :class="isCalendarExpanded || !isMobile ? 'mb-4 lg:mb-6' : 'mb-0'">
                             <!-- 左側：月份與日期 -->
                             <div class="flex items-center gap-3 min-w-0 flex-1">
                                 <div class="cursor-pointer group flex flex-col min-w-0"
