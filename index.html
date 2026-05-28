@@ -1005,11 +1005,11 @@
                         <div class="flex gap-2 mb-5">
                             <input v-model="quickNutrientInput" @keyup.enter="parseQuickInput"
                                 :disabled="editingMeal.items && editingMeal.items.length > 0"
-                                class="flex-1 bg-white px-5 py-3.5 rounded-2xl text-base font-black outline-none border border-transparent focus:border-indigo-400 shadow-md transition-all disabled:opacity-50 disabled:bg-slate-50 disabled:cursor-not-allowed"
+                                class="flex-1 min-w-0 bg-white px-5 py-3.5 rounded-2xl text-base font-black outline-none border border-transparent focus:border-indigo-400 shadow-md transition-all disabled:opacity-50 disabled:bg-slate-50 disabled:cursor-not-allowed"
                                 :placeholder="editingMeal.items && editingMeal.items.length > 0 ? '請直接修改上方品項內容' : '範例：70/7/5/1'">
                             <button @click="parseQuickInput" 
                                 :disabled="editingMeal.items && editingMeal.items.length > 0"
-                                class="px-6 bg-indigo-600 text-white rounded-2xl text-sm font-black hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 active:scale-95 disabled:opacity-50 disabled:shadow-none">
+                                class="px-4 sm:px-6 bg-indigo-600 text-white rounded-2xl text-sm font-black hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 active:scale-95 disabled:opacity-50 disabled:shadow-none whitespace-nowrap">
                                 解析
                             </button>
                         </div>
