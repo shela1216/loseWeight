@@ -513,7 +513,7 @@
                                             fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"
                                             style="color:var(--text-muted)"><path d="M9 5l7 7-7 7"/></svg>
                                     </div>
-                                    <div v-if="!isCalendarExpanded || window.innerWidth < 1024" class="flex items-center gap-2 mt-0.5">
+                                    <div v-if="!isCalendarExpanded || isMobile" class="flex items-center gap-2 mt-0.5">
                                         <span class="text-base font-black" style="color:var(--accent-primary)">{{ new Date(selectedDate).getDate() }}日</span>
                                         <span class="px-2 py-0.5 rounded-full text-[10px] font-bold text-white uppercase"
                                             :class="{'bg-amber-500': currentDayRecord.planType === 'high','bg-indigo-500': currentDayRecord.planType === 'med','bg-rose-500': currentDayRecord.planType === 'low','bg-slate-400': currentDayRecord.planType === 'rest'}">
@@ -543,7 +543,7 @@
                             </div>
 
                             <!-- 底部：前後月切換 (電腦版併入) -->
-                            <div v-show="isCalendarExpanded && window.innerWidth >= 1024" class="flex gap-1.5 w-full lg:w-auto lg:ml-auto pt-3 lg:pt-0 border-t border-slate-100 dark:border-slate-800 lg:border-0 justify-center">
+                            <div v-show="isCalendarExpanded && !isMobile" class="flex gap-1.5 w-full lg:w-auto lg:ml-auto pt-3 lg:pt-0 border-t border-slate-100 dark:border-slate-800 lg:border-0 justify-center">
                                 <button @click="changeMonth(-1)"
                                     class="w-full lg:w-9 h-9 flex items-center justify-center rounded-xl text-muted transition-all hover:bg-slate-100 dark:hover:bg-slate-800"
                                     style="background:var(--bg-main); border:1px solid var(--border-color);"
@@ -560,7 +560,7 @@
                         </div>
 
                         <!-- 電腦版日曆展開內容 -->
-                        <div v-if="isCalendarExpanded && window.innerWidth >= 1024" class="relative">
+                        <div v-if="isCalendarExpanded && !isMobile" class="relative">
                             <div class="animate-in fade-in slide-in-from-top-4 duration-500 pb-2">
                                 <div class="flex justify-center mb-4">
                                     <button @click="showMonthModal = true; jumpYear = pickerMonth.getFullYear()" 
@@ -1900,15 +1900,22 @@
                 const loginEmail = ref('');
                 const loginPassword = ref('');
 
+                const screenWidth = ref(window.innerWidth);
+                window.addEventListener('resize', () => {
+                    screenWidth.value = window.innerWidth;
+                });
+                const isMobile = computed(() => screenWidth.value < 1024);
+
                 const isCalendarExpanded = ref(window.innerWidth >= 1024);
                 const showCalendarModal = ref(false);
                 const isNameAuto = ref(true);
                 const showMonthModal = ref(false);
                 const jumpYear = ref(new Date().getFullYear());
+                const showMonthJump = ref(false); // 確保沒遺漏，雖然現在改用 modal
                 const showMobileMenu = ref(false);
 
                 const toggleCalendar = (val) => {
-                    if (window.innerWidth < 1024) {
+                    if (isMobile.value) {
                         showCalendarModal.value = (val !== undefined) ? val : !showCalendarModal.value;
                     } else {
                         if (val !== undefined) isCalendarExpanded.value = val;
@@ -2527,7 +2534,7 @@
                     addItem, removeItem, updateTotalsFromItems,
                     showExportModal, isExporting, exportRange, exportPDF, getRangeStats,
                     excludedDates, exportDateList, toggleExcludedDate, toggleAllExportDates, setQuickRange,
-                    isCalendarExpanded, toggleCalendar, showMonthModal, showCalendarModal, jumpYear, jumpToMonth, showMobileMenu,
+                    isMobile, screenWidth, isCalendarExpanded, toggleCalendar, showMonthModal, showCalendarModal, jumpYear, jumpToMonth, showMobileMenu,
                     handleAuth: async (mode) => {
                         try {
                             mode === 'login'
