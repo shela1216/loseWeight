@@ -971,12 +971,12 @@
                                             class="w-full bg-white px-4 py-2.5 rounded-xl text-sm font-black outline-none border border-transparent focus:border-indigo-300 shadow-sm transition-all" 
                                             placeholder="70/7/5/1">
                                     </div>
-                                    <div class="grid grid-cols-4 gap-1.5 bg-white/50 rounded-xl p-2 border border-slate-100">
-                                        <div v-for="n in [{k:'calories',l:'熱',u:'k'},{k:'carbs',l:'碳',u:'g'},{k:'protein',l:'蛋',u:'g'},{k:'fat',l:'脂',u:'g'}]" :key="n.k" class="text-center">
-                                            <div class="text-[8px] font-bold text-slate-300 uppercase leading-none mb-1">{{ n.l }}</div>
+                                    <div class="grid grid-cols-4 gap-2 bg-white/60 rounded-2xl p-3 border border-slate-100/50">
+                                        <div v-for="n in [{k:'calories',l:'熱量',u:'k'},{k:'carbs',l:'碳水',u:'g'},{k:'protein',l:'蛋白',u:'g'},{k:'fat',l:'脂肪',u:'g'}]" :key="n.k" class="text-center transition-all">
+                                            <div class="text-[8px] font-bold text-slate-400 uppercase leading-none mb-1.5">{{ n.l }}</div>
                                             <input type="number" v-model.number="item[n.k]" @input="updateTotalsFromItems"
-                                                class="w-full bg-transparent text-center text-[11px] font-black text-slate-700 leading-none outline-none">
-                                            <div class="text-[7px] opacity-30 font-bold uppercase">{{ n.u }}</div>
+                                                class="w-full bg-transparent text-center text-sm font-black text-slate-800 leading-none outline-none py-1 focus:text-indigo-600">
+                                            <div class="text-[7px] opacity-30 font-bold uppercase mt-1">{{ n.u }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -1008,12 +1008,14 @@
                             </button>
                         </div>
 
-                        <!-- 數值預覽格 (取代舊的大輸入框) -->
+                        <!-- 數值預覽與手動修正格 -->
                         <div class="grid grid-cols-4 gap-2">
                             <div v-for="n in [{k:'calories',l:'熱量',u:'kcal',c:'orange'},{k:'carbs',l:'淨碳水',u:'g',c:'indigo'},{k:'protein',l:'蛋白',u:'g',c:'violet'},{k:'fat',l:'脂肪',u:'g',c:'pink'}]" 
-                                :key="n.k" class="bg-white rounded-2xl p-3 border border-slate-50 text-center shadow-sm">
-                                <div class="text-[10px] font-black text-slate-400 uppercase mb-1">{{ n.l }}</div>
-                                <div class="text-lg font-black leading-none" :class="'text-'+n.c+'-600'">{{ editingMeal[n.k] || 0 }}</div>
+                                :key="n.k" class="bg-white rounded-2xl p-2.5 border border-slate-50 text-center shadow-sm focus-within:border-indigo-200 transition-all">
+                                <div class="text-[9px] font-black text-slate-400 uppercase mb-1">{{ n.l }}</div>
+                                <input type="number" v-model.number="editingMeal[n.k]"
+                                    :disabled="editingMeal.items && editingMeal.items.length > 0"
+                                    class="w-full bg-transparent text-center text-lg font-black leading-none outline-none disabled:opacity-30" :class="'text-'+n.c+'-600'">
                                 <div class="text-[8px] font-bold text-slate-300 uppercase mt-1">{{ n.u }}</div>
                             </div>
                         </div>
