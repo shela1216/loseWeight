@@ -438,63 +438,6 @@
                                         Premium tracker</p>
                                 </div>
                             </div>
-                            
-                            <!-- 手機版懸浮主選單按鈕 -->
-                            <div class="lg:hidden fixed bottom-6 right-6 z-[200]">
-                                <button @click="showMobileMenu = !showMobileMenu" class="w-14 h-14 bg-indigo-600 text-white rounded-[1.5rem] shadow-2xl shadow-indigo-500/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-all">
-                                    <svg v-if="!showMobileMenu" class="w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
-                                    <svg v-else class="w-6 h-6 transition-transform duration-300 rotate-90" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                                </button>
-                            </div>
-
-                            <!-- 功能按鈕區 (電腦版右下角常駐，手機版點擊展開) -->
-                            <div class="flex-col gap-4 items-end shrink-0 fixed bottom-24 right-6 z-[190] lg:flex lg:bottom-8 lg:right-8 lg:flex-col lg:items-center lg:gap-6 lg:bg-indigo-50/10 lg:backdrop-blur-xl lg:p-6 lg:rounded-[3rem] lg:shadow-2xl lg:border lg:border-theme transition-all duration-300 origin-bottom-right"
-                                :class="showMobileMenu ? 'flex scale-100 opacity-100' : 'hidden lg:flex lg:scale-100 lg:opacity-100 scale-90 opacity-0 pointer-events-none lg:pointer-events-auto'">
-                                <button @click="toggleTheme" class="btn-circular group flex items-center flex-row-reverse lg:flex-col gap-3 lg:gap-0" title="切換主題">
-                                    <div class="icon-wrapper shadow-lg lg:shadow-none">
-                                        <svg v-if="!isDark" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                            <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                                        </svg>
-                                        <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                            <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z" />
-                                        </svg>
-                                    </div>
-                                    <span class="lg:absolute lg:right-20 bg-slate-800 text-white border border-slate-700 dark:bg-white dark:text-slate-900 dark:border-slate-100 px-3 py-1.5 rounded-lg text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">{{ isDark ? '淺色模式' : '深色模式' }}</span>
-                                </button>
-                                <button @click="showExportModal = true; showMobileMenu = false" class="btn-circular group flex items-center flex-row-reverse lg:flex-col gap-3 lg:gap-0" title="匯出報告與分析">
-                                    <div class="icon-wrapper shadow-lg lg:shadow-none">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
-                                            viewBox="0 0 24 24">
-                                            <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                        </svg>
-                                    </div>
-                                    <span
-                                        class="lg:absolute lg:right-20 bg-slate-800 text-white border border-slate-700 dark:bg-white dark:text-slate-900 dark:border-slate-100 px-3 py-1.5 rounded-lg text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">匯出報告</span>
-                                </button>
-                                <button @click="openSettings(); showMobileMenu = false" class="btn-circular group flex items-center flex-row-reverse lg:flex-col gap-3 lg:gap-0" title="設定目標">
-                                    <div class="icon-wrapper shadow-lg lg:shadow-none">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
-                                            viewBox="0 0 24 24">
-                                            <path
-                                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                    </div>
-                                    <span
-                                        class="lg:absolute lg:right-20 bg-slate-800 text-white border border-slate-700 dark:bg-white dark:text-slate-900 dark:border-slate-100 px-3 py-1.5 rounded-lg text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">設定</span>
-                                </button>
-                                <button @click="handleLogout" class="btn-circular group flex items-center flex-row-reverse lg:flex-col gap-3 lg:gap-0" title="登出帳號">
-                                    <div class="icon-wrapper shadow-lg lg:shadow-none">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
-                                            viewBox="0 0 24 24">
-                                            <path
-                                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                        </svg>
-                                    </div>
-                                    <span
-                                        class="lg:absolute lg:right-20 bg-slate-800 text-white border border-slate-700 dark:bg-white dark:text-slate-900 dark:border-slate-100 px-3 py-1.5 rounded-lg text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">登出</span>
-                                </button>
-                            </div>
                         </div>
                     </header>
 
@@ -872,6 +815,63 @@
                         </div>
                     </section>
                 </div>
+            </div>
+
+            <!-- 手機版懸浮主選單按鈕 (移至最外層) -->
+            <div class="lg:hidden fixed bottom-6 right-6 z-[200]">
+                <button @click="showMobileMenu = !showMobileMenu" class="w-14 h-14 bg-indigo-600 text-white rounded-[1.5rem] shadow-2xl shadow-indigo-500/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-all">
+                    <svg v-if="!showMobileMenu" class="w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    <svg v-else class="w-6 h-6 transition-transform duration-300 rotate-90" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- 功能按鈕區 (電腦版右下角常駐，手機版點擊展開) (移至最外層) -->
+            <div class="flex-col gap-4 items-end shrink-0 fixed bottom-24 right-6 z-[190] lg:flex lg:bottom-8 lg:right-8 lg:flex-col lg:items-center lg:gap-6 lg:bg-indigo-50/10 lg:backdrop-blur-xl lg:p-6 lg:rounded-[3rem] lg:shadow-2xl lg:border lg:border-theme transition-all duration-300 origin-bottom-right"
+                :class="showMobileMenu ? 'flex scale-100 opacity-100' : 'hidden lg:flex lg:scale-100 lg:opacity-100 scale-90 opacity-0 pointer-events-none lg:pointer-events-auto'">
+                <button @click="toggleTheme" class="btn-circular group flex items-center flex-row-reverse lg:flex-col gap-3 lg:gap-0" title="切換主題">
+                    <div class="icon-wrapper shadow-lg lg:shadow-none">
+                        <svg v-if="!isDark" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                        <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z" />
+                        </svg>
+                    </div>
+                    <span class="lg:absolute lg:right-20 bg-slate-800 text-white border border-slate-700 dark:bg-white dark:text-slate-900 dark:border-slate-100 px-3 py-1.5 rounded-lg text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">{{ isDark ? '淺色模式' : '深色模式' }}</span>
+                </button>
+                <button @click="showExportModal = true; showMobileMenu = false" class="btn-circular group flex items-center flex-row-reverse lg:flex-col gap-3 lg:gap-0" title="匯出報告與分析">
+                    <div class="icon-wrapper shadow-lg lg:shadow-none">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                    </div>
+                    <span
+                        class="lg:absolute lg:right-20 bg-slate-800 text-white border border-slate-700 dark:bg-white dark:text-slate-900 dark:border-slate-100 px-3 py-1.5 rounded-lg text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">匯出報告</span>
+                </button>
+                <button @click="openSettings(); showMobileMenu = false" class="btn-circular group flex items-center flex-row-reverse lg:flex-col gap-3 lg:gap-0" title="設定目標">
+                    <div class="icon-wrapper shadow-lg lg:shadow-none">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path
+                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </div>
+                    <span
+                        class="lg:absolute lg:right-20 bg-slate-800 text-white border border-slate-700 dark:bg-white dark:text-slate-900 dark:border-slate-100 px-3 py-1.5 rounded-lg text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">設定</span>
+                </button>
+                <button @click="handleLogout" class="btn-circular group flex items-center flex-row-reverse lg:flex-col gap-3 lg:gap-0" title="登出帳號">
+                    <div class="icon-wrapper shadow-lg lg:shadow-none">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                    </div>
+                    <span
+                        class="lg:absolute lg:right-20 bg-slate-800 text-white border border-slate-700 dark:bg-white dark:text-slate-900 dark:border-slate-100 px-3 py-1.5 rounded-lg text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">登出</span>
+                </button>
             </div>
         </div>
 
