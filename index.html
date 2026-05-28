@@ -498,22 +498,22 @@
                         </div>
                     </header>
 
-                    <!-- 月曆 (撐開式) -->
+                    <!-- 月曆 (電腦版側邊 / 手機版點擊展開) -->
                     <div class="premium-card-sub p-5 transition-all duration-500 overflow-hidden"
                         :class="isCalendarExpanded ? 'max-h-[1000px]' : 'max-h-[84px] sm:max-h-[92px]'">
-                        <!-- 日曆標題列（修正跑版問題） -->
+                        <!-- 日曆標題列 -->
                         <div class="flex flex-wrap justify-between items-center px-1 mb-4 lg:mb-6 gap-y-3">
                             <!-- 左側：月份與日期 -->
                             <div class="flex items-center gap-3 min-w-0 flex-1">
                                 <div class="cursor-pointer group flex flex-col min-w-0"
-                                    @click="showMonthJump = !showMonthJump; jumpYear = pickerMonth.getFullYear(); toggleCalendar(true)">
+                                    @click="toggleCalendar()">
                                     <div class="flex items-center gap-1.5">
                                         <h2 class="text-sm font-black transition-colors truncate" style="color:var(--text-main)">{{ currentMonthYearDisplay }}</h2>
-                                        <svg class="w-3.5 h-3.5 shrink-0 transition-transform duration-300" :class="showMonthJump ? 'rotate-180' : ''"
+                                        <svg class="w-3.5 h-3.5 shrink-0 transition-transform duration-300 lg:hidden"
                                             fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"
-                                            style="color:var(--text-muted)"><path d="M19 9l-7 7-7-7"/></svg>
+                                            style="color:var(--text-muted)"><path d="M9 5l7 7-7 7"/></svg>
                                     </div>
-                                    <div v-if="!isCalendarExpanded" class="flex items-center gap-2 mt-0.5">
+                                    <div v-if="!isCalendarExpanded || window.innerWidth < 1024" class="flex items-center gap-2 mt-0.5">
                                         <span class="text-base font-black" style="color:var(--accent-primary)">{{ new Date(selectedDate).getDate() }}日</span>
                                         <span class="px-2 py-0.5 rounded-full text-[10px] font-bold text-white uppercase"
                                             :class="{'bg-amber-500': currentDayRecord.planType === 'high','bg-indigo-500': currentDayRecord.planType === 'med','bg-rose-500': currentDayRecord.planType === 'low','bg-slate-400': currentDayRecord.planType === 'rest'}">
@@ -531,7 +531,7 @@
                                     今日
                                 </button>
                                 <button @click="toggleCalendar()"
-                                    class="w-9 h-9 shrink-0 flex items-center justify-center rounded-xl text-muted transition-all hover:bg-slate-100 dark:hover:bg-slate-800"
+                                    class="w-9 h-9 shrink-0 hidden lg:flex items-center justify-center rounded-xl text-muted transition-all hover:bg-slate-100 dark:hover:bg-slate-800"
                                     style="background:var(--bg-main); border:1px solid var(--border-color);"
                                     :title="isCalendarExpanded ? '收合日曆' : '展開日曆'">
                                     <svg class="w-4 h-4 transition-transform duration-300"
@@ -542,8 +542,8 @@
                                 </button>
                             </div>
 
-                            <!-- 底部：前後月切換 (手機版獨占一行，電腦版併入) -->
-                            <div v-show="isCalendarExpanded" class="flex gap-1.5 w-full lg:w-auto lg:ml-auto pt-3 lg:pt-0 border-t border-slate-100 dark:border-slate-800 lg:border-0 justify-center">
+                            <!-- 底部：前後月切換 (電腦版併入) -->
+                            <div v-show="isCalendarExpanded && window.innerWidth >= 1024" class="flex gap-1.5 w-full lg:w-auto lg:ml-auto pt-3 lg:pt-0 border-t border-slate-100 dark:border-slate-800 lg:border-0 justify-center">
                                 <button @click="changeMonth(-1)"
                                     class="w-full lg:w-9 h-9 flex items-center justify-center rounded-xl text-muted transition-all hover:bg-slate-100 dark:hover:bg-slate-800"
                                     style="background:var(--bg-main); border:1px solid var(--border-color);"
@@ -558,41 +558,16 @@
                                 </button>
                             </div>
                         </div>
-                        <div v-if="isCalendarExpanded" class="relative">
-                            <!-- 快速跳月選取器 -->
-                            <div v-if="showMonthJump"
-                                class="absolute inset-0 z-20 bg-card/95 backdrop-blur-md animate-in fade-in zoom-in-95 duration-200 flex flex-col p-4 rounded-2xl border border-theme shadow-xl">
-                                <div class="flex justify-between items-center mb-6 px-2">
-                                    <button @click="jumpYear--"
-                                        class="p-2 text-muted hover:text-indigo-600 transition-colors"><svg
-                                            class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3"
-                                            viewBox="0 0 24 24">
-                                            <path d="M15 19l-7-7 7-7" />
-                                        </svg></button>
-                                    <span class="text-lg font-black tracking-tight">{{ jumpYear
-                                        }}年</span>
-                                    <button @click="jumpYear++"
-                                        class="p-2 text-muted hover:text-indigo-600 transition-colors"><svg
-                                            class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3"
-                                            viewBox="0 0 24 24">
-                                            <path d="M9 5l7 7-7 7" />
-                                        </svg></button>
-                                </div>
-                                <div class="grid grid-cols-3 gap-3 flex-1 overflow-y-auto custom-scroll pr-1">
-                                    <button
-                                        v-for="(m, idx) in ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月']"
-                                        :key="idx" @click="jumpToMonth(idx)"
-                                        class="py-3.5 rounded-xl text-sm font-bold transition-all"
-                                        :class="idx === pickerMonth.getMonth() && jumpYear === pickerMonth.getFullYear() ? 'bg-teal-600 text-white shadow-lg' : 'text-muted hover:text-teal-600'"
-                                        :style="!(idx === pickerMonth.getMonth() && jumpYear === pickerMonth.getFullYear()) ? 'background:var(--bg-main)' : ''">
-                                        {{ m }}
+
+                        <!-- 電腦版日曆展開內容 -->
+                        <div v-if="isCalendarExpanded && window.innerWidth >= 1024" class="relative">
+                            <div class="animate-in fade-in slide-in-from-top-4 duration-500 pb-2">
+                                <div class="flex justify-center mb-4">
+                                    <button @click="showMonthModal = true; jumpYear = pickerMonth.getFullYear()" 
+                                        class="text-xs font-black text-indigo-600 bg-indigo-50 px-4 py-1.5 rounded-full hover:bg-indigo-100 transition-all">
+                                        快速跳月
                                     </button>
                                 </div>
-                                <button @click="showMonthJump = false"
-                                    class="mt-6 py-3 bg-theme text-muted rounded-xl text-xs font-black uppercase tracking-widest hover:text-indigo-600 transition-all">取消選取</button>
-                            </div>
-
-                            <div class="animate-in fade-in slide-in-from-top-4 duration-500 pb-2">
                                 <div class="grid grid-cols-7 gap-1 mb-2 px-1 text-center">
                                     <div v-for="d in ['一','二','三','四','五','六','日']"
                                         class="text-[10px] font-black text-muted py-2 uppercase tracking-tighter">
@@ -600,7 +575,7 @@
                                 </div>
                                 <div class="grid grid-cols-7 gap-1.5">
                                     <div v-for="day in calendarDays" :key="day.date"
-                                        @click="selectedDate = day.date; toggleCalendar(true)"
+                                        @click="selectedDate = day.date"
                                         class="calendar-day-cell rounded-2xl cursor-pointer transition-all"
                                         :class="[day.currentMonth ? 'text-main' : 'opacity-20', selectedDate === day.date ? 'selected-day-ring font-black' : 'hover:bg-indigo-50/5']">
                                         <svg v-if="getDayStats(day.date)" class="day-progress-svg p-1.5"
@@ -1420,6 +1395,80 @@
             </div>
         </div>
 
+        <!-- 日期選擇彈窗 (手機版專用) -->
+        <div v-if="showCalendarModal" class="fixed inset-0 z-[150] flex items-end sm:items-center justify-center p-0 sm:p-4">
+            <div class="modal-overlay absolute inset-0" @click="showCalendarModal = false"></div>
+            <div class="bg-white w-full max-w-lg rounded-t-[2.5rem] sm:rounded-[2.5rem] relative z-10 shadow-2xl flex flex-col max-h-[90vh] border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-10 duration-300">
+                <div class="p-6 sm:p-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="flex items-center gap-3">
+                            <h3 class="text-xl font-black text-slate-900">{{ currentMonthYearDisplay }}</h3>
+                            <button @click="showMonthModal = true; jumpYear = pickerMonth.getFullYear()" 
+                                class="w-8 h-8 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 transition-all">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+                        </div>
+                        <button @click="showCalendarModal = false" class="w-10 h-10 flex items-center justify-center bg-slate-50 rounded-2xl text-slate-400 hover:text-slate-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="flex justify-between items-center mb-6 gap-2">
+                        <button @click="changeMonth(-1)" class="flex-1 py-3 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-all border border-slate-100/50">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+                        </button>
+                        <button @click="goToToday(); showCalendarModal = false" class="px-6 py-3 bg-indigo-50 text-indigo-600 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-100 transition-all border border-indigo-100/50">回今日</button>
+                        <button @click="changeMonth(1)" class="flex-1 py-3 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-all border border-slate-100/50">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-7 gap-1 mb-4 text-center">
+                        <div v-for="d in ['一','二','三','四','五','六','日']" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ d }}</div>
+                    </div>
+                    <div class="grid grid-cols-7 gap-2">
+                        <div v-for="day in calendarDays" :key="day.date"
+                            @click="selectedDate = day.date; showCalendarModal = false"
+                            class="calendar-day-cell rounded-2xl cursor-pointer transition-all aspect-square"
+                            :class="[day.currentMonth ? 'text-slate-900' : 'opacity-10', selectedDate === day.date ? 'selected-day-ring font-black bg-indigo-50/50' : 'hover:bg-slate-50']">
+                            <svg v-if="getDayStats(day.date)" class="day-progress-svg p-1.5" viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="38" fill="none" :stroke="getDayStats(day.date).color" stroke-width="6" class="opacity-[0.15]" />
+                                <circle cx="50" cy="50" r="38" fill="none" :stroke="getDayStats(day.date).color" stroke-width="8" stroke-linecap="round" :stroke-dasharray="2 * Math.PI * 38" :stroke-dashoffset="2 * Math.PI * 38 * (1 - Math.min(getDayStats(day.date).percent / 100, 1))" style="transition: stroke-dashoffset 0.5s ease" />
+                            </svg>
+                            <div :class="day.date === new Date().toLocaleDateString('sv-SE') ? 'today-number-circle !w-6 !h-6 !text-[10px]' : ''" class="relative z-10 flex items-center justify-center">
+                                <span class="text-sm" :class="selectedDate === day.date && day.date !== new Date().toLocaleDateString('sv-SE') ? 'text-indigo-600' : ''">{{ day.dayNum }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 獨立的月份/年份選擇彈窗 -->
+        <div v-if="showMonthModal" class="fixed inset-0 z-[200] flex items-center justify-center p-4">
+            <div class="modal-overlay absolute inset-0" @click="showMonthModal = false"></div>
+            <div class="bg-white w-full max-w-xs rounded-[2.5rem] p-8 relative z-10 shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
+                <div class="flex justify-between items-center mb-8 px-2">
+                    <button @click="jumpYear--" class="w-10 h-10 flex items-center justify-center bg-slate-50 rounded-xl text-slate-400 hover:text-indigo-600 transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" /></svg>
+                    </button>
+                    <span class="text-xl font-black text-slate-900 tracking-tight">{{ jumpYear }}年</span>
+                    <button @click="jumpYear++" class="w-10 h-10 flex items-center justify-center bg-slate-50 rounded-xl text-slate-400 hover:text-indigo-600 transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" /></svg>
+                    </button>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <button v-for="(m, idx) in ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月']"
+                        :key="idx" @click="jumpToMonth(idx)"
+                        class="py-3.5 rounded-2xl text-xs font-black transition-all border border-transparent"
+                        :class="idx === pickerMonth.getMonth() && jumpYear === pickerMonth.getFullYear() ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-100' : 'bg-slate-50 text-slate-400 hover:bg-white hover:border-indigo-100 hover:text-indigo-600'">
+                        {{ m }}
+                    </button>
+                </div>
+                <button @click="showMonthModal = false" class="w-full mt-8 py-4 bg-slate-50 text-slate-400 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:text-rose-500 transition-all">取消選取</button>
+            </div>
+        </div>
+
         <!-- 隱藏的截圖報表模板 -->
         <div id="export-report"
             style="display: none; width: 800px; padding: 40px; background-color: #f8f9fb; font-family: sans-serif;">
@@ -1852,23 +1901,26 @@
                 const loginPassword = ref('');
 
                 const isCalendarExpanded = ref(window.innerWidth >= 1024);
+                const showCalendarModal = ref(false);
                 const isNameAuto = ref(true);
-                const showMonthJump = ref(false);
+                const showMonthModal = ref(false);
                 const jumpYear = ref(new Date().getFullYear());
                 const showMobileMenu = ref(false);
 
                 const toggleCalendar = (val) => {
-                    if (val !== undefined) isCalendarExpanded.value = val;
-                    else isCalendarExpanded.value = !isCalendarExpanded.value;
-                    // 如果關閉月曆，也同步關閉跳月面板
-                    if (!isCalendarExpanded.value) showMonthJump.value = false;
+                    if (window.innerWidth < 1024) {
+                        showCalendarModal.value = (val !== undefined) ? val : !showCalendarModal.value;
+                    } else {
+                        if (val !== undefined) isCalendarExpanded.value = val;
+                        else isCalendarExpanded.value = !isCalendarExpanded.value;
+                    }
                 };
 
                 const jumpToMonth = (mIdx) => {
                     pickerMonth.value = new Date(jumpYear.value, mIdx, 1);
                     // 同步更新選中日期到該月 1 號
                     selectedDate.value = formatDate(new Date(jumpYear.value, mIdx, 1));
-                    showMonthJump.value = false;
+                    showMonthModal.value = false;
                 };
 
                 const editingIndex = ref(null);
@@ -2475,7 +2527,7 @@
                     addItem, removeItem, updateTotalsFromItems,
                     showExportModal, isExporting, exportRange, exportPDF, getRangeStats,
                     excludedDates, exportDateList, toggleExcludedDate, toggleAllExportDates, setQuickRange,
-                    isCalendarExpanded, toggleCalendar, showMonthJump, jumpYear, jumpToMonth, showMobileMenu,
+                    isCalendarExpanded, toggleCalendar, showMonthModal, showCalendarModal, jumpYear, jumpToMonth, showMobileMenu,
                     handleAuth: async (mode) => {
                         try {
                             mode === 'login'
