@@ -440,7 +440,7 @@
                             </div>
                             
                             <!-- 手機版懸浮主選單按鈕 -->
-                            <div class="lg:hidden fixed bottom-6 right-6 z-[95]">
+                            <div class="lg:hidden fixed bottom-6 right-6 z-[110]">
                                 <button @click="showMobileMenu = !showMobileMenu" class="w-14 h-14 bg-indigo-600 text-white rounded-[1.5rem] shadow-2xl shadow-indigo-500/30 flex items-center justify-center hover:scale-105 active:scale-95 transition-all">
                                     <svg v-if="!showMobileMenu" class="w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
                                     <svg v-else class="w-6 h-6 transition-transform duration-300 rotate-90" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -448,7 +448,7 @@
                             </div>
 
                             <!-- 功能按鈕區 (電腦版右下角常駐，手機版點擊展開) -->
-                            <div class="flex-col gap-4 items-end shrink-0 fixed bottom-24 right-6 z-[90] lg:flex lg:bottom-8 lg:right-8 lg:flex-col lg:items-center lg:gap-6 lg:bg-indigo-50/10 lg:backdrop-blur-xl lg:p-6 lg:rounded-[3rem] lg:shadow-2xl lg:border lg:border-theme transition-all duration-300 origin-bottom-right"
+                            <div class="flex-col gap-4 items-end shrink-0 fixed bottom-24 right-6 z-[105] lg:flex lg:bottom-8 lg:right-8 lg:flex-col lg:items-center lg:gap-6 lg:bg-indigo-50/10 lg:backdrop-blur-xl lg:p-6 lg:rounded-[3rem] lg:shadow-2xl lg:border lg:border-theme transition-all duration-300 origin-bottom-right"
                                 :class="showMobileMenu ? 'flex scale-100 opacity-100' : 'hidden lg:flex lg:scale-100 lg:opacity-100 scale-90 opacity-0 pointer-events-none lg:pointer-events-auto'">
                                 <button @click="toggleTheme" class="btn-circular group flex items-center flex-row-reverse lg:flex-col gap-3 lg:gap-0" title="切換主題">
                                     <div class="icon-wrapper shadow-lg lg:shadow-none">
@@ -1286,18 +1286,34 @@
                             </div>
                             
                             <div class="space-y-4">
-                                <div v-for="n in [{k:'calories',l:'熱量',u:'kcal'},{k:'carbs',l:'淨碳水',u:'g'},{k:'protein',l:'蛋白',u:'g'},{k:'fat',l:'脂肪',u:'g'}]" 
-                                    :key="n.k" class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-6 bg-slate-50/50 p-3 sm:p-4 rounded-2xl border border-slate-100/50">
+                                <div v-for="n in [
+                                    {k:'calories', l:'熱量', u:'kcal', c:'amber'},
+                                    {k:'carbs', l:'淨碳水', u:'g', c:'indigo'},
+                                    {k:'protein', l:'蛋白', u:'g', c:'violet'},
+                                    {k:'fat', l:'脂肪', u:'g', c:'pink'}
+                                ]" :key="n.k" 
+                                    class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-6 p-3 sm:p-4 rounded-2xl border transition-all"
+                                    :class="[
+                                        n.c === 'amber' ? 'bg-amber-50/40 border-amber-100/50' :
+                                        n.c === 'indigo' ? 'bg-indigo-50/40 border-indigo-100/50' :
+                                        n.c === 'violet' ? 'bg-violet-50/40 border-violet-100/50' :
+                                        'bg-pink-50/40 border-pink-100/50'
+                                    ]">
                                     <div class="flex items-center gap-2 shrink-0">
-                                        <span class="text-[11px] font-black text-slate-500 uppercase tracking-wider">{{ n.l }}</span>
-                                        <span class="text-[9px] font-bold text-slate-300 uppercase">{{ n.u }}</span>
+                                        <div class="w-1.5 h-4 rounded-full" :class="'bg-'+n.c+'-500'"></div>
+                                        <span class="text-[11px] font-black uppercase tracking-wider" :class="'text-'+n.c+'-600'">{{ n.l }}</span>
+                                        <span class="text-[9px] font-bold opacity-40 uppercase" :class="'text-'+n.c+'-600'">{{ n.u }}</span>
                                     </div>
                                     <div class="flex items-center gap-3 flex-1 sm:max-w-[240px]">
                                         <input type="number" v-model.number="p[n.k].min"
-                                            class="w-full text-center text-sm p-3 bg-white border border-slate-100 rounded-xl font-black outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all shadow-sm" placeholder="最小值">
-                                        <span class="text-slate-300 font-bold">-</span>
+                                            class="w-full text-center text-sm p-3 bg-white border rounded-xl font-black outline-none transition-all shadow-sm" 
+                                            :class="'border-'+n.c+'-100 focus:ring-2 focus:ring-'+n.c+'-500/10 focus:border-'+n.c+'-400'"
+                                            placeholder="最小值">
+                                        <span class="font-bold opacity-30" :class="'text-'+n.c+'-600'">-</span>
                                         <input type="number" v-model.number="p[n.k].max"
-                                            class="w-full text-center text-sm p-3 bg-white border border-slate-100 rounded-xl font-black outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all shadow-sm" placeholder="最大值">
+                                            class="w-full text-center text-sm p-3 bg-white border rounded-xl font-black outline-none transition-all shadow-sm" 
+                                            :class="'border-'+n.c+'-100 focus:ring-2 focus:ring-'+n.c+'-500/10 focus:border-'+n.c+'-400'"
+                                            placeholder="最大值">
                                     </div>
                                 </div>
                             </div>
