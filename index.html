@@ -964,9 +964,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <div class="space-y-1">
-                                        <label class="text-[9px] font-black text-indigo-400 uppercase tracking-widest pl-1">快速輸入 (熱/碳/蛋/脂)</label>
+                                <div class="flex flex-col gap-3">
+                                    <div class="w-full">
+                                        <label class="text-[9px] font-black text-indigo-400 uppercase tracking-widest pl-1 mb-1 block">快速輸入 (熱/碳/蛋/脂)</label>
                                         <input v-model="item.qInput" @input="updateTotalsFromItems" 
                                             class="w-full bg-white px-4 py-2.5 rounded-xl text-sm font-black outline-none border border-transparent focus:border-indigo-300 shadow-sm transition-all" 
                                             placeholder="70/7/5/1">
@@ -974,7 +974,9 @@
                                     <div class="grid grid-cols-4 gap-1.5 bg-white/50 rounded-xl p-2 border border-slate-100">
                                         <div v-for="n in [{k:'calories',l:'熱',u:'k'},{k:'carbs',l:'碳',u:'g'},{k:'protein',l:'蛋',u:'g'},{k:'fat',l:'脂',u:'g'}]" :key="n.k" class="text-center">
                                             <div class="text-[8px] font-bold text-slate-300 uppercase leading-none mb-1">{{ n.l }}</div>
-                                            <div class="text-[11px] font-black text-slate-700 leading-none">{{ item[n.k] || 0 }}<span class="text-[7px] ml-0.5 opacity-50">{{ n.u }}</span></div>
+                                            <input type="number" v-model.number="item[n.k]" @input="updateTotalsFromItems"
+                                                class="w-full bg-transparent text-center text-[11px] font-black text-slate-700 leading-none outline-none">
+                                            <div class="text-[7px] opacity-30 font-bold uppercase">{{ n.u }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -1975,7 +1977,7 @@
 
                 const addItem = () => {
                     if (!editingMeal.items) editingMeal.items = [];
-                    editingMeal.items.push({ name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0 });
+                    editingMeal.items.unshift({ name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, qInput: '' });
                 };
 
                 const removeItem = (idx) => {
