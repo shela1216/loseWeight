@@ -969,10 +969,10 @@
                                     <div class="w-full">
                                         <label class="text-[9px] font-black text-indigo-400 uppercase tracking-widest pl-1 mb-1 block">快速輸入 (熱/碳/蛋/脂)</label>
                                         <div class="flex gap-2">
-                                            <input v-model="item.qInput" @keyup.enter="updateTotalsFromItems" 
+                                            <input v-model="item.qInput" @keyup.enter="parseItemInput(item)" 
                                                 class="flex-1 bg-white px-4 py-2.5 rounded-xl text-sm font-black outline-none border border-transparent focus:border-indigo-300 shadow-sm transition-all" 
                                                 placeholder="70/7/5/1">
-                                            <button @click="updateTotalsFromItems" 
+                                            <button @click="parseItemInput(item)" 
                                                 class="px-4 bg-indigo-100 text-indigo-600 rounded-xl text-[10px] font-black hover:bg-indigo-200 transition-all active:scale-95">
                                                 解析
                                             </button>
@@ -1784,7 +1784,8 @@
                 // 通用營養素解析工具
                 const parseNutrients = (target, inputStr) => {
                     if (!inputStr) return;
-                    const parts = inputStr.split(/[\/\s,，。.]+/).filter(p => p !== '');
+                    // 移除 . 從分隔符號中，以支援小數點
+                    const parts = inputStr.split(/[\/\s,，。]+/).filter(p => p !== '');
                     if (parts.length >= 1) target.calories = formatFloat(parts[0]);
                     if (parts.length >= 2) target.carbs = formatFloat(parts[1]);
                     if (parts.length >= 3) target.protein = formatFloat(parts[2]);
@@ -1794,6 +1795,11 @@
                 const parseQuickInput = () => {
                     parseNutrients(editingMeal, quickNutrientInput.value);
                     if (quickNutrientInput.value) quickNutrientInput.value = '';
+                };
+
+                const parseItemInput = (item) => {
+                    parseNutrients(item, item.qInput);
+                    updateTotalsFromItems();
                 };
 
                 const exportPDF = async () => {
@@ -1970,10 +1976,10 @@
 
                 const updateTotalsFromItems = () => {
                     if (!editingMeal.items || editingMeal.items.length === 0) return;
-                    editingMeal.calories = formatNum(editingMeal.items.reduce((sum, item) => sum + (Number(item.calories) || 0), 0));
-                    editingMeal.carbs = formatNum(editingMeal.items.reduce((sum, item) => sum + (Number(item.carbs) || 0), 0));
-                    editingMeal.protein = formatNum(editingMeal.items.reduce((sum, item) => sum + (Number(item.protein) || 0), 0));
-                    editingMeal.fat = formatNum(editingMeal.items.reduce((sum, item) => sum + (Number(item.fat) || 0), 0));
+                    editingMeal.calories = formatFloat(editingMeal.items.reduce((sum, item) => sum + (Number(item.calories) || 0), 0));
+                    editingMeal.carbs = formatFloat(editingMeal.items.reduce((sum, item) => sum + (Number(item.carbs) || 0), 0));
+                    editingMeal.protein = formatFloat(editingMeal.items.reduce((sum, item) => sum + (Number(item.protein) || 0), 0));
+                    editingMeal.fat = formatFloat(editingMeal.items.reduce((sum, item) => sum + (Number(item.fat) || 0), 0));
                     
                     // 自動生成名稱：只要 isNameAuto 為 true，就持續同步
                     if (isNameAuto.value) {
