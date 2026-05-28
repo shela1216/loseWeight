@@ -699,8 +699,8 @@
                                             class="text-[10px] sm:text-xs font-black text-muted uppercase tracking-wider">目標值</span>
                                     </div>
                                     <div class="flex items-baseline gap-1">
-                                        <span class="text-xl sm:text-5xl font-black leading-none opacity-50">{{
-                                            currentPlan.calories }}</span>
+                                        <span class="text-xl sm:text-4xl font-black leading-none opacity-50">{{
+                                            getGoalDisplay('calories') }}</span>
                                         <span
                                             class="text-[10px] sm:text-xs font-bold text-muted uppercase">kcal</span>
                                     </div>
@@ -726,7 +726,7 @@
                                     :class="n.key === 'carbs' ? 'bg-indigo-500/20' : n.key === 'protein' ? 'bg-violet-500/20' : 'bg-pink-500/20'">
                                     <div class="h-full rounded-full transition-all duration-1000"
                                         :class="n.key === 'carbs' ? 'bg-indigo-500' : n.key === 'protein' ? 'bg-violet-500' : 'bg-pink-500'"
-                                        :style="{ width: Math.min((getDailySum(n.key) / (currentPlan[n.key] || 1)) * 100, 100) + '%' }">
+                                        :style="{ width: Math.min((getDailySum(n.key) / (typeof currentPlan[n.key] === 'object' ? currentPlan[n.key].min : (currentPlan[n.key] || 1))) * 100, 100) + '%' }">
                                     </div>
                                 </div>
                                 <div class="text-center sm:text-left">
@@ -734,7 +734,7 @@
                                         <span class="text-xs sm:text-xs font-black">{{
                                             formatNum(getDailySum(n.key)) }}</span>
                                         <span class="text-[10px] sm:text-xs font-bold text-muted uppercase">/ {{
-                                            currentPlan[n.key] }}g</span>
+                                            getGoalDisplay(n.key) }}g</span>
                                     </div>
                                     <!-- 新增：比例輔助顯示 -->
                                     <div class="flex flex-col sm:flex-row justify-between items-center text-[11px] font-bold mt-1.5 opacity-70 leading-tight">
@@ -1289,8 +1289,13 @@
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                 <div v-for="n in [{k:'calories',l:'熱量',u:'kcal'},{k:'carbs',l:'淨碳水',u:'g'},{k:'protein',l:'蛋白',u:'g'},{k:'fat',l:'脂肪',u:'g'}]" :key="n.k" class="space-y-1.5">
                                     <label class="sm:hidden text-[9px] font-black text-slate-400 pl-1 uppercase">{{ n.l }} ({{ n.u }})</label>
-                                    <input type="number" v-model.number="p[n.k]"
-                                        class="w-full text-center text-sm p-3.5 bg-slate-50 border border-slate-100 rounded-xl font-black outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all">
+                                    <div class="flex items-center gap-1">
+                                        <input type="number" v-model.number="p[n.k].min"
+                                            class="w-full text-center text-[11px] p-2 bg-slate-50 border border-slate-100 rounded-xl font-black outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all" placeholder="Min">
+                                        <span class="text-slate-300 font-bold">-</span>
+                                        <input type="number" v-model.number="p[n.k].max"
+                                            class="w-full text-center text-[11px] p-2 bg-slate-50 border border-slate-100 rounded-xl font-black outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all" placeholder="Max">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2012,17 +2017,17 @@
                 });
 
                 const plans = reactive({
-                    high: { calories: 2200, carbs: 275, protein: 165, fat: 48 },
-                    med: { calories: 1800, carbs: 180, protein: 135, fat: 60 },
-                    low: { calories: 1500, carbs: 75, protein: 150, fat: 66 },
-                    rest: { calories: 1400, carbs: 35, protein: 140, fat: 77 }
+                    high: { calories: { min: 2100, max: 2300 }, carbs: { min: 260, max: 280 }, protein: { min: 160, max: 170 }, fat: { min: 45, max: 55 } },
+                    med: { calories: { min: 1700, max: 1900 }, carbs: { min: 170, max: 190 }, protein: { min: 130, max: 140 }, fat: { min: 55, max: 65 } },
+                    low: { calories: { min: 1400, max: 1600 }, carbs: { min: 60, max: 80 }, protein: { min: 140, max: 160 }, fat: { min: 60, max: 70 } },
+                    rest: { calories: { min: 1300, max: 1500 }, carbs: { min: 20, max: 50 }, protein: { min: 130, max: 150 }, fat: { min: 70, max: 85 } }
                 });
 
                 const tempPlans = reactive({
-                    high: { calories: 0, carbs: 0, protein: 0, fat: 0 },
-                    med: { calories: 0, carbs: 0, protein: 0, fat: 0 },
-                    low: { calories: 0, carbs: 0, protein: 0, fat: 0 },
-                    rest: { calories: 0, carbs: 0, protein: 0, fat: 0 }
+                    high: { calories: { min: 0, max: 0 }, carbs: { min: 0, max: 0 }, protein: { min: 0, max: 0 }, fat: { min: 0, max: 0 } },
+                    med: { calories: { min: 0, max: 0 }, carbs: { min: 0, max: 0 }, protein: { min: 0, max: 0 }, fat: { min: 0, max: 0 } },
+                    low: { calories: { min: 0, max: 0 }, carbs: { min: 0, max: 0 }, protein: { min: 0, max: 0 }, fat: { min: 0, max: 0 } },
+                    rest: { calories: { min: 0, max: 0 }, carbs: { min: 0, max: 0 }, protein: { min: 0, max: 0 }, fat: { min: 0, max: 0 } }
                 });
 
                 const allData = reactive({});
@@ -2517,11 +2522,26 @@
                     }),
                     getMealLabel, getPlanLabel,
                     getDailySum: (type) => (allData[selectedDate.value]?.meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0),
+                    getGoalDisplay: (type, planObj = null) => {
+                        const plan = planObj || allData[selectedDate.value]?.goals || plans[allData[selectedDate.value]?.planType] || plans.med;
+                        const goal = plan[type];
+                        if (typeof goal === 'object' && goal !== null) {
+                            return goal.min === goal.max ? `${goal.min}` : `${goal.min}-${goal.max}`;
+                        }
+                        return goal || 0;
+                    },
                     getGap: (type) => {
                         const day = allData[selectedDate.value];
                         const plan = day?.goals || plans[day?.planType] || plans.med;
+                        const goal = plan[type];
                         const sum = (allData[selectedDate.value]?.meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0);
-                        return Math.round(plan[type] - sum);
+                        
+                        if (typeof goal === 'object' && goal !== null) {
+                            if (sum < goal.min) return Math.round(goal.min - sum); // 還差多少到最低
+                            if (sum > goal.max) return Math.round(goal.max - sum); // 超出多少 (負數)
+                            return 0; // 在範圍內
+                        }
+                        return Math.round((goal || 0) - sum);
                     },
                     changeMonth: (dir) => {
                         const d = new Date(selectedDate.value);
@@ -2544,19 +2564,36 @@
                         if (!record || !record.planType) return null;
                         const plan = record.goals || plans[record.planType] || plans.med;
                         const intake = (record.meals || []).reduce((s, m) => s + (Number(m.calories) || 0), 0);
-                        const goal = plan.calories || 1;
-                        const gapPercent = (Math.abs(goal - intake) / goal) * 100;
-                        const progress = Math.max(0, 100 - gapPercent);
+                        
+                        const goalObj = plan.calories;
+                        const minGoal = typeof goalObj === 'object' ? goalObj.min : (goalObj || 1);
+                        const maxGoal = typeof goalObj === 'object' ? goalObj.max : (goalObj || 1);
+                        
+                        let progress = 0;
+                        if (intake < minGoal) {
+                            progress = (intake / minGoal) * 100;
+                        } else if (intake <= maxGoal) {
+                            progress = 100;
+                        } else {
+                            // 超出範圍，顯示為紅色/特殊狀態 (這裡簡單處理為 100+)
+                            progress = 100;
+                        }
+                        
                         const colorMap = { high: '#f59e0b', med: '#6366f1', low: '#f43f5e', rest: '#64748b' };
                         return { percent: progress, color: colorMap[record.planType] };
                     },
                     getNutrientPercent: (key, isTarget) => {
                         const multipliers = { carbs: 4, protein: 4, fat: 9 };
                         const mult = multipliers[key];
+                        const plan = allData[selectedDate.value]?.goals || plans[allData[selectedDate.value]?.planType] || plans.med;
+                        
                         if (isTarget) {
-                            const plan = allData[selectedDate.value]?.goals || plans[allData[selectedDate.value]?.planType] || plans.med;
-                            const total = (Number(plan.carbs) * 4) + (Number(plan.protein) * 4) + (Number(plan.fat) * 9) || 1;
-                            return Math.round((Number(plan[key]) * mult / total) * 100);
+                            const getVal = (k) => {
+                                const g = plan[k];
+                                return typeof g === 'object' ? (g.min + g.max) / 2 : (g || 0);
+                            };
+                            const total = (getVal('carbs') * 4) + (getVal('protein') * 4) + (getVal('fat') * 9) || 1;
+                            return Math.round((getVal(key) * mult / total) * 100);
                         } else {
                             const meals = allData[selectedDate.value]?.meals || [];
                             const c = meals.reduce((s, m) => s + (Number(m.carbs) || 0), 0);
