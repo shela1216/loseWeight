@@ -507,18 +507,20 @@
                             <div class="flex items-center gap-3 min-w-0 flex-1">
                                 <div class="cursor-pointer group flex flex-col min-w-0"
                                     @click="toggleCalendar()">
-                                    <div class="flex items-center gap-1.5">
-                                        <h2 class="text-sm font-black transition-colors truncate" style="color:var(--text-main)">{{ currentMonthYearDisplay }}</h2>
-                                        <svg class="w-3.5 h-3.5 shrink-0 transition-transform duration-300 lg:hidden"
-                                            fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"
-                                            style="color:var(--text-muted)"><path d="M9 5l7 7-7 7"/></svg>
-                                    </div>
-                                    <div v-if="!isCalendarExpanded || isMobile" class="flex items-center gap-2 mt-0.5">
-                                        <span class="text-base font-black" style="color:var(--accent-primary)">{{ new Date(selectedDate).getDate() }}日</span>
-                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold text-white uppercase"
-                                            :class="{'bg-amber-500': currentDayRecord.planType === 'high','bg-indigo-500': currentDayRecord.planType === 'med','bg-rose-500': currentDayRecord.planType === 'low','bg-slate-400': currentDayRecord.planType === 'rest'}">
-                                            {{ {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[currentDayRecord.planType] }}
-                                        </span>
+                                    <div class="flex flex-wrap items-baseline gap-x-2">
+                                        <div class="flex items-center gap-1.5">
+                                            <h2 class="text-sm font-black transition-colors truncate" style="color:var(--text-main)">{{ currentMonthYearDisplay }}</h2>
+                                            <svg class="w-3.5 h-3.5 shrink-0 transition-transform duration-300 lg:hidden"
+                                                fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"
+                                                style="color:var(--text-muted)"><path d="M9 5l7 7-7 7"/></svg>
+                                        </div>
+                                        <div v-if="!isCalendarExpanded || isMobile" class="flex items-center gap-2">
+                                            <span class="text-base font-black" style="color:var(--accent-primary)">{{ new Date(selectedDate).getDate() }}日</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold text-white uppercase"
+                                                :class="{'bg-amber-500': currentDayRecord.planType === 'high','bg-indigo-500': currentDayRecord.planType === 'med','bg-rose-500': currentDayRecord.planType === 'low','bg-slate-400': currentDayRecord.planType === 'rest'}">
+                                                {{ {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[currentDayRecord.planType] }}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -972,6 +974,23 @@
                                 </div>
                             </div>
                             <p class="text-center text-[9px] font-bold text-slate-300 uppercase tracking-widest py-2">總計數值將自動同步至下方主欄位</p>
+                        </div>
+                    </div>
+
+                    <!-- 快速營養素輸入 -->
+                    <div class="bg-indigo-50/30 rounded-2xl p-4 border border-indigo-100/50">
+                        <div class="flex justify-between items-center mb-2 px-1">
+                            <label class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">快速輸入 (熱量/碳水/蛋白/脂肪)</label>
+                            <span class="text-[9px] font-bold text-indigo-300 uppercase">Quick Batch Input</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <input v-model="quickNutrientInput" @keyup.enter="parseQuickInput"
+                                class="flex-1 bg-white px-4 py-3 rounded-xl text-sm font-black outline-none border border-transparent focus:border-indigo-300 shadow-sm transition-all"
+                                placeholder="範例：70/7/5/1">
+                            <button @click="parseQuickInput" 
+                                class="px-4 bg-indigo-600 text-white rounded-xl text-xs font-black hover:bg-indigo-700 transition-all shadow-md">
+                                解析
+                            </button>
                         </div>
                     </div>
 
@@ -1762,6 +1781,21 @@
 
                 const showMonthPicker = ref(false);
                 const historySearch = ref('');
+                const quickNutrientInput = ref('');
+
+                const parseQuickInput = () => {
+                    const input = quickNutrientInput.value.trim();
+                    // 支援多種分隔符號: / , . 空格
+                    const parts = input.split(/[\/\s,，。.]+/).filter(p => p !== '');
+                    
+                    if (parts.length >= 1) editingMeal.calories = formatFloat(parts[0]);
+                    if (parts.length >= 2) editingMeal.carbs = formatFloat(parts[1]);
+                    if (parts.length >= 3) editingMeal.protein = formatFloat(parts[2]);
+                    if (parts.length >= 4) editingMeal.fat = formatFloat(parts[3]);
+                    
+                    // 解析完後清空
+                    if (parts.length > 0) quickNutrientInput.value = '';
+                };
 
                 const exportPDF = async () => {
                     isExporting.value = true;
@@ -2532,6 +2566,7 @@
                     setPlanType, autoCalculatePlans, exportCSV, saveData,
                     openSettings, saveSettings,
                     addItem, removeItem, updateTotalsFromItems,
+                    quickNutrientInput, parseQuickInput,
                     showExportModal, isExporting, exportRange, exportPDF, getRangeStats,
                     excludedDates, exportDateList, toggleExcludedDate, toggleAllExportDates, setQuickRange,
                     isMobile, screenWidth, isCalendarExpanded, toggleCalendar, showMonthModal, showCalendarModal, jumpYear, jumpToMonth, showMobileMenu,
