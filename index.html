@@ -1345,6 +1345,10 @@
                                     :class="profile.activity === a.v ? 'bg-indigo-600 border-indigo-600 shadow-md shadow-indigo-100' : 'bg-slate-50 border-slate-100 hover:border-indigo-200'">
                                     <div class="font-black text-sm" :class="profile.activity === a.v ? 'text-white' : 'text-slate-800'">{{ a.l }}</div>
                                     <div class="text-[10px] font-bold mt-0.5" :class="profile.activity === a.v ? 'text-indigo-200' : 'text-slate-400'">{{ a.d }}</div>
+                                    <div class="text-xs font-black mt-1.5 tabular-nums"
+                                        :class="profile.activity === a.v ? 'text-white' : 'text-indigo-500'">
+                                        ~ {{ formatNum(calculatedTDEE / profile.activity * a.v).toLocaleString() }} kcal/日
+                                    </div>
                                 </button>
                             </div>
                         </div>
