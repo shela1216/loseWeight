@@ -2753,7 +2753,7 @@
                         const plan = planObj || allData[selectedDate.value]?.goals || plans[allData[selectedDate.value]?.planType] || plans.med;
                         const goal = plan[type];
                         if (typeof goal === 'object' && goal !== null) {
-                            return goal.min === goal.max ? `${goal.min}` : `${goal.min}-${goal.max}`;
+                            return goal.min === goal.max ? `${goal.min}` : `${Math.round((goal.min + goal.max) / 2)}`;
                         }
                         return goal || 0;
                     },
