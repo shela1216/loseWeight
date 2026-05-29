@@ -329,6 +329,11 @@
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
         .custom-scroll::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 4px; }
 
+        /* === 設定介面：隱藏數字輸入框上下箭頭 === */
+        .no-spin::-webkit-inner-spin-button,
+        .no-spin::-webkit-outer-spin-button { -webkit-appearance: none; appearance: none; margin: 0; }
+        .no-spin { -moz-appearance: textfield; appearance: textfield; }
+
         /* === 設定介面 range slider === */
         .settings-range {
             -webkit-appearance: none;
@@ -1374,7 +1379,7 @@
                                         :value="Math.round((p.calories.min + p.calories.max) / 2)"
                                         @change="setCalorieCenter(key, $event.target.value)"
                                         min="800" max="4000" step="50"
-                                        class="w-20 text-center text-xl font-black border-b-2 bg-transparent outline-none transition-colors pb-0.5"
+                                        class="no-spin w-20 text-center text-xl font-black border-b-2 bg-transparent outline-none transition-colors pb-0.5"
                                         :class="{
                                             'text-amber-500 border-amber-300 focus:border-amber-500': key === 'high',
                                             'text-indigo-500 border-indigo-300 focus:border-indigo-500': key === 'med',
@@ -1405,23 +1410,28 @@
                             </div>
 
                             <!-- 蛋白/碳水/脂肪 min-max 範圍 -->
-                            <div class="grid grid-cols-3 gap-2">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                 <div v-for="n in [
                                     {k:'protein', l:'蛋白質', u:'g', bg:'bg-violet-50', border:'border-violet-100', text:'text-violet-600', ring:'focus:ring-violet-500/10 focus:border-violet-400'},
                                     {k:'carbs',   l:'淨碳水', u:'g', bg:'bg-indigo-50', border:'border-indigo-100', text:'text-indigo-600', ring:'focus:ring-indigo-500/10 focus:border-indigo-400'},
                                     {k:'fat',     l:'脂肪',   u:'g', bg:'bg-pink-50',   border:'border-pink-100',   text:'text-pink-600',   ring:'focus:ring-pink-500/10 focus:border-pink-400'}
                                 ]" :key="n.k"
-                                    class="rounded-xl p-3 border" :class="[n.bg, n.border]">
-                                    <div class="font-black text-xs mb-0.5 text-center" :class="n.text">{{ n.l }}</div>
-                                    <div class="text-[10px] font-bold text-center mb-2 opacity-50" :class="n.text">{{ n.u }}</div>
-                                    <div class="flex items-center gap-1">
+                                    class="flex sm:flex-col items-center sm:items-stretch gap-3 sm:gap-0 rounded-xl p-3 border"
+                                    :class="[n.bg, n.border]">
+                                    <!-- 標籤：手機靠左固定寬，電腦置中 -->
+                                    <div class="w-14 shrink-0 sm:w-auto sm:text-center sm:mb-2">
+                                        <div class="font-black text-xs" :class="n.text">{{ n.l }}</div>
+                                        <div class="text-[10px] font-bold opacity-50 mt-0.5" :class="n.text">{{ n.u }}</div>
+                                    </div>
+                                    <!-- 輸入框：手機 flex-1 撐開，電腦正常寬度 -->
+                                    <div class="flex items-center gap-1 flex-1 sm:flex-none">
                                         <input type="number" v-model.number="p[n.k].min"
-                                            class="w-full text-center text-xs p-1.5 bg-white border rounded-lg font-black outline-none focus:ring-2 transition-all"
+                                            class="no-spin w-full text-center text-sm sm:text-xs p-2 sm:p-1.5 bg-white border rounded-lg font-black outline-none focus:ring-2 transition-all"
                                             :class="[n.border, n.ring]"
                                             placeholder="最小">
-                                        <span class="font-bold text-xs flex-shrink-0 opacity-30" :class="n.text">–</span>
+                                        <span class="font-bold text-sm sm:text-xs flex-shrink-0 opacity-30" :class="n.text">–</span>
                                         <input type="number" v-model.number="p[n.k].max"
-                                            class="w-full text-center text-xs p-1.5 bg-white border rounded-lg font-black outline-none focus:ring-2 transition-all"
+                                            class="no-spin w-full text-center text-sm sm:text-xs p-2 sm:p-1.5 bg-white border rounded-lg font-black outline-none focus:ring-2 transition-all"
                                             :class="[n.border, n.ring]"
                                             placeholder="最大">
                                     </div>
@@ -1432,11 +1442,11 @@
                         <!-- 操作按鈕 -->
                         <div class="flex gap-3 pt-2">
                             <button @click="settingsStep=1"
-                                class="py-4 px-5 bg-slate-50 text-slate-500 rounded-[1.5rem] font-black text-xs hover:bg-slate-100 active:scale-95 transition-all border border-slate-100 leading-tight text-center">
-                                以 TDEE<br>重新計算
+                                class="flex-1 py-4 bg-slate-50 text-slate-500 rounded-[1.5rem] font-black text-sm hover:bg-slate-100 active:scale-95 transition-all border border-slate-100">
+                                以 TDEE 重新計算
                             </button>
                             <button @click="saveSettings"
-                                class="flex-1 py-4 bg-slate-900 text-white rounded-[1.5rem] font-black text-base shadow-2xl hover:bg-black active:scale-95 transition-all tracking-tight">
+                                class="flex-1 py-4 bg-slate-900 text-white rounded-[1.5rem] font-black text-sm shadow-2xl hover:bg-black active:scale-95 transition-all tracking-tight">
                                 確定並儲存
                             </button>
                         </div>
