@@ -642,13 +642,14 @@
                                     <circle cx="50" cy="50" r="38" fill="none" stroke-width="6" stroke-linecap="round"
                                         :stroke="getGap('calories') < 0 ? '#ef4444' : ({high:'#f59e0b', med:'#6366f1', low:'#f43f5e', rest:'#64748b'}[currentDayRecord.planType])"
                                         :stroke-dasharray="`${2 * 3.14159 * 38}`"
-                                        :stroke-dashoffset="2 * 3.14159 * 38 * (1 - Math.min(getDailySum('calories') / (currentPlan.calories || 1), 1))"
+                                        :stroke-dashoffset="2 * 3.14159 * 38 * (1 - Math.min(getDailySum('calories') / getGoalMidpoint('calories'), 1))"
                                         style="transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s ease" />
                                 </svg>
                                 <div
                                     class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none px-2 sm:px-4">
-                                    <div class="text-[10px] sm:text-xs font-bold text-muted mb-0.5 sm:mb-1">{{
-                                        getGap('calories') >= 0 ? '還可以吃' : '已超出' }}</div>
+                                    <div class="text-[10px] sm:text-xs font-bold mb-0.5 sm:mb-1"
+                                        :class="isGoalInRange('calories') ? 'text-teal-500' : 'text-muted'">{{
+                                        isGoalInRange('calories') ? '已達標' : getGap('calories') >= 0 ? '還可以吃' : '已超出' }}</div>
                                     <div class="calorie-num truncate w-full">{{ formatNum(Math.abs(getGap('calories')))
                                         }}</div>
                                     <div class="text-[10px] sm:text-xs font-bold text-muted mt-0.5 sm:mt-1">kcal
@@ -2766,13 +2767,32 @@
                         const plan = day?.goals || plans[day?.planType] || plans.med;
                         const goal = plan[type];
                         const sum = (allData[selectedDate.value]?.meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0);
-                        
+
                         if (typeof goal === 'object' && goal !== null) {
-                            if (sum < goal.min) return Math.round(goal.min - sum); // 還差多少到最低
-                            if (sum > goal.max) return Math.round(goal.max - sum); // 超出多少 (負數)
-                            return 0; // 在範圍內
+                            if (sum < goal.min) return Math.round(goal.min - sum); // 未達最低，顯示還差多少
+                            if (sum > goal.max) return Math.round(goal.max - sum); // 超出最高（負數）
+                            return Math.round(goal.max - sum);                     // 在範圍內，顯示距上限還剩多少
                         }
                         return Math.round((goal || 0) - sum);
+                    },
+                    isGoalInRange: (type) => {
+                        const day = allData[selectedDate.value];
+                        const plan = day?.goals || plans[day?.planType] || plans.med;
+                        const goal = plan[type];
+                        const sum = (allData[selectedDate.value]?.meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0);
+                        if (typeof goal === 'object' && goal !== null) {
+                            return sum >= goal.min && sum <= goal.max;
+                        }
+                        return false;
+                    },
+                    getGoalMidpoint: (type) => {
+                        const day = allData[selectedDate.value];
+                        const plan = day?.goals || plans[day?.planType] || plans.med;
+                        const goal = plan[type];
+                        if (typeof goal === 'object' && goal !== null) {
+                            return Math.round((goal.min + goal.max) / 2);
+                        }
+                        return goal || 1;
                     },
                     changeMonth: (dir) => {
                         const d = new Date(selectedDate.value);
