@@ -735,7 +735,7 @@
                                         <span class="text-[10px] sm:text-xs font-bold text-muted uppercase">/ {{
                                             getGoalDisplay(n.key) }}g</span>
                                     </div>
-                                    <div v-if="typeof currentPlan[n.key] === 'object' && currentPlan[n.key].min !== currentPlan[n.key].max"
+                                    <div v-if="typeof currentPlan[n.key] === 'object'"
                                         class="text-[9px] font-bold text-muted opacity-50 mt-0.5 text-center sm:text-left">
                                         範圍 {{ currentPlan[n.key].min }}–{{ currentPlan[n.key].max }}g
                                     </div>
