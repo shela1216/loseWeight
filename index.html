@@ -487,62 +487,63 @@
                     <div class="premium-card-sub p-4 sm:p-5 transition-all duration-500 overflow-hidden"
                         :class="isCalendarExpanded ? 'max-h-[1000px]' : 'max-h-[76px] sm:max-h-[92px]'">
                         <!-- 日曆標題列 -->
-                        <div class="flex flex-wrap justify-between items-center px-1 gap-y-3"
-                            :class="isCalendarExpanded || !isMobile ? 'mb-4 lg:mb-6' : 'mb-0'">
-                            <!-- 左側：月份與日期 -->
-                            <div class="flex items-center gap-3 min-w-0 flex-1">
-                                <div class="cursor-pointer group flex flex-col min-w-0"
-                                    @click="toggleCalendar()">
-                                    <div class="flex flex-wrap items-baseline gap-x-2">
-                                        <div class="flex items-center gap-1.5">
-                                            <h2 class="text-sm font-black transition-colors truncate" style="color:var(--text-main)">{{ currentMonthYearDisplay }}</h2>
-                                            <svg class="w-3.5 h-3.5 shrink-0 transition-transform duration-300 lg:hidden"
-                                                fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"
-                                                style="color:var(--text-muted)"><path d="M9 5l7 7-7 7"/></svg>
-                                        </div>
-                                        <div v-if="!isCalendarExpanded || isMobile" class="flex items-center gap-2">
-                                            <span class="text-base font-black" style="color:var(--accent-primary)">{{ new Date(selectedDate).getDate() }}日</span>
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold text-white uppercase"
-                                                :class="{'bg-amber-500': currentDayRecord.planType === 'high','bg-indigo-500': currentDayRecord.planType === 'med','bg-rose-500': currentDayRecord.planType === 'low','bg-slate-400': currentDayRecord.planType === 'rest'}">
-                                                {{ {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[currentDayRecord.planType] }}
-                                            </span>
-                                        </div>
+                        <div class="flex items-center justify-between px-1 gap-2"
+                            :class="isCalendarExpanded || !isMobile ? 'mb-4 lg:mb-5' : 'mb-0'">
+
+                            <!-- 左側：月份導航 -->
+                            <div class="flex items-center gap-1.5 min-w-0 flex-1">
+                                <!-- 電腦展開：上個月 -->
+                                <button v-if="isCalendarExpanded && !isMobile" @click="changeMonth(-1)"
+                                    class="w-7 h-7 shrink-0 flex items-center justify-center rounded-lg transition-all hover:bg-slate-100 dark:hover:bg-slate-700"
+                                    style="border:1px solid var(--border-color); color:var(--text-muted);" title="上個月">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+                                </button>
+
+                                <!-- 月份文字：電腦展開時可點擊跳月，否則切換展開 -->
+                                <button class="flex flex-col min-w-0 text-left group"
+                                    @click="isCalendarExpanded && !isMobile ? (showMonthModal = true, jumpYear = pickerMonth.getFullYear()) : toggleCalendar()">
+                                    <div class="flex items-center gap-1.5">
+                                        <h2 class="text-sm font-black truncate transition-colors group-hover:opacity-70" style="color:var(--text-main)">{{ currentMonthYearDisplay }}</h2>
+                                        <!-- 手機：展開箭頭 -->
+                                        <svg class="w-3.5 h-3.5 shrink-0 lg:hidden" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="color:var(--text-muted)"><path d="M9 5l7 7-7 7"/></svg>
+                                        <!-- 電腦展開：小日曆圖示提示可跳月 -->
+                                        <svg v-if="isCalendarExpanded && !isMobile" class="w-3 h-3 shrink-0 opacity-30 group-hover:opacity-60 transition-opacity" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--text-muted)"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                     </div>
-                                </div>
+                                    <!-- 收合時顯示選中日期 + 計畫 -->
+                                    <div v-if="!isCalendarExpanded || isMobile" class="flex items-center gap-2 mt-0.5">
+                                        <span class="text-base font-black" style="color:var(--accent-primary)">{{ new Date(selectedDate).getDate() }}日</span>
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold text-white uppercase"
+                                            :class="{'bg-amber-500': currentDayRecord.planType === 'high','bg-indigo-500': currentDayRecord.planType === 'med','bg-rose-500': currentDayRecord.planType === 'low','bg-slate-400': currentDayRecord.planType === 'rest'}">
+                                            {{ {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[currentDayRecord.planType] }}
+                                        </span>
+                                    </div>
+                                </button>
+
+                                <!-- 電腦展開：下個月 -->
+                                <button v-if="isCalendarExpanded && !isMobile" @click="changeMonth(1)"
+                                    class="w-7 h-7 shrink-0 flex items-center justify-center rounded-lg transition-all hover:bg-slate-100 dark:hover:bg-slate-700"
+                                    style="border:1px solid var(--border-color); color:var(--text-muted);" title="下個月">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+                                </button>
                             </div>
 
-                            <!-- 右側：操作按鈕 -->
+                            <!-- 右側：今日 + 收合/展開 -->
                             <div class="flex items-center gap-1.5 shrink-0">
                                 <button @click="goToToday()"
-                                    class="h-9 px-3 shrink-0 flex items-center justify-center rounded-xl font-black text-xs transition-all hover:opacity-80"
+                                    class="h-8 px-3 shrink-0 flex items-center justify-center rounded-lg font-black text-xs transition-all hover:opacity-80"
                                     style="background:color-mix(in srgb, var(--accent-primary) 12%, transparent); color:var(--accent-primary);">
                                     今日
                                 </button>
+                                <!-- 收合/展開按鈕：電腦版才顯示，帶文字標籤 -->
                                 <button @click="toggleCalendar()"
-                                    class="w-9 h-9 shrink-0 hidden lg:flex items-center justify-center rounded-xl text-muted transition-all hover:bg-slate-100 dark:hover:bg-slate-800"
-                                    style="background:var(--bg-main); border:1px solid var(--border-color);"
-                                    :title="isCalendarExpanded ? '收合日曆' : '展開日曆'">
-                                    <svg class="w-4 h-4 transition-transform duration-300"
+                                    class="hidden lg:flex items-center gap-1 h-8 px-2.5 rounded-lg font-black text-xs transition-all hover:bg-slate-100 dark:hover:bg-slate-700"
+                                    style="background:var(--bg-main); border:1px solid var(--border-color); color:var(--text-muted);">
+                                    <svg class="w-3.5 h-3.5 transition-transform duration-300"
                                         :class="isCalendarExpanded ? 'rotate-180' : ''"
                                         fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                         <path d="M19 9l-7 7-7-7"/>
                                     </svg>
-                                </button>
-                            </div>
-
-                            <!-- 底部：前後月切換 (電腦版併入) -->
-                            <div v-show="isCalendarExpanded && !isMobile" class="flex gap-1.5 w-full lg:w-auto lg:ml-auto pt-3 lg:pt-0 border-t border-slate-100 dark:border-slate-800 lg:border-0 justify-center">
-                                <button @click="changeMonth(-1)"
-                                    class="w-full lg:w-9 h-9 flex items-center justify-center rounded-xl text-muted transition-all hover:bg-slate-100 dark:hover:bg-slate-800"
-                                    style="background:var(--bg-main); border:1px solid var(--border-color);"
-                                    title="上個月">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
-                                </button>
-                                <button @click="changeMonth(1)"
-                                    class="w-full lg:w-9 h-9 flex items-center justify-center rounded-xl text-muted transition-all hover:bg-slate-100 dark:hover:bg-slate-800"
-                                    style="background:var(--bg-main); border:1px solid var(--border-color);"
-                                    title="下個月">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+                                    <span>{{ isCalendarExpanded ? '收合' : '展開' }}</span>
                                 </button>
                             </div>
                         </div>
@@ -550,12 +551,6 @@
                         <!-- 電腦版日曆展開內容 -->
                         <div v-if="isCalendarExpanded && !isMobile" class="relative">
                             <div class="animate-in fade-in slide-in-from-top-4 duration-500 pb-2">
-                                <div class="flex justify-center mb-4">
-                                    <button @click="showMonthModal = true; jumpYear = pickerMonth.getFullYear()" 
-                                        class="text-xs font-black text-indigo-600 bg-indigo-50 px-4 py-1.5 rounded-full hover:bg-indigo-100 transition-all">
-                                        快速跳月
-                                    </button>
-                                </div>
                                 <div class="grid grid-cols-7 gap-1 mb-2 px-1 text-center">
                                     <div v-for="d in ['一','二','三','四','五','六','日']"
                                         class="text-[10px] font-black text-muted py-2 uppercase tracking-tighter">
