@@ -585,6 +585,14 @@
                                         </div>
                                     </div>
                                 </div>
+                                <!-- 顏色對照說明 -->
+                                <div class="flex flex-wrap justify-center gap-x-4 gap-y-1 pt-4 mt-2 border-t border-slate-100 dark:border-slate-800">
+                                    <div v-for="l in [{c:'#f59e0b',t:'高碳日'},{c:'#6366f1',t:'中碳日'},{c:'#f43f5e',t:'低碳日'},{c:'#64748b',t:'自由日'}]" :key="l.t"
+                                        class="flex items-center gap-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" :style="{background: l.c}"></span>
+                                        <span class="text-[10px] font-bold text-muted">{{ l.t }}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1609,6 +1617,14 @@
                             <div :class="day.date === new Date().toLocaleDateString('sv-SE') ? 'today-number-circle !w-6 !h-6 !text-[10px]' : ''" class="relative z-10 flex items-center justify-center">
                                 <span class="text-sm" :class="selectedDate === day.date && day.date !== new Date().toLocaleDateString('sv-SE') ? 'text-indigo-600' : ''">{{ day.dayNum }}</span>
                             </div>
+                        </div>
+                    </div>
+                    <!-- 顏色對照說明 -->
+                    <div class="flex flex-wrap justify-center gap-x-4 gap-y-1 pt-4 mt-2 border-t border-slate-100">
+                        <div v-for="l in [{c:'#f59e0b',t:'高碳日'},{c:'#6366f1',t:'中碳日'},{c:'#f43f5e',t:'低碳日'},{c:'#64748b',t:'自由日'}]" :key="l.t"
+                            class="flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" :style="{background: l.c}"></span>
+                            <span class="text-[10px] font-bold text-slate-400">{{ l.t }}</span>
                         </div>
                     </div>
                 </div>
