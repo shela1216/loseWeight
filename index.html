@@ -711,16 +711,21 @@
                                         {{ n.label }}</div>
                                     <div class="flex items-baseline gap-1">
                                         <span class="text-base sm:text-2xl font-black leading-none"
-                                            :class="getGap(n.key) < 0 ? 'text-rose-500' : ''">{{
+                                            :class="isGoalInRange(n.key) ? 'text-teal-500' : getGap(n.key) < 0 ? 'text-rose-500' : ''">{{
                                             formatNum(Math.abs(getGap(n.key))) }}<span
-                                                class="text-[10px] sm:text-xs font-bold text-muted ml-0.5 uppercase">g</span></span>
+                                                class="text-[10px] sm:text-xs font-bold ml-0.5 uppercase"
+                                                :class="isGoalInRange(n.key) ? 'text-teal-400' : 'text-muted'">g</span></span>
+                                    </div>
+                                    <div class="text-[9px] font-black uppercase tracking-wider mt-0.5"
+                                        :class="isGoalInRange(n.key) ? 'text-teal-500' : getGap(n.key) < 0 ? 'text-rose-400' : 'text-muted opacity-60'">
+                                        {{ isGoalInRange(n.key) ? '已達標' : getGap(n.key) >= 0 ? '還可以吃' : '已超出' }}
                                     </div>
                                 </div>
                                 <div class="rounded-full overflow-hidden h-1.5 sm:h-2 mb-3 sm:mb-4"
                                     :class="n.key === 'carbs' ? 'bg-indigo-500/20' : n.key === 'protein' ? 'bg-violet-500/20' : 'bg-pink-500/20'">
                                     <div class="h-full rounded-full transition-all duration-1000"
-                                        :class="n.key === 'carbs' ? 'bg-indigo-500' : n.key === 'protein' ? 'bg-violet-500' : 'bg-pink-500'"
-                                        :style="{ width: Math.min((getDailySum(n.key) / (typeof currentPlan[n.key] === 'object' ? currentPlan[n.key].min : (currentPlan[n.key] || 1))) * 100, 100) + '%' }">
+                                        :class="isGoalInRange(n.key) ? 'bg-teal-400' : n.key === 'carbs' ? 'bg-indigo-500' : n.key === 'protein' ? 'bg-violet-500' : 'bg-pink-500'"
+                                        :style="{ width: Math.min((getDailySum(n.key) / getGoalMidpoint(n.key)) * 100, 100) + '%' }">
                                     </div>
                                 </div>
                                 <div class="text-center sm:text-left">
