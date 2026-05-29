@@ -729,6 +729,10 @@
                                         <span class="text-[10px] sm:text-xs font-bold text-muted uppercase">/ {{
                                             getGoalDisplay(n.key) }}g</span>
                                     </div>
+                                    <div v-if="typeof currentPlan[n.key] === 'object' && currentPlan[n.key].min !== currentPlan[n.key].max"
+                                        class="text-[9px] font-bold text-muted opacity-50 mt-0.5 text-center sm:text-left">
+                                        範圍 {{ currentPlan[n.key].min }}–{{ currentPlan[n.key].max }}g
+                                    </div>
                                     <!-- 新增：比例輔助顯示 -->
                                     <div class="flex flex-col sm:flex-row justify-between items-center text-[11px] font-bold mt-1.5 opacity-70 leading-tight">
                                         <span>目標: {{ getNutrientPercent(n.key, true) }}%</span>
@@ -2753,7 +2757,7 @@
                         const plan = planObj || allData[selectedDate.value]?.goals || plans[allData[selectedDate.value]?.planType] || plans.med;
                         const goal = plan[type];
                         if (typeof goal === 'object' && goal !== null) {
-                            return goal.min === goal.max ? `${goal.min}` : `${Math.round((goal.min + goal.max) / 2)}`;
+                            return `${Math.round((goal.min + goal.max) / 2)}`;
                         }
                         return goal || 0;
                     },
