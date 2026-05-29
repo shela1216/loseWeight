@@ -329,6 +329,43 @@
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
         .custom-scroll::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 4px; }
 
+        /* === 設定介面 range slider === */
+        .settings-range {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            border-radius: 9999px;
+            background: #e2e8f0;
+            outline: none;
+        }
+        .settings-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 9999px;
+            border: 2.5px solid white;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+        .settings-range::-webkit-slider-thumb:active { transform: scale(1.2); }
+        .settings-range::-moz-range-thumb {
+            width: 20px; height: 20px;
+            border-radius: 9999px;
+            border: 2.5px solid white;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+            cursor: pointer;
+        }
+        .range-amber::-webkit-slider-thumb { background: #f59e0b; }
+        .range-amber::-moz-range-thumb    { background: #f59e0b; }
+        .range-indigo::-webkit-slider-thumb { background: #6366f1; }
+        .range-indigo::-moz-range-thumb    { background: #6366f1; }
+        .range-rose::-webkit-slider-thumb { background: #f43f5e; }
+        .range-rose::-moz-range-thumb    { background: #f43f5e; }
+        .range-slate::-webkit-slider-thumb { background: #64748b; }
+        .range-slate::-moz-range-thumb    { background: #64748b; }
+
         /* === 亮色模式 modal 輸入框 === */
         .modal-input {
             background: var(--btn-bg);
@@ -1172,156 +1209,229 @@
                 </div>
             </div>
         </div>
-        <!-- 彈出視窗：設定與目標計算 (優化：修復捲軸溢出圓角問題) -->
+        <!-- 彈出視窗：設定與目標計算 (方案B：步驟式介面) -->
         <div v-if="showSettings" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
             <div class="modal-overlay absolute inset-0" @click="showSettings = false"></div>
-            <div
-                class="bg-white w-full max-w-xl rounded-[2.5rem] relative z-10 shadow-2xl flex flex-col max-h-[90vh] border border-slate-100 overflow-hidden">
+            <div class="bg-white w-full max-w-xl rounded-[2.5rem] relative z-10 shadow-2xl flex flex-col max-h-[90vh] border border-slate-100 overflow-hidden">
 
                 <!-- 固定 Header -->
-                <div class="flex justify-between items-center p-8 sm:p-10 pb-4 shrink-0 px-10">
+                <div class="flex justify-between items-center px-8 sm:px-10 pt-8 pb-4 shrink-0">
                     <div>
-                        <h3 class="text-3xl font-black text-slate-900 tracking-tight">設定與目標</h3>
-                        <p class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">
-                            個人化您的健康計劃</p>
+                        <h3 class="text-2xl font-black text-slate-900 tracking-tight">
+                            {{ settingsStep === 1 ? '基本資料' : '調整目標' }}
+                        </h3>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
+                            步驟 {{ settingsStep }}/2 &mdash; {{ settingsStep === 1 ? '填寫身體數據' : '確認各計畫熱量' }}
+                        </p>
                     </div>
                     <button @click="showSettings = false"
-                        class="w-12 h-12 flex items-center justify-center bg-slate-50 rounded-2xl text-slate-400 hover:text-slate-600 transition-colors">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        class="w-11 h-11 flex items-center justify-center bg-slate-50 rounded-2xl text-slate-400 hover:text-slate-600 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
                 </div>
 
-                <!-- 內縮式滾動內容區 -->
+                <!-- 步驟進度條 -->
+                <div class="px-8 sm:px-10 pb-5 shrink-0">
+                    <div class="flex gap-2">
+                        <div class="flex-1 h-1.5 rounded-full transition-all duration-300" :class="settingsStep >= 1 ? 'bg-indigo-500' : 'bg-slate-100'"></div>
+                        <div class="flex-1 h-1.5 rounded-full transition-all duration-300" :class="settingsStep >= 2 ? 'bg-indigo-500' : 'bg-slate-100'"></div>
+                    </div>
+                </div>
+
+                <!-- 滾動內容區 -->
                 <div class="flex-1 overflow-y-auto custom-scroll px-8 sm:px-10 pb-10">
-                    <!-- TDEE 計算器 -->
-                    <div class="bg-slate-50 border border-slate-100 rounded-[2rem] p-8 mb-10">
-                        <div class="flex items-center gap-3 mb-6">
-                            <div
-                                class="w-10 h-10 bg-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-100">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                </svg>
-                            </div>
-                            <h4 class="text-lg font-black text-slate-900 tracking-tight">TDEE 計算器</h4>
-                        </div>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-5 mb-8">
-                            <div class="space-y-2">
-                                <label class="text-xs font-black text-slate-400 pl-1">性別</label>
-                                <select v-model="profile.gender"
-                                    class="w-full bg-white px-4 py-3.5 rounded-2xl text-sm border border-slate-100 shadow-sm font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
-                                    <option value="male">男性</option>
-                                    <option value="female">女性</option>
-                                </select>
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-xs font-black text-slate-400 pl-1">體重 (kg)</label>
-                                <input type="number" v-model.number="profile.weight"
-                                    class="w-full bg-white px-4 py-3.5 rounded-2xl text-sm border border-slate-100 shadow-sm font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-xs font-black text-slate-400 pl-1">身高 (cm)</label>
-                                <input type="number" v-model.number="profile.height"
-                                    class="w-full bg-white px-4 py-3.5 rounded-2xl text-sm border border-slate-100 shadow-sm font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-xs font-black text-slate-400 pl-1">年齡</label>
-                                <input type="number" v-model.number="profile.age"
-                                    class="w-full bg-white px-4 py-3.5 rounded-2xl text-sm border border-slate-100 shadow-sm font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
-                            </div>
-                            <div class="col-span-2 md:col-span-2 space-y-2">
-                                <label class="text-xs font-black text-slate-400 pl-1">體重目標</label>
-                                <select v-model="profile.goal"
-                                    class="w-full bg-white px-4 py-3.5 rounded-2xl text-sm border border-slate-100 shadow-sm font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
-                                    <option value="lose">減重 (-500 kcal)</option>
-                                    <option value="maintain">維持身材 (TDEE)</option>
-                                </select>
-                            </div>
-                            <div class="col-span-2 md:col-span-3 space-y-2">
-                                <label class="text-xs font-black text-slate-400 pl-1">活動程度</label>
-                                <select v-model="profile.activity"
-                                    class="w-full bg-white px-4 py-3.5 rounded-2xl text-sm border border-slate-100 shadow-sm font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all">
-                                    <option :value="1.2">久坐 (無規律運動)</option>
-                                    <option :value="1.375">輕度 (每週 1-3 天)</option>
-                                    <option :value="1.55">中度 (每週 3-5 天)</option>
-                                    <option :value="1.725">高度 (每週 6-7 天)</option>
-                                </select>
+
+                    <!-- Step 1: 基本資料 -->
+                    <div v-if="settingsStep === 1" class="space-y-5">
+
+                        <!-- 性別 -->
+                        <div class="space-y-2">
+                            <label class="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">性別</label>
+                            <div class="flex gap-2">
+                                <button @click="profile.gender='male'"
+                                    class="flex-1 py-3.5 rounded-2xl font-black text-sm transition-all border"
+                                    :class="profile.gender === 'male' ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-100' : 'bg-slate-50 text-slate-500 border-slate-100 hover:border-indigo-200'">
+                                    男性
+                                </button>
+                                <button @click="profile.gender='female'"
+                                    class="flex-1 py-3.5 rounded-2xl font-black text-sm transition-all border"
+                                    :class="profile.gender === 'female' ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-100' : 'bg-slate-50 text-slate-500 border-slate-100 hover:border-indigo-200'">
+                                    女性
+                                </button>
                             </div>
                         </div>
-                        <div class="flex flex-col sm:flex-row items-center gap-6">
-                            <button @click="autoCalculatePlans"
-                                class="w-full sm:flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all">依照數據自動計算</button>
-                            <div class="text-center sm:text-right shrink-0">
-                                <span
-                                    class="text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-widest block mb-1">預估
-                                    TDEE</span>
-                                <span class="text-2xl font-black text-indigo-600 leading-none">{{ calculatedTDEE }}
-                                    <span class="text-xs text-slate-300 font-bold">kcal</span></span>
+
+                        <!-- 體重/身高/年齡 -->
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="space-y-2">
+                                <label class="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">體重</label>
+                                <div class="relative">
+                                    <input type="number" v-model.number="profile.weight"
+                                        class="w-full bg-slate-50 px-3 py-3.5 rounded-2xl text-sm border border-slate-100 font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all pr-8">
+                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-300 font-bold pointer-events-none">kg</span>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">身高</label>
+                                <div class="relative">
+                                    <input type="number" v-model.number="profile.height"
+                                        class="w-full bg-slate-50 px-3 py-3.5 rounded-2xl text-sm border border-slate-100 font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all pr-9">
+                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-300 font-bold pointer-events-none">cm</span>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">年齡</label>
+                                <div class="relative">
+                                    <input type="number" v-model.number="profile.age"
+                                        class="w-full bg-slate-50 px-3 py-3.5 rounded-2xl text-sm border border-slate-100 font-black outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all pr-8">
+                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-300 font-bold pointer-events-none">歲</span>
+                                </div>
                             </div>
                         </div>
+
+                        <!-- 目標 -->
+                        <div class="space-y-2">
+                            <label class="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">目標</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button @click="profile.goal='lose'"
+                                    class="p-4 rounded-2xl text-left border transition-all"
+                                    :class="profile.goal === 'lose' ? 'bg-rose-50 border-rose-300 shadow-md shadow-rose-50' : 'bg-slate-50 border-slate-100 hover:border-rose-100'">
+                                    <div class="text-xl mb-1">🔥</div>
+                                    <div class="font-black text-slate-900 text-sm">減重</div>
+                                    <div class="text-[10px] text-slate-400 font-bold mt-0.5">TDEE &minus; 400 kcal</div>
+                                </button>
+                                <button @click="profile.goal='maintain'"
+                                    class="p-4 rounded-2xl text-left border transition-all"
+                                    :class="profile.goal === 'maintain' ? 'bg-indigo-50 border-indigo-300 shadow-md shadow-indigo-50' : 'bg-slate-50 border-slate-100 hover:border-indigo-100'">
+                                    <div class="text-xl mb-1">⚖️</div>
+                                    <div class="font-black text-slate-900 text-sm">維持身材</div>
+                                    <div class="text-[10px] text-slate-400 font-bold mt-0.5">維持 TDEE 攝取</div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 活動程度 -->
+                        <div class="space-y-2">
+                            <label class="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">活動程度</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button v-for="a in [{v:1.2,l:'久坐',d:'幾乎不運動'},{v:1.375,l:'輕度活動',d:'每週 1-3 天'},{v:1.55,l:'中度活動',d:'每週 3-5 天'},{v:1.725,l:'高度活動',d:'每週 6-7 天'}]"
+                                    :key="a.v" @click="profile.activity=a.v"
+                                    class="p-3.5 rounded-2xl text-left border transition-all"
+                                    :class="profile.activity === a.v ? 'bg-indigo-600 border-indigo-600 shadow-md shadow-indigo-100' : 'bg-slate-50 border-slate-100 hover:border-indigo-200'">
+                                    <div class="font-black text-sm" :class="profile.activity === a.v ? 'text-white' : 'text-slate-800'">{{ a.l }}</div>
+                                    <div class="text-[10px] font-bold mt-0.5" :class="profile.activity === a.v ? 'text-indigo-200' : 'text-slate-400'">{{ a.d }}</div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- TDEE 即時顯示 -->
+                        <div class="p-5 bg-indigo-50 border border-indigo-100 rounded-2xl flex items-center justify-between">
+                            <div>
+                                <div class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">預估每日消耗</div>
+                                <div class="text-3xl font-black text-indigo-600 leading-none">{{ calculatedTDEE }} <span class="text-sm text-indigo-300 font-bold">kcal</span></div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-[10px] text-indigo-300 font-bold mb-1">目標攝取</div>
+                                <div class="text-lg font-black text-indigo-500">{{ profile.goal === 'lose' ? calculatedTDEE - 400 : calculatedTDEE }} <span class="text-xs text-indigo-300 font-bold">kcal</span></div>
+                            </div>
+                        </div>
+
+                        <!-- 下一步按鈕 -->
+                        <button @click="autoCalculatePlans(); settingsStep=2"
+                            class="w-full py-5 bg-indigo-600 text-white rounded-[1.5rem] font-black text-base shadow-xl shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all tracking-tight">
+                            計算我的目標 →
+                        </button>
                     </div>
 
-                    <!-- 計畫細節 -->
-                    <div class="space-y-4">
-                        <div class="px-2 mb-2 flex items-center gap-2">
-                            <div class="w-1.5 h-4 bg-slate-200 rounded-full"></div>
-                            <h4 class="text-xs font-black text-slate-400 uppercase tracking-widest">目標數值設定 (點擊自動計算後可手動微調)</h4>
-                        </div>
+                    <!-- Step 2: 調整目標 -->
+                    <div v-if="settingsStep === 2" class="space-y-4">
+
+                        <!-- 計畫卡片 -->
                         <div v-for="(p, key) in tempPlans" :key="key"
-                            class="p-6 bg-white border border-slate-100 rounded-[1.5rem] shadow-sm hover:shadow-md transition-shadow">
-                            <div class="flex justify-between items-center mb-6">
+                            class="p-5 rounded-[1.5rem] border transition-all"
+                            :class="{
+                                'bg-amber-50/60 border-amber-100': key === 'high',
+                                'bg-indigo-50/60 border-indigo-100': key === 'med',
+                                'bg-rose-50/60 border-rose-100': key === 'low',
+                                'bg-slate-50 border-slate-200': key === 'rest'
+                            }">
+
+                            <!-- 計畫標題列 -->
+                            <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full" :class="'dot-'+key"></span>
-                                    <span class="w-5 h-5 flex items-center justify-center text-slate-400">
-                                        <svg v-if="key === 'high'" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18M5 6v12M19 6v12M9 10v4M15 10v4" /></svg>
-                                        <svg v-if="key === 'med'" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18m0-18A9 9 0 003 12h9V3zm0 18A9 9 0 0021 12h-9v9z" /></svg>
-                                        <svg v-if="key === 'low'" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" /><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" /></svg>
-                                        <svg v-if="key === 'rest'" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                                    <span class="w-3 h-3 rounded-full shadow-sm flex-shrink-0" :style="{
+                                        background: key === 'high' ? '#f59e0b' : key === 'med' ? '#6366f1' : key === 'low' ? '#f43f5e' : '#64748b'
+                                    }"></span>
+                                    <span class="font-black text-slate-900 text-sm">{{ getPlanLabel(key) }}</span>
+                                    <span class="text-[10px] text-slate-400 font-bold hidden sm:inline">
+                                        {{ key === 'high' ? '· 訓練日' : key === 'med' ? '· 一般活動日' : key === 'low' ? '· 輕度活動日' : '· 休息恢復日' }}
                                     </span>
-                                    <div class="text-base font-black text-slate-900">{{ getPlanLabel(key) }}</div>
                                 </div>
-                                <span class="text-[10px] sm:text-xs text-slate-300 font-black uppercase tracking-widest">目標範圍設定</span>
+                                <span class="text-2xl font-black leading-none" :class="{
+                                    'text-amber-500': key === 'high',
+                                    'text-indigo-500': key === 'med',
+                                    'text-rose-500': key === 'low',
+                                    'text-slate-500': key === 'rest'
+                                }">
+                                    {{ Math.round((p.calories.min + p.calories.max) / 2) }}
+                                    <span class="text-xs font-bold opacity-50">kcal</span>
+                                </span>
                             </div>
-                            
-                            <div class="space-y-4">
-                                <div v-for="n in [
-                                    {k:'calories', l:'熱量', u:'kcal', c:'amber'},
-                                    {k:'carbs', l:'淨碳水', u:'g', c:'indigo'},
-                                    {k:'protein', l:'蛋白', u:'g', c:'violet'},
-                                    {k:'fat', l:'脂肪', u:'g', c:'pink'}
-                                ]" :key="n.k" 
-                                    class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-6 p-3 sm:p-4 rounded-2xl border transition-all"
-                                    :class="[
-                                        n.c === 'amber' ? 'bg-amber-50/40 border-amber-100/50' :
-                                        n.c === 'indigo' ? 'bg-indigo-50/40 border-indigo-100/50' :
-                                        n.c === 'violet' ? 'bg-violet-50/40 border-violet-100/50' :
-                                        'bg-pink-50/40 border-pink-100/50'
-                                    ]">
-                                    <div class="flex items-center gap-2 shrink-0">
-                                        <div class="w-1.5 h-4 rounded-full" :class="'bg-'+n.c+'-500'"></div>
-                                        <span class="text-[11px] font-black uppercase tracking-wider" :class="'text-'+n.c+'-600'">{{ n.l }}</span>
-                                        <span class="text-[9px] font-bold opacity-40 uppercase" :class="'text-'+n.c+'-600'">{{ n.u }}</span>
+
+                            <!-- 熱量滑桿 -->
+                            <div class="mb-4">
+                                <input type="range"
+                                    :value="Math.round((p.calories.min + p.calories.max) / 2)"
+                                    @input="setCalorieCenter(key, $event.target.value)"
+                                    min="800" max="4000" step="50"
+                                    class="settings-range w-full cursor-pointer"
+                                    :class="{
+                                        'range-amber': key === 'high',
+                                        'range-indigo': key === 'med',
+                                        'range-rose': key === 'low',
+                                        'range-slate': key === 'rest'
+                                    }">
+                                <div class="flex justify-between mt-1.5">
+                                    <span class="text-[10px] text-slate-300 font-bold">{{ p.calories.min }} kcal</span>
+                                    <span class="text-[10px] text-slate-300 font-bold">{{ p.calories.max }} kcal</span>
+                                </div>
+                            </div>
+
+                            <!-- 蛋白/碳水/脂肪 -->
+                            <div class="grid grid-cols-3 gap-2">
+                                <div v-for="n in [{k:'protein',l:'蛋白',u:'g',d:5},{k:'carbs',l:'碳水',u:'g',d:10},{k:'fat',l:'脂肪',u:'g',d:5}]" :key="n.k"
+                                    class="bg-white/80 rounded-xl p-2.5 text-center border border-white/60">
+                                    <div class="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">{{ n.l }}</div>
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button @click="setNutrientCenter(key, n.k, Math.round((p[n.k].min+p[n.k].max)/2) - 5, n.d)"
+                                            class="w-6 h-6 rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 active:scale-90 transition-all text-base font-black flex items-center justify-center leading-none">−</button>
+                                        <input type="number"
+                                            :value="Math.round((p[n.k].min + p[n.k].max) / 2)"
+                                            @change="setNutrientCenter(key, n.k, Number($event.target.value), n.d)"
+                                            class="w-10 text-center text-sm font-black text-slate-800 bg-transparent outline-none">
+                                        <button @click="setNutrientCenter(key, n.k, Math.round((p[n.k].min+p[n.k].max)/2) + 5, n.d)"
+                                            class="w-6 h-6 rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 active:scale-90 transition-all text-base font-black flex items-center justify-center leading-none">+</button>
                                     </div>
-                                    <div class="flex items-center gap-3 flex-1 sm:max-w-[240px]">
-                                        <input type="number" v-model.number="p[n.k].min"
-                                            class="w-full text-center text-sm p-3 bg-white border rounded-xl font-black outline-none transition-all shadow-sm" 
-                                            :class="'border-'+n.c+'-100 focus:ring-2 focus:ring-'+n.c+'-500/10 focus:border-'+n.c+'-400'"
-                                            placeholder="最小值">
-                                        <span class="font-bold opacity-30" :class="'text-'+n.c+'-600'">-</span>
-                                        <input type="number" v-model.number="p[n.k].max"
-                                            class="w-full text-center text-sm p-3 bg-white border rounded-xl font-black outline-none transition-all shadow-sm" 
-                                            :class="'border-'+n.c+'-100 focus:ring-2 focus:ring-'+n.c+'-500/10 focus:border-'+n.c+'-400'"
-                                            placeholder="最大值">
-                                    </div>
+                                    <div class="text-[9px] text-slate-300 font-bold mt-1">{{ n.u }}</div>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- 操作按鈕 -->
+                        <div class="flex gap-3 pt-2">
+                            <button @click="settingsStep=1"
+                                class="py-4 px-6 bg-slate-50 text-slate-500 rounded-[1.5rem] font-black text-sm hover:bg-slate-100 active:scale-95 transition-all border border-slate-100">
+                                ← 返回
+                            </button>
+                            <button @click="saveSettings"
+                                class="flex-1 py-4 bg-slate-900 text-white rounded-[1.5rem] font-black text-base shadow-2xl hover:bg-black active:scale-95 transition-all tracking-tight">
+                                確定並儲存
+                            </button>
+                        </div>
                     </div>
 
-                    <button @click="saveSettings"
-                        class="w-full mt-10 py-5 bg-slate-900 text-white rounded-[1.5rem] font-black text-base shadow-2xl hover:bg-black active:scale-95 transition-all tracking-tight shrink-0">確定並儲存變更</button>
                 </div>
             </div>
         </div>
@@ -2250,6 +2360,20 @@
                     }
                 };
 
+                const settingsStep = ref(1);
+
+                const setCalorieCenter = (planKey, value) => {
+                    const v = Number(value);
+                    tempPlans[planKey].calories.min = Math.max(0, v - 100);
+                    tempPlans[planKey].calories.max = v + 100;
+                };
+
+                const setNutrientCenter = (planKey, nutrient, value, delta) => {
+                    const v = Number(value);
+                    tempPlans[planKey][nutrient].min = Math.max(0, v - delta);
+                    tempPlans[planKey][nutrient].max = v + delta;
+                };
+
                 const saveSettings = () => {
                     Object.assign(plans, JSON.parse(JSON.stringify(tempPlans)));
                     updateFutureGoals();
@@ -2259,6 +2383,7 @@
 
                 const openSettings = () => {
                     Object.assign(tempPlans, JSON.parse(JSON.stringify(plans)));
+                    settingsStep.value = 1;
                     showSettings.value = true;
                 };
 
@@ -2575,6 +2700,7 @@
                     initialized, user, saving, showSettings, showHistory, showMonthPicker, historySearch, selectedDate, pickerMonth, loginEmail, loginPassword,
                     editingIndex, isAddingMeal, mealToDelete, nutrientKeys, profile, plans, tempPlans, allData, mealHistory, editingMeal, showSyncModal, templates,
                     currentMonthYearDisplay, calculatedTDEE, formatNum, formatFloat, scaleNutrients, lastAmount, prepareScale, onlyNumber,
+                    settingsStep, setCalorieCenter, setNutrientCenter,
                     calendarDays, changePickerMonth, goToToday,
                     currentDayRecord: computed(() => {
                         if (!allData[selectedDate.value]) { allData[selectedDate.value] = { planType: 'med', meals: [] }; }
