@@ -1,0 +1,1028 @@
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, updateDoc, onSnapshot, collection, query, where, getDocs, writeBatch, deleteField, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const { createApp, ref, reactive, computed, onMounted } = Vue;
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.error('Service Worker registration failed:', error);
+                    });
+            });
+        }
+
+
+        createApp({
+            setup() {
+                // 統一日期格式化工具 (確保 YYYY-MM-DD)
+                const formatDate = (d) => {
+                    const y = d.getFullYear();
+                    const m = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, '0');
+                    return `${y}-${m}-${day}`;
+                };
+
+                const isDark = ref(localStorage.getItem('theme') === 'dark');
+                const updateTheme = () => {
+                    if (isDark.value) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
+                };
+                const toggleTheme = () => {
+                    isDark.value = !isDark.value;
+                    localStorage.setItem('theme', isDark.value ? 'dark' : 'light');
+                    updateTheme();
+                };
+
+                const initialized = ref(false);
+                const user = ref(null);
+                const saving = ref(false);
+                const showSettings = ref(false);
+                const showHistory = ref(false);
+                const showExportModal = ref(false);
+                const isExporting = ref(false);
+                const exportRange = reactive({ start: formatDate(new Date(new Date().setDate(new Date().getDate() - 7))), end: formatDate(new Date()) });
+                const excludedDates = ref(new Set());
+
+                const exportDateList = computed(() => {
+                    const list = [];
+                    const start = new Date(exportRange.start);
+                    const end = new Date(exportRange.end);
+                    if (isNaN(start.getTime()) || isNaN(end.getTime())) return [];
+                    const temp = new Date(start);
+                    while (temp <= end) {
+                        list.push(formatDate(new Date(temp)));
+                        temp.setDate(temp.getDate() + 1);
+                    }
+                    return list;
+                });
+
+                const toggleExcludedDate = (date) => {
+                    if (excludedDates.value.has(date)) excludedDates.value.delete(date);
+                    else excludedDates.value.add(date);
+                };
+
+                const toggleAllExportDates = (select) => {
+                    if (select) excludedDates.value.clear();
+                    else exportDateList.value.forEach(d => excludedDates.value.add(d));
+                };
+
+                const setQuickRange = (type) => {
+                    const now = new Date();
+                    let start, end = new Date(now);
+                    if (type === 'thisWeek') {
+                        const day = now.getDay();
+                        const diff = (day === 0 ? -6 : 1) - day;
+                        start = new Date(now.getTime() + diff * 86400000);
+                        end = new Date();
+                    } else if (type === 'lastWeek') {
+                        const day = now.getDay();
+                        const diff = (day === 0 ? -6 : 1) - day - 7;
+                        start = new Date(now.getTime() + diff * 86400000);
+                        end = new Date(start.getTime() + 6 * 86400000);
+                    } else if (type === 'thisMonth') {
+                        start = new Date(now.getFullYear(), now.getMonth(), 1);
+                        end = new Date();
+                    } else if (type === 'lastMonth') {
+                        start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                        end = new Date(now.getFullYear(), now.getMonth(), 0);
+                    } else if (type === 'thisYear') {
+                        start = new Date(now.getFullYear(), 0, 1);
+                        end = new Date();
+                    }
+                    if (start && end) {
+                        exportRange.start = formatDate(start);
+                        exportRange.end = formatDate(end);
+                    }
+                };
+
+                const showMonthPicker = ref(false);
+                const historySearch = ref('');
+                const quickNutrientInput = ref('');
+
+                // 通用營養素解析工具
+                const parseNutrients = (target, inputStr) => {
+                    if (!inputStr) return;
+                    // 移除 . 從分隔符號中，以支援小數點
+                    const parts = inputStr.split(/[\/\s,，。]+/).filter(p => p !== '');
+                    if (parts.length >= 1) target.calories = formatFloat(parts[0]);
+                    if (parts.length >= 2) target.carbs = formatFloat(parts[1]);
+                    if (parts.length >= 3) target.protein = formatFloat(parts[2]);
+                    if (parts.length >= 4) target.fat = formatFloat(parts[3]);
+                };
+
+                const parseQuickInput = () => {
+                    parseNutrients(editingMeal, quickNutrientInput.value);
+                    if (quickNutrientInput.value) quickNutrientInput.value = '';
+                };
+
+                const parseItemInput = (item) => {
+                    parseNutrients(item, item.qInput);
+                    updateTotalsFromItems();
+                };
+
+                const exportPDF = async () => {
+                    isExporting.value = true;
+                    await Vue.nextTick();
+                    const reportEl = document.getElementById('export-report');
+                    reportEl.style.display = 'block';
+
+                    const stats = getRangeStats();
+                    renderExportCharts(stats);
+
+                    await new Promise(r => setTimeout(r, 1000));
+
+                    try {
+                        const { jsPDF } = window.jspdf;
+                        const canvas = await html2canvas(reportEl, {
+                            scale: 2,
+                            useCORS: true,
+                            backgroundColor: '#f8f9fb',
+                            logging: false
+                        });
+
+                        const imgData = canvas.toDataURL('image/png');
+                        const pdf = new jsPDF('p', 'mm', 'a4');
+
+                        const imgProps = pdf.getImageProperties(imgData);
+                        const pdfWidth = pdf.internal.pageSize.getWidth();
+                        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+                        if (pdfHeight > pdf.internal.pageSize.getHeight()) {
+                            const longPdf = new jsPDF('p', 'mm', [pdfWidth, pdfHeight]);
+                            longPdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                            longPdf.save(`健康報告_${exportRange.start}_to_${exportRange.end}.pdf`);
+                        } else {
+                            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                            pdf.save(`健康報告_${exportRange.start}_to_${exportRange.end}.pdf`);
+                        }
+
+                        showExportModal.value = false;
+                    } catch (e) {
+                        console.error('匯出 PDF 失敗', e);
+                        alert('匯出失敗，請稍後再試');
+                    } finally {
+                        reportEl.style.display = 'none';
+                        isExporting.value = false;
+                    }
+                };
+
+                const getRangeStats = () => {
+                    const stats = {
+                        days: 0,
+                        totalCalories: 0,
+                        avgCalories: 0,
+                        totalCarbs: 0,
+                        totalProtein: 0,
+                        totalFat: 0,
+                        dailyLabels: [],
+                        dailyCals: [],
+                        meals: [],
+                        dailyRecords: [],
+                        daysByType: { high: 0, med: 0, low: 0, rest: 0 },
+                        planAverages: { high: null, med: null, low: null },
+                        nutrientPercents: { carbs: 0, protein: 0, fat: 0 }
+                    };
+                    const start = new Date(exportRange.start);
+                    const end = new Date(exportRange.end);
+
+                    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                        const dateStr = formatDate(d);
+                        const record = allData[dateStr];
+                        stats.days++;
+                        stats.dailyLabels.push(dateStr.slice(5));
+
+                        let dayType = 'med';
+                        if (record && record.planType) {
+                            dayType = record.planType;
+                            stats.daysByType[record.planType]++;
+                            if (!stats.planAverages[record.planType] && record.planType !== 'rest') {
+                                stats.planAverages[record.planType] = record.goals || plans[record.planType];
+                            }
+                        }
+
+                        let dayCal = 0;
+                        const dayMeals = record && record.meals ? record.meals : [];
+                        dayMeals.forEach(m => {
+                            dayCal += Number(m.calories) || 0;
+                            stats.totalCalories += Number(m.calories) || 0;
+                            stats.totalCarbs += Number(m.carbs) || 0;
+                            stats.totalProtein += Number(m.protein) || 0;
+                            stats.totalFat += Number(m.fat) || 0;
+                            stats.meals.push({ date: dateStr, ...m });
+                        });
+                        stats.dailyCals.push(dayCal);
+                        stats.dailyRecords.push({
+                            date: dateStr,
+                            meals: dayMeals,
+                            totalCalories: dayCal,
+                            planType: dayType
+                        });
+                    }
+                    stats.avgCalories = stats.days > 0 ? Math.round(stats.totalCalories / stats.days) : 0;
+
+                    const cCal = stats.totalCarbs * 4;
+                    const pCal = stats.totalProtein * 4;
+                    const fCal = stats.totalFat * 9;
+                    const totalNutrientCal = cCal + pCal + fCal || 1;
+                    stats.nutrientPercents = {
+                        carbs: Math.round(cCal / totalNutrientCal * 100),
+                        protein: Math.round(pCal / totalNutrientCal * 100),
+                        fat: Math.round(fCal / totalNutrientCal * 100)
+                    };
+
+                    return stats;
+                };
+
+                let nutrientChart = null;
+                let trendChart = null;
+                const renderExportCharts = (stats) => {
+                    if (nutrientChart) nutrientChart.destroy();
+                    if (trendChart) trendChart.destroy();
+                    const ctx1 = document.getElementById('nutrientChart').getContext('2d');
+                    nutrientChart = new Chart(ctx1, {
+                        type: 'doughnut',
+                        data: { labels: ['淨碳水', '蛋白', '脂肪'], datasets: [{ data: [stats.totalCarbs, stats.totalProtein, stats.totalFat], backgroundColor: ['#6366f1', '#8b5cf6', '#ec4899'], borderWidth: 0 }] },
+                        options: { responsive: false, animation: false, plugins: { legend: { position: 'bottom', labels: { font: { weight: 'bold' } } } } }
+                    });
+                    const ctx2 = document.getElementById('trendChart').getContext('2d');
+                    trendChart = new Chart(ctx2, {
+                        type: 'line',
+                        data: { labels: stats.dailyLabels, datasets: [{ label: '每日熱量 (kcal)', data: stats.dailyCals, borderColor: '#6366f1', backgroundColor: 'rgba(99, 102, 241, 0.1)', fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: '#6366f1' }] },
+                        options: { responsive: false, animation: false, scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } }
+                    });
+                };
+
+                const selectedDate = ref(formatDate(new Date()));
+                const pickerMonth = ref(new Date()); // 用於月份選擇器的顯示月份
+                const loginEmail = ref('');
+                const loginPassword = ref('');
+
+                const screenWidth = ref(window.innerWidth);
+                window.addEventListener('resize', () => {
+                    screenWidth.value = window.innerWidth;
+                });
+                const isMobile = computed(() => screenWidth.value < 1024);
+
+                const isCalendarExpanded = ref(window.innerWidth >= 1024);
+                const showCalendarModal = ref(false);
+                const isNameAuto = ref(true);
+                const showMonthModal = ref(false);
+                const jumpYear = ref(new Date().getFullYear());
+                const showMonthJump = ref(false); // 確保沒遺漏，雖然現在改用 modal
+                const showMobileMenu = ref(false);
+
+                const toggleCalendar = (val) => {
+                    if (isMobile.value) {
+                        showCalendarModal.value = (val !== undefined) ? val : !showCalendarModal.value;
+                    } else {
+                        if (val !== undefined) isCalendarExpanded.value = val;
+                        else isCalendarExpanded.value = !isCalendarExpanded.value;
+                    }
+                };
+
+                const jumpToMonth = (mIdx) => {
+                    pickerMonth.value = new Date(jumpYear.value, mIdx, 1);
+                    // 同步更新選中日期到該月 1 號
+                    selectedDate.value = formatDate(new Date(jumpYear.value, mIdx, 1));
+                    showMonthModal.value = false;
+                };
+
+                const editingIndex = ref(null);
+                const isAddingMeal = ref(false);
+                const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
+                const tempMealBackup = ref(null);
+
+                const updateTotalsFromItems = () => {
+                    if (!editingMeal.items || editingMeal.items.length === 0) return;
+                    editingMeal.calories = formatFloat(editingMeal.items.reduce((sum, item) => sum + (Number(item.calories) || 0), 0));
+                    editingMeal.carbs = formatFloat(editingMeal.items.reduce((sum, item) => sum + (Number(item.carbs) || 0), 0));
+                    editingMeal.protein = formatFloat(editingMeal.items.reduce((sum, item) => sum + (Number(item.protein) || 0), 0));
+                    editingMeal.fat = formatFloat(editingMeal.items.reduce((sum, item) => sum + (Number(item.fat) || 0), 0));
+                    
+                    // 自動生成名稱：只要 isNameAuto 為 true，就持續同步
+                    if (isNameAuto.value) {
+                        const names = editingMeal.items.map(i => i.name).filter(n => n).join(' + ');
+                        if (names) {
+                            editingMeal.name = names;
+                        }
+                    }
+                };
+
+                const addItem = () => {
+                    if (!editingMeal.items) editingMeal.items = [];
+                    editingMeal.items.unshift({ name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, qInput: '' });
+                };
+
+                const removeItem = (idx) => {
+                    editingMeal.items.splice(idx, 1);
+                    updateTotalsFromItems();
+                };
+                const mealToDelete = ref(null);
+                const showSyncModal = ref(false);
+                const lastAmount = ref(1);
+                const originalNutrients = reactive({ calories: 0, carbs: 0, protein: 0, fat: 0 });
+                const templates = reactive({});
+
+                const nutrientKeys = [{ key: 'carbs', label: '淨碳水' }, { key: 'protein', label: '蛋白質' }, { key: 'fat', label: '脂肪' }];
+
+                const profile = reactive({
+                    gender: 'male', weight: 70, height: 175, age: 30, activity: 1.2, goal: 'lose'
+                });
+
+                const plans = reactive({
+                    high: { calories: { min: 2100, max: 2300 }, carbs: { min: 260, max: 280 }, protein: { min: 160, max: 170 }, fat: { min: 45, max: 55 } },
+                    med: { calories: { min: 1700, max: 1900 }, carbs: { min: 170, max: 190 }, protein: { min: 130, max: 140 }, fat: { min: 55, max: 65 } },
+                    low: { calories: { min: 1400, max: 1600 }, carbs: { min: 60, max: 80 }, protein: { min: 140, max: 160 }, fat: { min: 60, max: 70 } },
+                    rest: { calories: { min: 1300, max: 1500 }, carbs: { min: 20, max: 50 }, protein: { min: 130, max: 150 }, fat: { min: 70, max: 85 } }
+                });
+
+                const tempPlans = reactive({
+                    high: { calories: { min: 0, max: 0 }, carbs: { min: 0, max: 0 }, protein: { min: 0, max: 0 }, fat: { min: 0, max: 0 } },
+                    med: { calories: { min: 0, max: 0 }, carbs: { min: 0, max: 0 }, protein: { min: 0, max: 0 }, fat: { min: 0, max: 0 } },
+                    low: { calories: { min: 0, max: 0 }, carbs: { min: 0, max: 0 }, protein: { min: 0, max: 0 }, fat: { min: 0, max: 0 } },
+                    rest: { calories: { min: 0, max: 0 }, carbs: { min: 0, max: 0 }, protein: { min: 0, max: 0 }, fat: { min: 0, max: 0 } }
+                });
+
+                const allData = reactive({});
+                let db, auth, unsubscribe = null;
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'diet-tracker-v2';
+
+
+                // 數值格式化：四捨五入至整數
+                const formatNum = (val) => {
+                    if (val === undefined || val === null || isNaN(val)) return 0;
+                    return Math.round(Number(val));
+                };
+
+                const formatFloat = (val) => {
+                    if (val === undefined || val === null || isNaN(val)) return 0;
+                    return Number(Number(val).toFixed(2));
+                };
+
+                const scaleNutrients = () => {
+                    const newAmount = editingMeal.amount || 0;
+                    if (lastAmount.value > 0 && newAmount >= 0) {
+                        const ratio = newAmount / lastAmount.value;
+                        editingMeal.calories = formatFloat(originalNutrients.calories * ratio);
+                        editingMeal.carbs = formatFloat(originalNutrients.carbs * ratio);
+                        editingMeal.protein = formatFloat(originalNutrients.protein * ratio);
+                        editingMeal.fat = formatFloat(originalNutrients.fat * ratio);
+                    }
+                };
+
+                const prepareScale = () => {
+                    lastAmount.value = editingMeal.amount || 1;
+                    originalNutrients.calories = editingMeal.calories;
+                    originalNutrients.carbs = editingMeal.carbs;
+                    originalNutrients.protein = editingMeal.protein;
+                    originalNutrients.fat = editingMeal.fat;
+                };
+
+                const calculatedTDEE = computed(() => {
+                    const { gender, weight, height, age, activity } = profile;
+                    let bmr = (10 * weight) + (6.25 * height) - (5 * age);
+                    bmr = gender === 'male' ? bmr + 5 : bmr - 161;
+                    return Math.round(bmr * activity);
+                });
+
+                // 計算歷史紀錄 (依使用頻率，數值取自模板庫)
+                const mealHistory = computed(() => {
+                    const counts = new Map();
+                    // 統計次數
+                    Object.values(allData).forEach(day => {
+                        if (day.meals) {
+                            day.meals.forEach(m => {
+                                if (m.name) {
+                                    const k = m.name.toLowerCase().trim();
+                                    counts.set(k, (counts.get(k) || 0) + 1);
+                                }
+                            });
+                        }
+                    });
+
+                    let list = Object.keys(templates).map(key => ({
+                        ...templates[key],
+                        count: counts.get(key) || 0
+                    }));
+
+                    list.sort((a, b) => b.count - a.count);
+                    if (historySearch.value) {
+                        const term = historySearch.value.toLowerCase();
+                        list = list.filter(m => m.name.toLowerCase().includes(term));
+                    }
+                    return list.slice(0, 50);
+                });
+
+                const addFromHistory = (meal) => {
+                    const newMeal = JSON.parse(JSON.stringify(meal));
+                    if (newMeal.amount === undefined) newMeal.amount = 1;
+                    if (newMeal.unit === undefined) newMeal.unit = '份';
+
+                    if (editingIndex.value !== null) {
+                        Object.assign(editingMeal, newMeal);
+                        isNameAuto.value = false;
+                        prepareScale();
+                    } else {
+                        newMeal.type = 'lunch';
+                        if (!allData[selectedDate.value]) {
+                            allData[selectedDate.value] = { planType: 'med', meals: [] };
+                        }
+                        allData[selectedDate.value].meals.push(newMeal);
+                        sortMeals();
+                        saveData();
+                    }
+                    showHistory.value = false;
+                };
+
+                const setPlanType = (type) => {
+                    if (!allData[selectedDate.value]) {
+                        allData[selectedDate.value] = { meals: [] };
+                    }
+                    const day = allData[selectedDate.value];
+                    day.planType = type;
+                    // 快照當前的目標數值到該日期
+                    day.goals = JSON.parse(JSON.stringify(plans[type]));
+                    saveData();
+                };
+
+                const updateFutureGoals = () => {
+                    const todayStr = formatDate(new Date());
+                    // 僅更新當前及未來日期的快照
+                    Object.keys(allData).forEach(date => {
+                        if (date >= todayStr && allData[date].planType) {
+                            allData[date].goals = JSON.parse(JSON.stringify(plans[allData[date].planType]));
+                        }
+                    });
+                    saveData();
+                };
+
+                const autoCalculatePlans = () => {
+                    const { gender, weight, height, age, activity, goal } = profile;
+                    let bmr = (10 * weight) + (6.25 * height) - (5 * age);
+                    bmr = gender === 'male' ? bmr + 5 : bmr - 161;
+                    const tdee = Math.round(bmr * activity);
+                    
+                    // 根據目標調整基準熱量 (減重通常減少 300-500 kcal，維持則與 TDEE 相當)
+                    const base = goal === 'lose' ? tdee - 400 : tdee;
+                    
+                    // 動態計算蛋白質倍數 (根據活動量與目標)
+                    let pMultiplier = 1.6;
+                    if (goal === 'lose') {
+                        if (activity <= 1.2) pMultiplier = 1.6;
+                        else if (activity <= 1.375) pMultiplier = 1.9;
+                        else if (activity <= 1.55) pMultiplier = 2.2;
+                        else pMultiplier = 2.4;
+                    } else {
+                        if (activity <= 1.2) pMultiplier = 1.2;
+                        else if (activity <= 1.375) pMultiplier = 1.5;
+                        else if (activity <= 1.55) pMultiplier = 1.8;
+                        else pMultiplier = 2.0;
+                    }
+                    
+                    const pGrams = weight * pMultiplier; 
+
+                    // 輔助函式：將單一數值轉換為範圍物件
+                    const makeRange = (val, type) => {
+                        const num = formatNum(val);
+                        if (type === 'calories') return { min: Math.max(0, num - 100), max: num + 100 };
+                        if (type === 'carbs') return { min: Math.max(0, num - 10), max: num + 10 };
+                        return { min: Math.max(0, num - 5), max: num + 5 };
+                    };
+                    
+                    // 根據目標計算各計畫數值
+                    if (goal === 'lose') {
+                        tempPlans.high = { 
+                            calories: makeRange(base + 200, 'calories'), 
+                            protein: makeRange(pGrams, 'protein'), 
+                            carbs: makeRange((base + 200) * 0.45 / 4, 'carbs'), 
+                            fat: makeRange((base + 200) * 0.25 / 9, 'fat') 
+                        };
+                        tempPlans.med = { 
+                            calories: makeRange(base, 'calories'), 
+                            protein: makeRange(pGrams, 'protein'), 
+                            carbs: makeRange(base * 0.3 / 4, 'carbs'), 
+                            fat: makeRange(base * 0.3 / 9, 'fat') 
+                        };
+                        tempPlans.low = { 
+                            calories: makeRange(base - 200, 'calories'), 
+                            protein: makeRange(pGrams, 'protein'), 
+                            carbs: makeRange((base - 200) * 0.15 / 4, 'carbs'), 
+                            fat: makeRange((base - 200) * 0.45 / 9, 'fat') 
+                        };
+                        tempPlans.rest = { 
+                            calories: JSON.parse(JSON.stringify(tempPlans.high.calories)), 
+                            protein: JSON.parse(JSON.stringify(tempPlans.high.protein)), 
+                            carbs: JSON.parse(JSON.stringify(tempPlans.high.carbs)), 
+                            fat: JSON.parse(JSON.stringify(tempPlans.low.fat)) 
+                        };
+                    } else {
+                        // 維持身材邏輯
+                        tempPlans.high = { 
+                            calories: makeRange(base + 300, 'calories'), 
+                            protein: makeRange(pGrams, 'protein'), 
+                            carbs: makeRange((base + 300) * 0.55 / 4, 'carbs'), 
+                            fat: makeRange((base + 300) * 0.2 / 9, 'fat') 
+                        };
+                        tempPlans.med = { 
+                            calories: makeRange(base, 'calories'), 
+                            protein: makeRange(pGrams, 'protein'), 
+                            carbs: makeRange(base * 0.4 / 4, 'carbs'), 
+                            fat: makeRange(base * 0.4 / 9, 'fat') 
+                        };
+                        tempPlans.low = { 
+                            calories: makeRange(base - 200, 'calories'), 
+                            protein: makeRange(pGrams, 'protein'), 
+                            carbs: makeRange((base - 200) * 0.25 / 4, 'carbs'), 
+                            fat: makeRange((base - 200) * 0.45 / 9, 'fat') 
+                        };
+                        tempPlans.rest = { 
+                            calories: JSON.parse(JSON.stringify(tempPlans.high.calories)), 
+                            protein: JSON.parse(JSON.stringify(tempPlans.high.protein)), 
+                            carbs: JSON.parse(JSON.stringify(tempPlans.high.carbs)), 
+                            fat: JSON.parse(JSON.stringify(tempPlans.low.fat)) 
+                        };
+                    }
+                };
+
+                const settingsStep = ref(1);
+
+                const setCalorieCenter = (planKey, value) => {
+                    const v = Number(value);
+                    tempPlans[planKey].calories.min = Math.max(0, v - 100);
+                    tempPlans[planKey].calories.max = v + 100;
+                };
+
+                const setNutrientCenter = (planKey, nutrient, value, delta) => {
+                    const v = Number(value);
+                    tempPlans[planKey][nutrient].min = Math.max(0, v - delta);
+                    tempPlans[planKey][nutrient].max = v + delta;
+                };
+
+                const saveSettings = () => {
+                    Object.assign(plans, JSON.parse(JSON.stringify(tempPlans)));
+                    updateFutureGoals();
+                    showSettings.value = false;
+                    saveData();
+                };
+
+                const openSettings = () => {
+                    Object.assign(tempPlans, JSON.parse(JSON.stringify(plans)));
+                    settingsStep.value = 2;
+                    showSettings.value = true;
+                };
+
+                const currentMonthYearDisplay = computed(() => {
+                    return new Date(selectedDate.value).toLocaleDateString('zh-TW', { year: 'numeric', month: 'long' });
+                });
+
+                const getMealLabel = (type) => {
+                    const map = { breakfast: '🌅 早餐', lunch: '☀️ 午餐', dinner: '🌙 晚餐', snack: '🍰 點心' };
+                    return map[type] || '餐點';
+                };
+
+                const getPlanLabel = (key) => {
+                    const map = { high: '高碳日', med: '中碳日', low: '低碳日', rest: '自由日' };
+                    return map[key];
+                };
+
+                const mealTypes = [
+                    { key: 'breakfast', label: '🌅 早餐' },
+                    { key: 'lunch', label: '☀️ 午餐' },
+                    { key: 'dinner', label: '🌙 晚餐' },
+                    { key: 'snack', label: '🍰 點心' }
+                ];
+
+                const getMealsByType = (type) => {
+                    return (allData[selectedDate.value]?.meals || [])
+                        .map((meal, index) => ({ ...meal, originalIndex: index }))
+                        .filter(m => m.type === type);
+                };
+
+                const calendarDays = computed(() => {
+                    const year = pickerMonth.value.getFullYear();
+                    const month = pickerMonth.value.getMonth();
+                    const firstDay = new Date(year, month, 1);
+                    const lastDay = new Date(year, month + 1, 0);
+
+                    let startDay = firstDay.getDay();
+                    if (startDay === 0) startDay = 7;
+                    startDay -= 1;
+
+                    const days = [];
+                    const prevMonthLastDay = new Date(year, month, 0).getDate();
+                    for (let i = startDay - 1; i >= 0; i--) {
+                        const d = new Date(year, month - 1, prevMonthLastDay - i);
+                        days.push({ date: formatDate(d), dayNum: d.getDate(), currentMonth: false });
+                    }
+                    for (let i = 1; i <= lastDay.getDate(); i++) {
+                        const d = new Date(year, month, i);
+                        days.push({ date: formatDate(d), dayNum: i, currentMonth: true });
+                    }
+                    const remaining = 42 - days.length;
+                    for (let i = 1; i <= remaining; i++) {
+                        const d = new Date(year, month + 1, i);
+                        days.push({ date: formatDate(d), dayNum: i, currentMonth: false });
+                    }
+                    return days;
+                });
+
+                const changePickerMonth = (dir) => {
+                    pickerMonth.value = new Date(pickerMonth.value.getFullYear(), pickerMonth.value.getMonth() + dir, 1);
+                };
+
+                const goToToday = () => {
+                    const now = new Date();
+                    selectedDate.value = formatDate(now);
+                    pickerMonth.value = new Date(now.getFullYear(), now.getMonth(), 1);
+                };
+
+                // 分月載入資料 (按需載入)
+                const loadMonthData = async (date) => {
+                    if (!user.value) return;
+                    const year = date.getFullYear();
+                    const month = date.getMonth();
+                    const start = formatDate(new Date(year, month, 1));
+                    const end = formatDate(new Date(year, month + 1, 0));
+
+                    const q = query(
+                        collection(db, 'artifacts', appId, 'users', user.value.uid, 'dailyRecords'),
+                        where('date', '>=', start),
+                        where('date', '<=', end)
+                    );
+
+                    const snap = await getDocs(q);
+                    snap.forEach(doc => {
+                        allData[doc.id] = doc.data();
+                    });
+                };
+
+                const initApp = async () => {
+                    let firebaseConfig;
+                    try {
+                        const response = await fetch('/firebase-config.json');
+                        if (response.ok) firebaseConfig = await response.json();
+                        else throw new Error();
+                    } catch (e) {
+                        if (typeof __firebase_config !== 'undefined') firebaseConfig = JSON.parse(__firebase_config);
+                        else return;
+                    }
+
+                    const app = initializeApp(firebaseConfig);
+                    auth = getAuth(app);
+                    db = getFirestore(app);
+
+                    // 點 2: 啟用離線快取 (IndexedDB Persistence)
+                    try {
+                        await enableIndexedDbPersistence(db);
+                    } catch (err) {
+                        console.warn("Offline persistence failed", err.code);
+                    }
+
+                    onAuthStateChanged(auth, async (u) => {
+                        user.value = u;
+                        if (u) {
+                            const settingsRef = doc(db, 'artifacts', appId, 'users', u.uid, 'settings', 'dietData');
+                            
+                            // 監聽全局設定
+                            onSnapshot(settingsRef, async (snap) => {
+                                if (snap.exists()) {
+                                    const data = snap.data();
+                                    if (data.plans) Object.assign(plans, data.plans);
+                                    if (data.profile) Object.assign(profile, data.profile);
+                                    if (data.templates) Object.assign(templates, data.templates);
+
+                                    // 點 1: 資料遷移 (Migration) - 如果發現舊的大型 allData
+                                    if (data.allData) {
+                                        console.log("偵測到舊架構，開始資料遷移...");
+                                        const batch = writeBatch(db);
+                                        const dailyCol = collection(db, 'artifacts', appId, 'users', u.uid, 'dailyRecords');
+                                        
+                                        Object.keys(data.allData).forEach(date => {
+                                            const dayRef = doc(dailyCol, date);
+                                            batch.set(dayRef, { ...data.allData[date], date });
+                                            // 同時同步到本地快取
+                                            allData[date] = data.allData[date];
+                                        });
+                                        
+                                        // 遷移完成後移除舊欄位
+                                        batch.update(settingsRef, { allData: deleteField() });
+                                        await batch.commit();
+                                        console.log("資料遷移完成。");
+                                    }
+                                }
+                                initialized.value = true;
+                            });
+
+                            // 初始載入：本月與前後一月資料
+                            await loadMonthData(new Date());
+                            const prevMonth = new Date(); prevMonth.setMonth(prevMonth.getMonth() - 1);
+                            const nextMonth = new Date(); nextMonth.setMonth(nextMonth.getMonth() + 1);
+                            await Promise.all([loadMonthData(prevMonth), loadMonthData(nextMonth)]);
+                        } else {
+                            initialized.value = true;
+                        }
+                    });
+                };
+
+                const saveData = () => {
+                    if (!user.value) return;
+                    clearTimeout(window.saveTimer);
+                    window.saveTimer = setTimeout(async () => {
+                        saving.value = true;
+                        try {
+                            const batch = writeBatch(db);
+                            
+                            // 1. 儲存全局設定
+                            const settingsRef = doc(db, 'artifacts', appId, 'users', user.value.uid, 'settings', 'dietData');
+                            batch.set(settingsRef, {
+                                plans: JSON.parse(JSON.stringify(plans)),
+                                profile: JSON.parse(JSON.stringify(profile)),
+                                templates: JSON.parse(JSON.stringify(templates))
+                            }, { merge: true });
+
+                            // 2. 僅儲存「目前選中日期」的紀錄 (點 1: 分片寫入)
+                            const todayData = allData[selectedDate.value];
+                            if (todayData) {
+                                const dayRef = doc(db, 'artifacts', appId, 'users', user.value.uid, 'dailyRecords', selectedDate.value);
+                                batch.set(dayRef, { ...JSON.parse(JSON.stringify(todayData)), date: selectedDate.value });
+                            }
+
+                            await batch.commit();
+                        } catch (e) {
+                            console.error("同步失敗", e);
+                        } finally {
+                            saving.value = false;
+                        }
+                    }, 800);
+                };
+
+                const sortMeals = () => {
+                    const order = { breakfast: 1, lunch: 2, dinner: 3, snack: 4 };
+                    if (allData[selectedDate.value]?.meals) {
+                        allData[selectedDate.value].meals.sort((a, b) => {
+                            return (order[a.type] || 99) - (order[b.type] || 99);
+                        });
+                    }
+                };
+
+                const startEdit = (index) => {
+                    const meal = allData[selectedDate.value].meals[index];
+                    const copiedMeal = JSON.parse(JSON.stringify(meal));
+                    if (!copiedMeal.items) copiedMeal.items = [];
+                    Object.assign(editingMeal, copiedMeal);
+                    
+                    // 檢查名稱是否與品項串接相符，判斷是否為自動生成
+                    const names = editingMeal.items.map(i => i.name).filter(n => n).join(' + ');
+                    isNameAuto.value = !editingMeal.name || editingMeal.name === names;
+
+                    editingIndex.value = index;
+                    isAddingMeal.value = false;
+                    lastAmount.value = editingMeal.amount;
+                    tempMealBackup.value = JSON.parse(JSON.stringify(copiedMeal));
+                };
+
+                const addMeal = () => {
+                    if (!allData[selectedDate.value]) {
+                        allData[selectedDate.value] = { planType: 'med', meals: [] };
+                    }
+                    const newMeal = { type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] };
+                    Object.assign(editingMeal, newMeal);
+                    isNameAuto.value = true;
+                    const newIndex = allData[selectedDate.value].meals.push(newMeal) - 1;
+                    editingIndex.value = newIndex;
+                    isAddingMeal.value = true;
+                    lastAmount.value = 1;
+                    tempMealBackup.value = null;
+                };
+
+                const cancelEdit = () => {
+                    if (isAddingMeal.value && editingIndex.value !== null) {
+                        allData[selectedDate.value].meals.splice(editingIndex.value, 1);
+                    } else if (tempMealBackup.value && editingIndex.value !== null) {
+                        allData[selectedDate.value].meals[editingIndex.value] = tempMealBackup.value;
+                    }
+                    editingIndex.value = null;
+                    isAddingMeal.value = false;
+                    tempMealBackup.value = null;
+                };
+
+                const saveMeal = (syncOption = null) => {
+                    if (!editingMeal.name) return;
+                    const k = editingMeal.name.toLowerCase().trim();
+                    const currentNormalized = {
+                        ...editingMeal,
+                        amount: 1,
+                        calories: formatFloat(editingMeal.calories / (editingMeal.amount || 1)),
+                        carbs: formatFloat(editingMeal.carbs / (editingMeal.amount || 1)),
+                        protein: formatFloat(editingMeal.protein / (editingMeal.amount || 1)),
+                        fat: formatFloat(editingMeal.fat / (editingMeal.amount || 1))
+                    };
+                    const existing = templates[k];
+                    if (syncOption === null && existing) {
+                        const isDifferent =
+                            Math.abs(existing.calories - currentNormalized.calories) > 0.1 ||
+                            Math.abs(existing.carbs - currentNormalized.carbs) > 0.1 ||
+                            Math.abs(existing.protein - currentNormalized.protein) > 0.1 ||
+                            Math.abs(existing.fat - currentNormalized.fat) > 0.1;
+
+                        const nutrientsChangedFromBackup = !tempMealBackup.value || (
+                            Math.abs(tempMealBackup.value.calories - editingMeal.calories) > 0.1 ||
+                            Math.abs(tempMealBackup.value.carbs - editingMeal.carbs) > 0.1 ||
+                            Math.abs(tempMealBackup.value.protein - editingMeal.protein) > 0.1 ||
+                            Math.abs(tempMealBackup.value.fat - editingMeal.fat) > 0.1
+                        );
+
+                        if (isDifferent && nutrientsChangedFromBackup) {
+                            showSyncModal.value = true;
+                            return;
+                        }
+                    }
+                    if (syncOption === 'sync' || !existing) {
+                        templates[k] = currentNormalized;
+                    }
+                    if (editingIndex.value !== null) {
+                        allData[selectedDate.value].meals[editingIndex.value] = JSON.parse(JSON.stringify(editingMeal));
+                    }
+                    sortMeals();
+                    editingIndex.value = null;
+                    isAddingMeal.value = false;
+                    showSyncModal.value = false;
+                    saveData();
+                };
+
+                const exportCSV = () => {
+                    let csvContent = "data:text/csv;charset=utf-8,日期,計畫類型,餐點名稱,餐點類型,份量,單位,熱量,淨碳水,蛋白質,脂肪,品項內容\n";
+                    Object.keys(allData).sort().forEach(date => {
+                        const day = allData[date];
+                        if (day.meals && day.meals.length > 0) {
+                            day.meals.forEach(m => {
+                                const itemsStr = m.items ? m.items.map(i => `${i.name}(${i.amount}${i.unit})`).join('; ') : '';
+                                csvContent += `${date},${getPlanLabel(day.planType)},${m.name},${getMealLabel(m.type)},${m.amount},${m.unit || '份'},${m.calories},${m.carbs},${m.protein},${m.fat},"${itemsStr}"\n`;
+                            });
+                        }
+                    });
+                    const encodedUri = encodeURI(csvContent);
+                    const link = document.createElement("a");
+                    link.setAttribute("href", encodedUri);
+                    link.setAttribute("download", `健康飲食紀錄_${new Date().toLocaleDateString('sv-SE')}.csv`);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                };
+
+                const onlyNumber = (e) => {
+                    if (['e', 'E', '+', '-'].includes(e.key)) e.preventDefault();
+                };
+
+                onMounted(() => {
+                    updateTheme();
+                    initApp();
+                });
+
+                return {
+                    isDark, toggleTheme,
+                    initialized, user, saving, showSettings, showHistory, showMonthPicker, historySearch, selectedDate, pickerMonth, loginEmail, loginPassword,
+                    editingIndex, isAddingMeal, mealToDelete, nutrientKeys, profile, plans, tempPlans, allData, mealHistory, editingMeal, showSyncModal, templates,
+                    currentMonthYearDisplay, calculatedTDEE, formatNum, formatFloat, scaleNutrients, lastAmount, prepareScale, onlyNumber,
+                    settingsStep, setCalorieCenter, setNutrientCenter,
+                    calendarDays, changePickerMonth, goToToday,
+                    currentDayRecord: computed(() => {
+                        if (!allData[selectedDate.value]) { allData[selectedDate.value] = { planType: 'med', meals: [] }; }
+                        return allData[selectedDate.value];
+                    }),
+                    currentPlan: computed(() => {
+                        const day = allData[selectedDate.value];
+                        if (day?.goals) return day.goals;
+                        return plans[day?.planType] || plans.med;
+                    }),
+                    getMealLabel, getPlanLabel,
+                    getDailySum: (type) => (allData[selectedDate.value]?.meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0),
+                    getGoalDisplay: (type, planObj = null) => {
+                        const plan = planObj || allData[selectedDate.value]?.goals || plans[allData[selectedDate.value]?.planType] || plans.med;
+                        const goal = plan[type];
+                        if (typeof goal === 'object' && goal !== null) {
+                            return `${Math.round((goal.min + goal.max) / 2)}`;
+                        }
+                        return goal || 0;
+                    },
+                    getGap: (type) => {
+                        const day = allData[selectedDate.value];
+                        const plan = day?.goals || plans[day?.planType] || plans.med;
+                        const goal = plan[type];
+                        const sum = (allData[selectedDate.value]?.meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0);
+
+                        if (typeof goal === 'object' && goal !== null) {
+                            if (sum < goal.min) return Math.round(goal.min - sum); // 未達最低，顯示還差多少
+                            if (sum > goal.max) return Math.round(goal.max - sum); // 超出最高（負數）
+                            return Math.round(goal.max - sum);                     // 在範圍內，顯示距上限還剩多少
+                        }
+                        return Math.round((goal || 0) - sum);
+                    },
+                    isGoalInRange: (type) => {
+                        const day = allData[selectedDate.value];
+                        const plan = day?.goals || plans[day?.planType] || plans.med;
+                        const goal = plan[type];
+                        const sum = (allData[selectedDate.value]?.meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0);
+                        if (typeof goal === 'object' && goal !== null) {
+                            return sum >= goal.min && sum <= goal.max;
+                        }
+                        return false;
+                    },
+                    getGoalMidpoint: (type) => {
+                        const day = allData[selectedDate.value];
+                        const plan = day?.goals || plans[day?.planType] || plans.med;
+                        const goal = plan[type];
+                        if (typeof goal === 'object' && goal !== null) {
+                            return Math.round((goal.min + goal.max) / 2);
+                        }
+                        return goal || 1;
+                    },
+                    changeMonth: (dir) => {
+                        const d = new Date(selectedDate.value);
+                        const oldDay = d.getDate();
+                        d.setMonth(d.getMonth() + dir);
+                        if (d.getDate() !== oldDay) d.setDate(0);
+                        selectedDate.value = formatDate(d);
+                        pickerMonth.value = new Date(d.getFullYear(), d.getMonth(), 1);
+                    },
+                    mealTypes, getMealsByType,
+                    addMeal, startEdit, cancelEdit, saveMeal, addFromHistory,
+                    confirmDelete: (i) => { mealToDelete.value = i; },
+                    executeDelete: () => {
+                        allData[selectedDate.value].meals.splice(mealToDelete.value, 1);
+                        mealToDelete.value = null;
+                        saveData();
+                    },
+                    getDayStats: (date) => {
+                        const record = allData[date];
+                        if (!record || !record.planType) return null;
+                        const plan = record.goals || plans[record.planType] || plans.med;
+                        const intake = (record.meals || []).reduce((s, m) => s + (Number(m.calories) || 0), 0);
+                        
+                        const goalObj = plan.calories;
+                        const minGoal = typeof goalObj === 'object' ? goalObj.min : (goalObj || 1);
+                        const maxGoal = typeof goalObj === 'object' ? goalObj.max : (goalObj || 1);
+                        
+                        let progress = 0;
+                        if (intake < minGoal) {
+                            progress = (intake / minGoal) * 100;
+                        } else if (intake <= maxGoal) {
+                            progress = 100;
+                        } else {
+                            // 超出範圍，顯示為紅色/特殊狀態 (這裡簡單處理為 100+)
+                            progress = 100;
+                        }
+                        
+                        const colorMap = { high: '#f59e0b', med: '#6366f1', low: '#f43f5e', rest: '#64748b' };
+                        return { percent: progress, color: colorMap[record.planType] };
+                    },
+                    getNutrientPercent: (key, isTarget) => {
+                        const multipliers = { carbs: 4, protein: 4, fat: 9 };
+                        const mult = multipliers[key];
+                        const plan = allData[selectedDate.value]?.goals || plans[allData[selectedDate.value]?.planType] || plans.med;
+                        
+                        if (isTarget) {
+                            const getVal = (k) => {
+                                const g = plan[k];
+                                return typeof g === 'object' ? (g.min + g.max) / 2 : (g || 0);
+                            };
+                            const total = (getVal('carbs') * 4) + (getVal('protein') * 4) + (getVal('fat') * 9) || 1;
+                            return Math.round((getVal(key) * mult / total) * 100);
+                        } else {
+                            const meals = allData[selectedDate.value]?.meals || [];
+                            const c = meals.reduce((s, m) => s + (Number(m.carbs) || 0), 0);
+                            const p = meals.reduce((s, m) => s + (Number(m.protein) || 0), 0);
+                            const f = meals.reduce((s, m) => s + (Number(m.fat) || 0), 0);
+                            const totalCal = (c * 4) + (p * 4) + (f * 9);
+                            if (totalCal === 0) return 0;
+                            const val = meals.reduce((s, m) => s + (Number(m[key]) || 0), 0);
+                            return Math.round((val * mult / totalCal) * 100);
+                        }
+                    },
+                    setPlanType, autoCalculatePlans, exportCSV, saveData,
+                    openSettings, saveSettings,
+                    addItem, removeItem, updateTotalsFromItems,
+                    quickNutrientInput, parseQuickInput, parseItemInput,
+                    showExportModal, isExporting, exportRange, exportPDF, getRangeStats,
+                    excludedDates, exportDateList, toggleExcludedDate, toggleAllExportDates, setQuickRange,
+                    isMobile, screenWidth, isCalendarExpanded, toggleCalendar, showMonthModal, showCalendarModal, jumpYear, jumpToMonth, showMobileMenu,
+                    handleAuth: async (mode) => {
+                        try {
+                            mode === 'login'
+                                ? await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value)
+                                : await createUserWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
+                        } catch (e) { alert('驗證失敗'); }
+                    },
+                    handleAnonymous: () => signInAnonymously(auth),
+                    handleLogout: () => signOut(auth)
+                };
+            }
+        }).mount('#app');
