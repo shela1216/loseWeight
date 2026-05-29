@@ -1406,16 +1406,23 @@
 
                             <!-- 蛋白/碳水/脂肪 min-max 範圍 -->
                             <div class="grid grid-cols-3 gap-2">
-                                <div v-for="n in [{k:'protein',l:'蛋白',u:'g'},{k:'carbs',l:'碳水',u:'g'},{k:'fat',l:'脂肪',u:'g'}]" :key="n.k"
-                                    class="bg-white/80 rounded-xl p-2.5 border border-white/60">
-                                    <div class="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2 text-center">{{ n.l }} <span class="opacity-50">{{ n.u }}</span></div>
+                                <div v-for="n in [
+                                    {k:'protein', l:'蛋白質', u:'g', bg:'bg-violet-50', border:'border-violet-100', text:'text-violet-600', ring:'focus:ring-violet-500/10 focus:border-violet-400'},
+                                    {k:'carbs',   l:'淨碳水', u:'g', bg:'bg-indigo-50', border:'border-indigo-100', text:'text-indigo-600', ring:'focus:ring-indigo-500/10 focus:border-indigo-400'},
+                                    {k:'fat',     l:'脂肪',   u:'g', bg:'bg-pink-50',   border:'border-pink-100',   text:'text-pink-600',   ring:'focus:ring-pink-500/10 focus:border-pink-400'}
+                                ]" :key="n.k"
+                                    class="rounded-xl p-3 border" :class="[n.bg, n.border]">
+                                    <div class="font-black text-xs mb-0.5 text-center" :class="n.text">{{ n.l }}</div>
+                                    <div class="text-[10px] font-bold text-center mb-2 opacity-50" :class="n.text">{{ n.u }}</div>
                                     <div class="flex items-center gap-1">
                                         <input type="number" v-model.number="p[n.k].min"
-                                            class="w-full text-center text-xs p-1.5 bg-slate-50 border border-slate-100 rounded-lg font-black outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all"
+                                            class="w-full text-center text-xs p-1.5 bg-white border rounded-lg font-black outline-none focus:ring-2 transition-all"
+                                            :class="[n.border, n.ring]"
                                             placeholder="最小">
-                                        <span class="text-slate-200 font-bold text-xs flex-shrink-0">–</span>
+                                        <span class="font-bold text-xs flex-shrink-0 opacity-30" :class="n.text">–</span>
                                         <input type="number" v-model.number="p[n.k].max"
-                                            class="w-full text-center text-xs p-1.5 bg-slate-50 border border-slate-100 rounded-lg font-black outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all"
+                                            class="w-full text-center text-xs p-1.5 bg-white border rounded-lg font-black outline-none focus:ring-2 transition-all"
+                                            :class="[n.border, n.ring]"
                                             placeholder="最大">
                                     </div>
                                 </div>
@@ -1425,8 +1432,8 @@
                         <!-- 操作按鈕 -->
                         <div class="flex gap-3 pt-2">
                             <button @click="settingsStep=1"
-                                class="py-4 px-6 bg-slate-50 text-slate-500 rounded-[1.5rem] font-black text-sm hover:bg-slate-100 active:scale-95 transition-all border border-slate-100">
-                                ← 返回
+                                class="py-4 px-5 bg-slate-50 text-slate-500 rounded-[1.5rem] font-black text-xs hover:bg-slate-100 active:scale-95 transition-all border border-slate-100 leading-tight text-center">
+                                以 TDEE<br>重新計算
                             </button>
                             <button @click="saveSettings"
                                 class="flex-1 py-4 bg-slate-900 text-white rounded-[1.5rem] font-black text-base shadow-2xl hover:bg-black active:scale-95 transition-all tracking-tight">
@@ -2386,7 +2393,7 @@
 
                 const openSettings = () => {
                     Object.assign(tempPlans, JSON.parse(JSON.stringify(plans)));
-                    settingsStep.value = 1;
+                    settingsStep.value = 2;
                     showSettings.value = true;
                 };
 
