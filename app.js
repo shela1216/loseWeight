@@ -1,6 +1,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, updateDoc, onSnapshot, collection, query, where, getDocs, writeBatch, deleteField, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeFirestore, persistentLocalCache, doc, setDoc, updateDoc, onSnapshot, collection, query, where, getDocs, writeBatch, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
 
@@ -19,7 +19,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.0.4');
+                console.log('App initialization starting... v0.0.5');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -299,7 +299,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.0.4');
+                const appVersion = ref('0.0.5');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -702,14 +702,11 @@
 
                     const app = initializeApp(firebaseConfig);
                     auth = getAuth(app);
-                    db = getFirestore(app);
-
-                    // 點 2: 啟用離線快取 (IndexedDB Persistence)
-                    try {
-                        await enableIndexedDbPersistence(db);
-                    } catch (err) {
-                        console.warn("Offline persistence failed", err.code);
-                    }
+                    
+                    // 使用新的 Firestore 快取設定 (取代已棄用的 enableIndexedDbPersistence)
+                    db = initializeFirestore(app, {
+                        localCache: persistentLocalCache()
+                    });
 
                     onAuthStateChanged(auth, async (u) => {
                         user.value = u;
