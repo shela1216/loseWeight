@@ -1133,7 +1133,7 @@
         </div>
 
         <!-- 確認刪除 Modal (餐點紀錄) -->
-        <div v-if="mealToDelete !== null" class="fixed inset-0 z-[130] flex items-center justify-center p-4">
+        <div v-if="mealToDelete !== null && mealToDelete !== undefined" class="fixed inset-0 z-[130] flex items-center justify-center p-4">
             <div class="modal-overlay absolute inset-0"></div>
             <div
                 class="bg-white rounded-[2.5rem] p-10 relative z-10 w-full max-w-xs text-center shadow-2xl border border-slate-100">
@@ -1157,7 +1157,7 @@
         </div>
 
         <!-- 確認刪除 Modal (歷史紀錄) -->
-        <div v-if="historyToDelete !== null" class="fixed inset-0 z-[130] flex items-center justify-center p-4">
+        <div v-if="historyToDelete" class="fixed inset-0 z-[130] flex items-center justify-center p-4">
             <div class="modal-overlay absolute inset-0"></div>
             <div
                 class="bg-white rounded-[2.5rem] p-10 relative z-10 w-full max-w-xs text-center shadow-2xl border border-slate-100">
