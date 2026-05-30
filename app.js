@@ -19,7 +19,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.0.5');
+                console.log('App initialization starting... v0.0.6');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -289,17 +289,19 @@
                     }
                 };
 
-                const jumpToMonth = (mIdx) => {
-                    pickerMonth.value = new Date(jumpYear.value, mIdx, 1);
+                const jumpToMonth = async (mIdx) => {
+                    const newMonth = new Date(jumpYear.value, mIdx, 1);
+                    pickerMonth.value = newMonth;
                     // 同步更新選中日期到該月 1 號
-                    selectedDate.value = formatDate(new Date(jumpYear.value, mIdx, 1));
+                    selectedDate.value = formatDate(newMonth);
                     showMonthModal.value = false;
+                    await loadMonthData(newMonth);
                 };
 
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.0.5');
+                const appVersion = ref('0.0.6');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -659,21 +661,30 @@
                     return days;
                 });
 
-                const changePickerMonth = (dir) => {
-                    pickerMonth.value = new Date(pickerMonth.value.getFullYear(), pickerMonth.value.getMonth() + dir, 1);
+                const changePickerMonth = async (dir) => {
+                    const newMonth = new Date(pickerMonth.value.getFullYear(), pickerMonth.value.getMonth() + dir, 1);
+                    pickerMonth.value = newMonth;
+                    await loadMonthData(newMonth);
                 };
 
-                const goToToday = () => {
+                const goToToday = async () => {
                     const now = new Date();
                     selectedDate.value = formatDate(now);
                     pickerMonth.value = new Date(now.getFullYear(), now.getMonth(), 1);
+                    await loadMonthData(now);
                 };
 
                 // 分月載入資料 (按需載入)
+                const loadedMonths = new Set();
                 const loadMonthData = async (date) => {
                     if (!user.value) return;
                     const year = date.getFullYear();
                     const month = date.getMonth();
+                    const monthKey = `${year}-${month}`;
+                    
+                    if (loadedMonths.has(monthKey)) return;
+                    loadedMonths.add(monthKey);
+
                     const start = formatDate(new Date(year, month, 1));
                     const end = formatDate(new Date(year, month + 1, 0));
 
@@ -743,11 +754,8 @@
                                 initialized.value = true;
                             });
 
-                            // 初始載入：本月與前後一月資料
+                            // 初始載入：僅載入本月資料
                             await loadMonthData(new Date());
-                            const prevMonth = new Date(); prevMonth.setMonth(prevMonth.getMonth() - 1);
-                            const nextMonth = new Date(); nextMonth.setMonth(nextMonth.getMonth() + 1);
-                            await Promise.all([loadMonthData(prevMonth), loadMonthData(nextMonth)]);
                         } else {
                             initialized.value = true;
                         }
@@ -1003,13 +1011,14 @@
                         }
                         return goal || 1;
                     },
-                    changeMonth: (dir) => {
+                    changeMonth: async (dir) => {
                         const d = new Date(selectedDate.value);
                         const oldDay = d.getDate();
                         d.setMonth(d.getMonth() + dir);
                         if (d.getDate() !== oldDay) d.setDate(0);
                         selectedDate.value = formatDate(d);
                         pickerMonth.value = new Date(d.getFullYear(), d.getMonth(), 1);
+                        await loadMonthData(pickerMonth.value);
                     },
                     mealTypes, getMealsByType,
                     addMeal, startEdit, cancelEdit, saveMeal, addFromHistory, saveToHistoryOnly,
