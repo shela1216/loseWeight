@@ -297,6 +297,7 @@
 
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
+                const skipHistorySave = ref(false);
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -800,13 +801,14 @@
                     const copiedMeal = JSON.parse(JSON.stringify(meal));
                     if (!copiedMeal.items) copiedMeal.items = [];
                     Object.assign(editingMeal, copiedMeal);
-                    
+
                     // 檢查名稱是否與品項串接相符，判斷是否為自動生成
                     const names = editingMeal.items.map(i => i.name).filter(n => n).join(' + ');
                     isNameAuto.value = !editingMeal.name || editingMeal.name === names;
 
                     editingIndex.value = index;
                     isAddingMeal.value = false;
+                    skipHistorySave.value = false;
                     lastAmount.value = editingMeal.amount;
                     tempMealBackup.value = JSON.parse(JSON.stringify(copiedMeal));
                 };
@@ -821,6 +823,7 @@
                     const newIndex = allData[selectedDate.value].meals.push(newMeal) - 1;
                     editingIndex.value = newIndex;
                     isAddingMeal.value = true;
+                    skipHistorySave.value = false;
                     lastAmount.value = 1;
                     tempMealBackup.value = null;
                 };
@@ -848,27 +851,29 @@
                         fat: formatFloat(editingMeal.fat / (editingMeal.amount || 1))
                     };
                     const existing = templates[k];
-                    if (syncOption === null && existing) {
-                        const isDifferent =
-                            Math.abs(existing.calories - currentNormalized.calories) > 0.1 ||
-                            Math.abs(existing.carbs - currentNormalized.carbs) > 0.1 ||
-                            Math.abs(existing.protein - currentNormalized.protein) > 0.1 ||
-                            Math.abs(existing.fat - currentNormalized.fat) > 0.1;
+                    if (!skipHistorySave.value) {
+                        if (syncOption === null && existing) {
+                            const isDifferent =
+                                Math.abs(existing.calories - currentNormalized.calories) > 0.1 ||
+                                Math.abs(existing.carbs - currentNormalized.carbs) > 0.1 ||
+                                Math.abs(existing.protein - currentNormalized.protein) > 0.1 ||
+                                Math.abs(existing.fat - currentNormalized.fat) > 0.1;
 
-                        const nutrientsChangedFromBackup = !tempMealBackup.value || (
-                            Math.abs(tempMealBackup.value.calories - editingMeal.calories) > 0.1 ||
-                            Math.abs(tempMealBackup.value.carbs - editingMeal.carbs) > 0.1 ||
-                            Math.abs(tempMealBackup.value.protein - editingMeal.protein) > 0.1 ||
-                            Math.abs(tempMealBackup.value.fat - editingMeal.fat) > 0.1
-                        );
+                            const nutrientsChangedFromBackup = !tempMealBackup.value || (
+                                Math.abs(tempMealBackup.value.calories - editingMeal.calories) > 0.1 ||
+                                Math.abs(tempMealBackup.value.carbs - editingMeal.carbs) > 0.1 ||
+                                Math.abs(tempMealBackup.value.protein - editingMeal.protein) > 0.1 ||
+                                Math.abs(tempMealBackup.value.fat - editingMeal.fat) > 0.1
+                            );
 
-                        if (isDifferent && nutrientsChangedFromBackup) {
-                            showSyncModal.value = true;
-                            return;
+                            if (isDifferent && nutrientsChangedFromBackup) {
+                                showSyncModal.value = true;
+                                return;
+                            }
                         }
-                    }
-                    if (syncOption === 'sync' || !existing) {
-                        templates[k] = currentNormalized;
+                        if (syncOption === 'sync' || !existing) {
+                            templates[k] = currentNormalized;
+                        }
                     }
                     if (editingIndex.value !== null) {
                         allData[selectedDate.value].meals[editingIndex.value] = JSON.parse(JSON.stringify(editingMeal));
@@ -943,7 +948,7 @@
                 return {
                     isDark, toggleTheme,
                     initialized, user, saving, showSettings, showHistory, showMonthPicker, historySearch, selectedDate, pickerMonth, loginEmail, loginPassword,
-                    editingIndex, isAddingMeal, mealToDelete, historyToDelete, nutrientKeys, profile, plans, tempPlans, allData, mealHistory, visibleMealHistory, handleHistoryScroll, editingMeal, showSyncModal, templates,
+                    editingIndex, isAddingMeal, skipHistorySave, mealToDelete, historyToDelete, nutrientKeys, profile, plans, tempPlans, allData, mealHistory, visibleMealHistory, handleHistoryScroll, editingMeal, showSyncModal, templates,
                     currentMonthYearDisplay, calculatedTDEE, formatNum, formatFloat, scaleNutrients, lastAmount, prepareScale, onlyNumber,
                     settingsStep, setCalorieCenter, setNutrientCenter,
                     calendarDays, changePickerMonth, goToToday,
