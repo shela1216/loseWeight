@@ -1170,7 +1170,7 @@
                     </svg>
                 </div>
                 <h4 class="text-xl font-black text-slate-900 mb-2 tracking-tight">刪除歷史模板？</h4>
-                <p class="text-sm text-slate-500 mb-8 leading-relaxed">確定要將「{{ historyToDelete.name }}」從歷史庫中永久移除嗎？</p>
+                <p class="text-sm text-slate-500 mb-8 leading-relaxed">確定要將「{{ historyToDelete?.name }}」從歷史庫中永久移除嗎？</p>
                 <div class="flex gap-3">
                     <button @click="historyToDelete = null"
                         class="flex-1 py-4 bg-slate-50 text-slate-500 rounded-2xl font-black text-sm hover:bg-slate-100 active:scale-95 transition-all">取消</button>

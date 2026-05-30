@@ -410,10 +410,13 @@
                         }
                     });
 
-                    let list = Object.keys(templates).map(key => ({
-                        ...templates[key],
-                        count: counts.get(key) || 0
-                    }));
+                    let list = Object.keys(templates)
+                        .map(key => templates[key])
+                        .filter(t => t && t.name)
+                        .map(t => ({
+                            ...t,
+                            count: counts.get(t.name.toLowerCase().trim()) || 0
+                        }));
 
                     list.sort((a, b) => b.count - a.count);
                     if (historySearch.value) {
