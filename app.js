@@ -326,6 +326,7 @@
                     updateTotalsFromItems();
                 };
                 const mealToDelete = ref(null);
+                const historyToDelete = ref(null);
                 const showSyncModal = ref(false);
                 const lastAmount = ref(1);
                 const originalNutrients = reactive({ calories: 0, carbs: 0, protein: 0, fat: 0 });
@@ -394,6 +395,7 @@
                 });
 
                 // 計算歷史紀錄 (依使用頻率，數值取自模板庫)
+                const historyDisplayLimit = ref(20);
                 const mealHistory = computed(() => {
                     const counts = new Map();
                     // 統計次數
@@ -418,8 +420,25 @@
                         const term = historySearch.value.toLowerCase();
                         list = list.filter(m => m.name.toLowerCase().includes(term));
                     }
-                    return list.slice(0, 50);
+                    return list;
                 });
+
+                const visibleMealHistory = computed(() => {
+                    return mealHistory.value.slice(0, historyDisplayLimit.value);
+                });
+
+                watch(historySearch, () => {
+                    historyDisplayLimit.value = 20; // 搜尋時重置顯示數量
+                });
+
+                const handleHistoryScroll = (e) => {
+                    const el = e.target;
+                    if (el.scrollHeight - el.scrollTop <= el.clientHeight + 100) {
+                        if (historyDisplayLimit.value < mealHistory.value.length) {
+                            historyDisplayLimit.value += 20;
+                        }
+                    }
+                };
 
                 const addFromHistory = (meal) => {
                     const newMeal = JSON.parse(JSON.stringify(meal));
@@ -858,6 +877,37 @@
                     saveData();
                 };
 
+                const saveToHistoryOnly = () => {
+                    if (!editingMeal.name) return;
+                    const k = editingMeal.name.toLowerCase().trim();
+                    const currentNormalized = {
+                        ...editingMeal,
+                        amount: 1,
+                        calories: formatFloat(editingMeal.calories / (editingMeal.amount || 1)),
+                        carbs: formatFloat(editingMeal.carbs / (editingMeal.amount || 1)),
+                        protein: formatFloat(editingMeal.protein / (editingMeal.amount || 1)),
+                        fat: formatFloat(editingMeal.fat / (editingMeal.amount || 1))
+                    };
+                    templates[k] = currentNormalized;
+                    
+                    if (isAddingMeal.value && editingIndex.value !== null) {
+                        allData[selectedDate.value].meals.splice(editingIndex.value, 1);
+                    }
+                    
+                    editingIndex.value = null;
+                    isAddingMeal.value = false;
+                    saveData();
+                };
+
+                const executeDeleteHistory = () => {
+                    if (historyToDelete.value) {
+                        const k = historyToDelete.value.name.toLowerCase().trim();
+                        delete templates[k];
+                        historyToDelete.value = null;
+                        saveData();
+                    }
+                };
+
                 const exportCSV = () => {
                     let csvContent = "data:text/csv;charset=utf-8,日期,計畫類型,餐點名稱,餐點類型,份量,單位,熱量,淨碳水,蛋白質,脂肪,品項內容\n";
                     Object.keys(allData).sort().forEach(date => {
@@ -890,7 +940,7 @@
                 return {
                     isDark, toggleTheme,
                     initialized, user, saving, showSettings, showHistory, showMonthPicker, historySearch, selectedDate, pickerMonth, loginEmail, loginPassword,
-                    editingIndex, isAddingMeal, mealToDelete, nutrientKeys, profile, plans, tempPlans, allData, mealHistory, editingMeal, showSyncModal, templates,
+                    editingIndex, isAddingMeal, mealToDelete, historyToDelete, nutrientKeys, profile, plans, tempPlans, allData, mealHistory, visibleMealHistory, handleHistoryScroll, editingMeal, showSyncModal, templates,
                     currentMonthYearDisplay, calculatedTDEE, formatNum, formatFloat, scaleNutrients, lastAmount, prepareScale, onlyNumber,
                     settingsStep, setCalorieCenter, setNutrientCenter,
                     calendarDays, changePickerMonth, goToToday,
@@ -954,7 +1004,8 @@
                         pickerMonth.value = new Date(d.getFullYear(), d.getMonth(), 1);
                     },
                     mealTypes, getMealsByType,
-                    addMeal, startEdit, cancelEdit, saveMeal, addFromHistory,
+                    addMeal, startEdit, cancelEdit, saveMeal, addFromHistory, saveToHistoryOnly,
+                    confirmDeleteHistory: (item) => { historyToDelete.value = item; }, executeDeleteHistory,
                     confirmDelete: (i) => { mealToDelete.value = i; },
                     executeDelete: () => {
                         allData[selectedDate.value].meals.splice(mealToDelete.value, 1);
