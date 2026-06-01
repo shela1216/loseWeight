@@ -19,7 +19,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.0.8');
+                console.log('App initialization starting... v0.0.9');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -301,7 +301,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.0.8');
+                const appVersion = ref('0.0.9');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -1021,6 +1021,13 @@
                     confirmDeleteHistory: (item) => { historyToDelete.value = item; }, executeDeleteHistory,
                     confirmDelete: (i) => { mealToDelete.value = i; },
                     executeDelete: () => {
+                        const meal = allData[selectedDate.value].meals[mealToDelete.value];
+                        if (meal && meal.name) {
+                            const k = meal.name.toLowerCase().trim();
+                            if (templates[k] && templates[k].count > 0) {
+                                templates[k].count--;
+                            }
+                        }
                         allData[selectedDate.value].meals.splice(mealToDelete.value, 1);
                         mealToDelete.value = null;
                         saveData();
