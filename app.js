@@ -19,7 +19,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.0.7');
+                console.log('App initialization starting... v0.0.8');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -301,7 +301,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.0.7');
+                const appVersion = ref('0.0.8');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -402,25 +402,12 @@
                 // 計算歷史紀錄 (依使用頻率，數值取自模板庫)
                 const historyDisplayLimit = ref(20);
                 const mealHistory = computed(() => {
-                    const counts = new Map();
-                    // 統計次數
-                    Object.values(allData).forEach(day => {
-                        if (day.meals) {
-                            day.meals.forEach(m => {
-                                if (m.name) {
-                                    const k = m.name.toLowerCase().trim();
-                                    counts.set(k, (counts.get(k) || 0) + 1);
-                                }
-                            });
-                        }
-                    });
-
                     let list = Object.keys(templates)
                         .map(key => templates[key])
                         .filter(t => t && t.name)
                         .map(t => ({
                             ...t,
-                            count: counts.get(t.name.toLowerCase().trim()) || 0
+                            count: t.count || 0
                         }));
 
                     list.sort((a, b) => b.count - a.count);
@@ -879,7 +866,15 @@
                             }
                         }
                         if (syncOption === 'sync' || !existing) {
-                            templates[k] = currentNormalized;
+                            templates[k] = {
+                                ...currentNormalized,
+                                count: existing?.count || 0
+                            };
+                        }
+                        
+                        // 只有在「新增」餐點時，才增加使用次數
+                        if (isAddingMeal.value && templates[k]) {
+                            templates[k].count = (templates[k].count || 0) + 1;
                         }
                     }
                     if (editingIndex.value !== null) {
@@ -901,7 +896,8 @@
                         calories: formatFloat(editingMeal.calories / (editingMeal.amount || 1)),
                         carbs: formatFloat(editingMeal.carbs / (editingMeal.amount || 1)),
                         protein: formatFloat(editingMeal.protein / (editingMeal.amount || 1)),
-                        fat: formatFloat(editingMeal.fat / (editingMeal.amount || 1))
+                        fat: formatFloat(editingMeal.fat / (editingMeal.amount || 1)),
+                        count: templates[k]?.count || 0
                     };
                     templates[k] = currentNormalized;
                     
