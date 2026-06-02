@@ -301,7 +301,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.1.3');
+                const appVersion = ref('0.1.4');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
