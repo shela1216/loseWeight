@@ -344,6 +344,10 @@
                                         <span
                                             class="text-[10px] sm:text-xs font-bold text-muted uppercase">kcal</span>
                                     </div>
+                                    <div v-if="typeof currentPlan.calories === 'object'"
+                                        class="text-[9px] font-bold text-muted opacity-50 mt-0.5">
+                                        範圍 {{ currentPlan.calories.min }}–{{ currentPlan.calories.max }} kcal
+                                    </div>
                                 </div>
                             </div>
                         </div>
