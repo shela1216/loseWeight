@@ -451,6 +451,10 @@
                         }
                         allData[selectedDate.value].meals.push(newMeal);
                         sortMeals();
+                        const k = newMeal.name.toLowerCase().trim();
+                        if (templates[k]) {
+                            templates[k].count = (templates[k].count || 0) + 1;
+                        }
                         saveData();
                     }
                     showHistory.value = false;
@@ -747,6 +751,36 @@
                             initialized.value = true;
                         }
                     });
+                };
+
+                const isRecalculating = ref(false);
+                const recalcCounts = async () => {
+                    if (!user.value || isRecalculating.value) return;
+                    isRecalculating.value = true;
+                    try {
+                        const allRecordsRef = collection(db, 'artifacts', appId, 'users', user.value.uid, 'dailyRecords');
+                        const snap = await getDocs(allRecordsRef);
+                        const counts = new Map();
+                        snap.forEach(docSnap => {
+                            const day = docSnap.data();
+                            if (day.meals) {
+                                day.meals.forEach(m => {
+                                    if (m.name) {
+                                        const k = m.name.toLowerCase().trim();
+                                        counts.set(k, (counts.get(k) || 0) + 1);
+                                    }
+                                });
+                            }
+                        });
+                        Object.keys(templates).forEach(k => {
+                            if (templates[k]) {
+                                templates[k].count = counts.get(k) || 0;
+                            }
+                        });
+                        saveData();
+                    } finally {
+                        isRecalculating.value = false;
+                    }
                 };
 
                 const saveData = () => {
@@ -1078,7 +1112,7 @@
                             return Math.round((val * mult / totalCal) * 100);
                         }
                     },
-                    setPlanType, autoCalculatePlans, exportCSV, saveData,
+                    setPlanType, autoCalculatePlans, exportCSV, saveData, recalcCounts, isRecalculating,
                     openSettings, saveSettings,
                     addItem, removeItem, updateTotalsFromItems,
                     quickNutrientInput, parseQuickInput, parseItemInput,
