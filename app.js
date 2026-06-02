@@ -301,7 +301,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.1.1');
+                const appVersion = ref('0.1.3');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -471,9 +471,15 @@
                     saveData();
                 };
 
+                // 解析目標計畫：過去日期用快照（歷史紀錄），今天及之後永遠用當前 plans 設定
+                const activePlan = (date, day) => {
+                    const todayStr = formatDate(new Date());
+                    if (date < todayStr && day?.goals) return day.goals;
+                    return plans[day?.planType] || plans.med;
+                };
+
                 const updateFutureGoals = () => {
                     const todayStr = formatDate(new Date());
-                    // 僅更新當前及未來日期的快照
                     Object.keys(allData).forEach(date => {
                         if (date >= todayStr && allData[date].planType) {
                             allData[date].goals = JSON.parse(JSON.stringify(plans[allData[date].planType]));
@@ -996,13 +1002,13 @@
                     }),
                     currentPlan: computed(() => {
                         const day = allData[selectedDate.value];
-                        if (day?.goals) return day.goals;
-                        return plans[day?.planType] || plans.med;
+                        return activePlan(selectedDate.value, day);
                     }),
                     getMealLabel, getPlanLabel,
                     getDailySum: (type) => (allData[selectedDate.value]?.meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0),
                     getGoalDisplay: (type, planObj = null) => {
-                        const plan = planObj || allData[selectedDate.value]?.goals || plans[allData[selectedDate.value]?.planType] || plans.med;
+                        const day = allData[selectedDate.value];
+                        const plan = planObj || activePlan(selectedDate.value, day);
                         const goal = plan[type];
                         if (typeof goal === 'object' && goal !== null) {
                             return `${Math.round((goal.min + goal.max) / 2)}`;
@@ -1011,12 +1017,13 @@
                     },
                     getGap: (type) => {
                         const day = allData[selectedDate.value];
-                        const plan = day?.goals || plans[day?.planType] || plans.med;
+                        const plan = activePlan(selectedDate.value, day);
                         const goal = plan[type];
                         const sum = (allData[selectedDate.value]?.meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0);
 
                         if (typeof goal === 'object' && goal !== null) {
-                            if (sum < goal.min) return Math.round(goal.min - sum); // 未達最低，顯示還差多少
+                            const mid = Math.round((goal.min + goal.max) / 2);
+                            if (sum < goal.min) return mid - sum;              // 未達最低，顯示距目標中心還差多少
                             if (sum > goal.max) return Math.round(goal.max - sum); // 超出最高（負數）
                             return Math.round(goal.max - sum);                     // 在範圍內，顯示距上限還剩多少
                         }
@@ -1024,7 +1031,7 @@
                     },
                     isGoalInRange: (type) => {
                         const day = allData[selectedDate.value];
-                        const plan = day?.goals || plans[day?.planType] || plans.med;
+                        const plan = activePlan(selectedDate.value, day);
                         const goal = plan[type];
                         const sum = (allData[selectedDate.value]?.meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0);
                         if (typeof goal === 'object' && goal !== null) {
@@ -1034,7 +1041,7 @@
                     },
                     getGoalMidpoint: (type) => {
                         const day = allData[selectedDate.value];
-                        const plan = day?.goals || plans[day?.planType] || plans.med;
+                        const plan = activePlan(selectedDate.value, day);
                         const goal = plan[type];
                         if (typeof goal === 'object' && goal !== null) {
                             return Math.round((goal.min + goal.max) / 2);
@@ -1069,7 +1076,7 @@
                     getDayStats: (date) => {
                         const record = allData[date];
                         if (!record || !record.planType) return null;
-                        const plan = record.goals || plans[record.planType] || plans.med;
+                        const plan = activePlan(date, record);
                         const intake = (record.meals || []).reduce((s, m) => s + (Number(m.calories) || 0), 0);
                         
                         const goalObj = plan.calories;
@@ -1092,8 +1099,8 @@
                     getNutrientPercent: (key, isTarget) => {
                         const multipliers = { carbs: 4, protein: 4, fat: 9 };
                         const mult = multipliers[key];
-                        const plan = allData[selectedDate.value]?.goals || plans[allData[selectedDate.value]?.planType] || plans.med;
-                        
+                        const plan = activePlan(selectedDate.value, allData[selectedDate.value]);
+
                         if (isTarget) {
                             const getVal = (k) => {
                                 const g = plan[k];
