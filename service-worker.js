@@ -1,5 +1,5 @@
 // 快取版本號
-const CACHE_NAME = 'diet-tracker-v0.0.12';
+const CACHE_NAME = 'diet-tracker-v0.0.13';
 
 // 需要快取的靜態資源列表
 const urlsToCache = [
@@ -10,7 +10,7 @@ const urlsToCache = [
     'manifest.json',
     'leaf.png',
     'https://cdn.tailwindcss.com',
-    'https://unpkg.com/vue@3/dist/vue.global.js',
+    'https://unpkg.com/vue@3.5.35/dist/vue.global.prod.js',
     'https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap'
 ];
 

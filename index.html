@@ -15,10 +15,11 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.tailwindcss.com" async></script>
+    <script src="https://unpkg.com/vue@3.5.35/dist/vue.global.prod.js"></script>
     
     <link rel="manifest" href='manifest.json'>
     <script>
@@ -47,7 +48,7 @@
     <div id="app" v-cloak class="min-h-screen">
 
         <!-- 載入中狀態 -->
-        <div v-if="!initialized" class="fixed inset-0 flex flex-col items-center justify-center z-[100]" style="background-color: var(--bg-main)">
+        <div v-if="!initialized" class="fixed inset-0 flex flex-col items-center justify-center z-[100]" style="background: color-mix(in srgb, var(--bg-main) 75%, transparent); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);">
             <div class="w-10 h-10 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
             <p class="mt-4 text-indigo-600 font-bold text-sm">數據加載中...</p>
         </div>
