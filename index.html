@@ -18,30 +18,11 @@
     <link rel="preconnect" href="https://unpkg.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/vue@3.5.35/dist/vue.global.prod.js"></script>
-    
-    <link rel="manifest" href='manifest.json'>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        indigo: {
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                        }
-                    },
-                    borderRadius: {
-                        '4xl': '2rem',
-                        '5xl': '2.5rem',
-                    }
-                }
-            }
-        }
-    </script>
+    <link rel="stylesheet" href="tailwind.css">
     <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/vue@3.5.35/dist/vue.global.prod.js"></script>
+
+    <link rel="manifest" href='manifest.json'>
 </head>
 
 <body class="min-h-screen font-sans transition-colors duration-500">
