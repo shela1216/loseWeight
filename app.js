@@ -19,7 +19,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.0.10');
+                console.log('App initialization starting... v0.0.11');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -434,14 +434,17 @@
                     const sortBy = historySortBy.value;
                     const sortOrder = historySortOrder.value;
 
+                    // 統一排序基準：g 單位的餐點換算為 per-100g 再比較
+                    const sortScale = (item) => item.unit === 'g' ? 100 : 1;
+
                     list.sort((a, b) => {
-                        let valA = a[sortBy] || 0;
-                        let valB = b[sortBy] || 0;
-                        
-                        // 處理次數排序的特殊屬性名 (雖然 map 已經處理過，但這裡確保萬無一失)
+                        let valA, valB;
                         if (sortBy === 'count') {
                             valA = a.count;
                             valB = b.count;
+                        } else {
+                            valA = (a[sortBy] || 0) * sortScale(a);
+                            valB = (b[sortBy] || 0) * sortScale(b);
                         }
 
                         if (sortOrder === 'desc') {

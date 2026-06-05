@@ -907,6 +907,8 @@
                                 <span
                                     class="text-[10px] sm:text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-lg font-black uppercase group-hover:bg-indigo-100 group-hover:text-indigo-500 transition-colors shrink-0 whitespace-nowrap">{{
                                     item.count }} 次記錄</span>
+                                <span v-if="item.unit === 'g'"
+                                    class="text-[10px] bg-teal-50 text-teal-500 border border-teal-100 px-2 py-0.5 rounded-lg font-black shrink-0 whitespace-nowrap">per 100g</span>
                             </div>
                             <div v-if="item.items && item.items.length > 0" class="flex flex-wrap gap-1.5 mb-2.5">
                                 <span v-for="sub in item.items" :key="sub.name" class="text-[9px] font-bold bg-slate-50 text-slate-400 px-2 py-0.5 rounded-md border border-slate-100/50">
@@ -915,15 +917,14 @@
                             </div>
                             <div class="space-y-1">
                                 <p class="flex items-center gap-2 text-sm">
-                                    <span class="font-black text-indigo-500">{{ item.amount }}{{ item.unit || '份'
-                                        }}</span>
+                                    <span class="font-black text-indigo-500">{{ item.unit === 'g' ? '100g' : (item.amount + (item.unit || '份')) }}</span>
                                     <span class="text-slate-200">•</span>
-                                    <span class="font-black text-slate-900">{{ formatFloat(item.calories) }}kcal</span>
+                                    <span class="font-black text-slate-900">{{ item.unit === 'g' ? formatFloat(item.calories * 100) : formatFloat(item.calories) }}kcal</span>
                                 </p>
                                 <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-tighter">
-                                    碳:<span class="text-slate-900 font-black mr-2">{{ formatFloat(item.carbs) }}</span>
-                                    蛋:<span class="text-slate-900 font-black mr-2">{{ formatFloat(item.protein) }}</span>
-                                    脂:<span class="text-slate-900 font-black">{{ formatFloat(item.fat) }}</span>
+                                    碳:<span class="text-slate-900 font-black mr-2">{{ item.unit === 'g' ? formatFloat(item.carbs * 100) : formatFloat(item.carbs) }}</span>
+                                    蛋:<span class="text-slate-900 font-black mr-2">{{ item.unit === 'g' ? formatFloat(item.protein * 100) : formatFloat(item.protein) }}</span>
+                                    脂:<span class="text-slate-900 font-black">{{ item.unit === 'g' ? formatFloat(item.fat * 100) : formatFloat(item.fat) }}</span>
                                 </p>
                             </div>
                         </div>
