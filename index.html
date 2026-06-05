@@ -411,12 +411,12 @@
                                     currentDayRecord.meals.length }})</p>
                             </div>
                             <div class="flex gap-4 sm:gap-6 items-center">
-                                <button @click="showHistory = true" class="btn-circular" title="查看歷史紀錄">
+                                <button @click="showHistory = true" class="btn-circular" title="食物資料庫">
                                     <div class="icon-wrapper">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
                                         </svg>
                                     </div>
                                 </button>
@@ -629,7 +629,7 @@
                         </div>
                         <button v-if="isAddingMeal" @click="showHistory = true"
                             class="shrink-0 bg-indigo-50 text-indigo-600 text-xs font-black uppercase tracking-widest hover:bg-indigo-100 px-4 py-2.5 rounded-xl transition-all shadow-sm">
-                            搜尋紀錄
+                            食物資料庫
                         </button>
                     </div>
 
@@ -772,7 +772,7 @@
                                 <input type="checkbox" v-model="skipHistorySave" 
                                     class="w-5 h-5 rounded-lg border-2 border-slate-200 text-indigo-600 focus:ring-indigo-500 transition-all cursor-pointer">
                                 <div class="flex flex-col">
-                                    <span class="text-xs font-black text-slate-700 group-hover:text-indigo-600 transition-colors">本次不存入歷史餐點資料庫</span>
+                                    <span class="text-xs font-black text-slate-700 group-hover:text-indigo-600 transition-colors">本次不存入食物資料庫</span>
                                     <span class="text-[9px] text-slate-400 font-bold uppercase tracking-tight">One-time entry only</span>
                                 </div>
                             </label>
@@ -789,10 +789,10 @@
                             <path d="M5 13l4 4L19 7"></path>
                         </svg>
                     </button>
-                    <!-- 僅存入歷史按鈕 -->
+                    <!-- 僅存入資料庫按鈕 -->
                     <button v-if="isAddingMeal && !skipHistorySave" @click="saveToHistoryOnly"
                         class="w-full py-4 bg-indigo-50 text-indigo-600 rounded-2xl text-base font-black border border-indigo-100 hover:bg-indigo-100 active:scale-95 transition-all flex items-center justify-center gap-2">
-                        <span>僅存入歷史餐點庫</span>
+                        <span>僅存入食物資料庫</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
                             <path d="M12 4v16m8-8H4"></path>
                         </svg>
@@ -817,28 +817,28 @@
                         </path>
                     </svg>
                 </div>
-                <h4 class="text-xl font-black text-slate-900 mb-3 tracking-tight">更新歷史模板？</h4>
-                <p class="text-sm text-slate-500 mb-8 leading-relaxed">檢測到營養成分與歷史紀錄不同，要將此設定存為「{{ editingMeal.name
-                    }}」未來的預設值嗎？</p>
+                <h4 class="text-xl font-black text-slate-900 mb-3 tracking-tight">更新資料庫？</h4>
+                <p class="text-sm text-slate-500 mb-8 leading-relaxed">檢測到營養成分與資料庫紀錄不同，要將此設定存為「{{ editingMeal.name
+                    }}」的新預設值嗎？</p>
                 <div class="space-y-3">
                     <button @click="saveMeal('sync')"
-                        class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all">更新歷史模板</button>
+                        class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all">同步至資料庫</button>
                     <button @click="saveMeal('only_once')"
                         class="w-full py-4 bg-slate-50 text-slate-500 rounded-2xl font-black text-sm hover:bg-slate-100 active:scale-95 transition-all">僅儲存此次紀錄</button>
                 </div>
             </div>
         </div>
 
-        <!-- 歷史紀錄 Modal -->
+        <!-- 食物資料庫 Modal -->
         <div v-if="showHistory" class="fixed inset-0 z-[110] flex items-center justify-center p-4">
             <div class="modal-overlay absolute inset-0" @click="showHistory = false"></div>
             <div
                 class="bg-white w-full max-w-lg rounded-[2.5rem] p-8 relative z-10 shadow-2xl flex flex-col max-h-[85vh] border border-slate-100">
                 <div class="flex justify-between items-center mb-8 px-2 shrink-0">
                     <div>
-                        <h3 class="text-2xl font-black text-slate-900 tracking-tight">選擇歷史餐點</h3>
+                        <h3 class="text-2xl font-black text-slate-900 tracking-tight">食物資料庫</h3>
                         <p class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">
-                            從您的資料庫中快速選擇</p>
+                            快速選取餐點並管理</p>
                     </div>
                     <div class="flex items-center gap-2">
                         <button @click="recalcCounts" :disabled="isRecalculating"
@@ -854,15 +854,48 @@
                     </div>
                 </div>
 
-                <div class="mb-6 relative shrink-0 px-2">
-                    <input type="text" v-model="historySearch"
-                        class="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-[1.25rem] text-sm font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 focus:bg-white transition-all"
-                        placeholder="搜尋餐點名稱...">
-                    <svg class="w-5 h-5 text-slate-300 absolute left-6 top-1/2 -translate-y-1/2" fill="none"
-                        stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
+                <div class="flex flex-col gap-4 mb-6 shrink-0 px-2">
+                    <div class="flex gap-2 p-1.5 bg-slate-50 rounded-2xl border border-slate-100/50">
+                        <button @click="historyTab = 'general'" 
+                            :class="historyTab === 'general' ? 'bg-white text-indigo-500 shadow-sm' : 'text-slate-400 hover:text-slate-600'"
+                            class="flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all">一般餐點</button>
+                        <button @click="historyTab = 'combo'"
+                            :class="historyTab === 'combo' ? 'bg-white text-indigo-500 shadow-sm' : 'text-slate-400 hover:text-slate-600'"
+                            class="flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all">組合餐點</button>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <div class="relative flex-1">
+                            <input type="text" v-model="historySearch"
+                                class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-100 rounded-[1.25rem] text-sm font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 focus:bg-white transition-all"
+                                placeholder="搜尋餐點名稱...">
+                            <svg class="w-5 h-5 text-slate-300 absolute left-6 top-1/2 -translate-y-1/2" fill="none"
+                                stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <select v-model="historySortBy" 
+                                class="pl-4 pr-10 py-3.5 bg-slate-50 border border-slate-100 rounded-[1.25rem] text-xs font-black text-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%2364748b%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_0.5rem_center] bg-no-repeat">
+                                <option value="count">次數</option>
+                                <option value="calories">熱量</option>
+                                <option value="carbs">碳水</option>
+                                <option value="protein">蛋白</option>
+                                <option value="fat">脂肪</option>
+                            </select>
+                            <button @click="historySortOrder = historySortOrder === 'desc' ? 'asc' : 'desc'"
+                                class="w-12 h-12 flex items-center justify-center bg-slate-50 border border-slate-100 rounded-[1.25rem] text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 transition-all active:scale-90"
+                                :title="historySortOrder === 'desc' ? '由高到低' : '由低到高'">
+                                <svg v-if="historySortOrder === 'desc'" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                                </svg>
+                                <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 8l4 4m0 0l4-4m-4 4V8" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="flex-1 overflow-y-auto overflow-x-hidden custom-scroll space-y-4 px-2 pb-4" @scroll="handleHistoryScroll">
@@ -1199,7 +1232,7 @@
             </div>
         </div>
 
-        <!-- 確認刪除 Modal (歷史紀錄) -->
+        <!-- 確認刪除 Modal (資料庫) -->
         <div v-if="historyToDelete" class="fixed inset-0 z-[130] flex items-center justify-center p-4">
             <div class="modal-overlay absolute inset-0"></div>
             <div
@@ -1212,8 +1245,8 @@
                         </path>
                     </svg>
                 </div>
-                <h4 class="text-xl font-black text-slate-900 mb-2 tracking-tight">刪除歷史模板？</h4>
-                <p class="text-sm text-slate-500 mb-8 leading-relaxed">確定要將「{{ historyToDelete?.name }}」從歷史庫中永久移除嗎？</p>
+                <h4 class="text-xl font-black text-slate-900 mb-2 tracking-tight">從資料庫移除？</h4>
+                <p class="text-sm text-slate-500 mb-8 leading-relaxed">確定要將「{{ historyToDelete?.name }}」從資料庫中永久移除嗎？</p>
                 <div class="flex gap-3">
                     <button @click="historyToDelete = null"
                         class="flex-1 py-4 bg-slate-50 text-slate-500 rounded-2xl font-black text-sm hover:bg-slate-100 active:scale-95 transition-all">取消</button>

@@ -106,6 +106,9 @@
 
                 const showMonthPicker = ref(false);
                 const historySearch = ref('');
+                const historySortBy = ref('count'); // count, calories, carbs, protein, fat
+                const historySortOrder = ref('desc'); // desc, asc
+                const historyTab = ref('general'); // general, combo
                 const quickNutrientInput = ref('');
 
                 // 通用營養素解析工具
@@ -301,7 +304,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.0.10');
+                const appVersion = ref('0.0.11');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -410,7 +413,25 @@
                             count: t.count || 0
                         }));
 
-                    list.sort((a, b) => b.count - a.count);
+                    // 分類：組合餐點 vs 一般餐點
+                    if (historyTab.value === 'combo') {
+                        list = list.filter(m => m.items && m.items.length > 0);
+                    } else {
+                        list = list.filter(m => !m.items || m.items.length === 0);
+                    }
+
+                    // 排序
+                    list.sort((a, b) => {
+                        let valA = a[historySortBy.value] || 0;
+                        let valB = b[historySortBy.value] || 0;
+                        if (historySortBy.value === 'count') {
+                            valA = a.count || 0;
+                            valB = b.count || 0;
+                        }
+                        
+                        return historySortOrder.value === 'desc' ? valB - valA : valA - valB;
+                    });
+
                     if (historySearch.value) {
                         const term = historySearch.value.toLowerCase();
                         list = list.filter(m => m.name.toLowerCase().includes(term));
@@ -422,8 +443,8 @@
                     return mealHistory.value.slice(0, historyDisplayLimit.value);
                 });
 
-                watch(historySearch, () => {
-                    historyDisplayLimit.value = 20; // 搜尋時重置顯示數量
+                watch([historySearch, historySortBy, historySortOrder, historyTab], () => {
+                    historyDisplayLimit.value = 20; // 變更條件時重置顯示數量
                 });
 
                 const handleHistoryScroll = (e) => {
@@ -991,7 +1012,7 @@
                 return {
                     appVersion, skipHistorySave,
                     isDark, toggleTheme,
-                    initialized, user, saving, showSettings, showHistory, showMonthPicker, historySearch, selectedDate, pickerMonth, loginEmail, loginPassword,
+                    initialized, user, saving, showSettings, showHistory, showMonthPicker, historySearch, historySortBy, historySortOrder, historyTab, selectedDate, pickerMonth, loginEmail, loginPassword,
                     editingIndex, isAddingMeal, mealToDelete, historyToDelete, nutrientKeys, profile, plans, tempPlans, allData, mealHistory, visibleMealHistory, handleHistoryScroll, editingMeal, showSyncModal, templates,
                     currentMonthYearDisplay, calculatedTDEE, formatNum, formatFloat, scaleNutrients, lastAmount, prepareScale, onlyNumber,
                     settingsStep, setCalorieCenter, setNutrientCenter,
