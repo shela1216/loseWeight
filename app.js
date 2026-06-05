@@ -304,7 +304,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.0.11');
+                const appVersion = ref('0.1.0');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -402,40 +402,55 @@
                     return Math.round(bmr * activity);
                 });
 
-                // 計算歷史紀錄 (依使用頻率，數值取自模板庫)
+                // 計算歷史紀錄 (食物資料庫)
                 const historyDisplayLimit = ref(20);
                 const mealHistory = computed(() => {
-                    let list = Object.keys(templates)
-                        .map(key => templates[key])
+                    // 使用 Object.values 獲取所有模板，並確保響應性
+                    let list = Object.values(templates)
                         .filter(t => t && t.name)
                         .map(t => ({
                             ...t,
-                            count: t.count || 0
+                            count: Number(t.count) || 0,
+                            calories: Number(t.calories) || 0,
+                            carbs: Number(t.carbs) || 0,
+                            protein: Number(t.protein) || 0,
+                            fat: Number(t.fat) || 0
                         }));
 
-                    // 分類：組合餐點 vs 一般餐點
+                    // 1. 分類過濾：組合餐點 vs 一般餐點
                     if (historyTab.value === 'combo') {
                         list = list.filter(m => m.items && m.items.length > 0);
                     } else {
                         list = list.filter(m => !m.items || m.items.length === 0);
                     }
 
-                    // 排序
-                    list.sort((a, b) => {
-                        let valA = a[historySortBy.value] || 0;
-                        let valB = b[historySortBy.value] || 0;
-                        if (historySortBy.value === 'count') {
-                            valA = a.count || 0;
-                            valB = b.count || 0;
-                        }
-                        
-                        return historySortOrder.value === 'desc' ? valB - valA : valA - valB;
-                    });
-
+                    // 2. 關鍵字過濾
                     if (historySearch.value) {
-                        const term = historySearch.value.toLowerCase();
+                        const term = historySearch.value.toLowerCase().trim();
                         list = list.filter(m => m.name.toLowerCase().includes(term));
                     }
+
+                    // 3. 排序邏輯
+                    const sortBy = historySortBy.value;
+                    const sortOrder = historySortOrder.value;
+
+                    list.sort((a, b) => {
+                        let valA = a[sortBy] || 0;
+                        let valB = b[sortBy] || 0;
+                        
+                        // 處理次數排序的特殊屬性名 (雖然 map 已經處理過，但這裡確保萬無一失)
+                        if (sortBy === 'count') {
+                            valA = a.count;
+                            valB = b.count;
+                        }
+
+                        if (sortOrder === 'desc') {
+                            return valB - valA;
+                        } else {
+                            return valA - valB;
+                        }
+                    });
+
                     return list;
                 });
 
