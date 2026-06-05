@@ -854,47 +854,47 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-4 mb-6 shrink-0 px-2">
-                    <div class="flex gap-2 p-1.5 bg-slate-50 rounded-2xl border border-slate-100/50">
-                        <button @click="historyTab = 'general'" 
-                            :class="historyTab === 'general' ? 'bg-white text-indigo-500 shadow-sm' : 'text-slate-400 hover:text-slate-600'"
-                            class="flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all">一般餐點</button>
-                        <button @click="historyTab = 'combo'"
-                            :class="historyTab === 'combo' ? 'bg-white text-indigo-500 shadow-sm' : 'text-slate-400 hover:text-slate-600'"
-                            class="flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all">組合餐點</button>
+                <div class="flex flex-col gap-3 mb-6 shrink-0 px-2">
+                    <!-- 搜尋框：全寬 -->
+                    <div class="relative">
+                        <input type="text" v-model="historySearch"
+                            class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-100 rounded-[1.25rem] text-sm font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 focus:bg-white transition-all"
+                            placeholder="搜尋餐點名稱...">
+                        <svg class="w-5 h-5 text-slate-300 absolute left-4 top-1/2 -translate-y-1/2" fill="none"
+                            stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
                     </div>
 
-                    <div class="flex items-center gap-3">
-                        <div class="relative flex-1">
-                            <input type="text" v-model="historySearch"
-                                class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-100 rounded-[1.25rem] text-sm font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 focus:bg-white transition-all"
-                                placeholder="搜尋餐點名稱...">
-                            <svg class="w-5 h-5 text-slate-300 absolute left-6 top-1/2 -translate-y-1/2" fill="none"
-                                stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    <!-- 分類 Tab + 排序：同行 -->
+                    <div class="flex items-center gap-2">
+                        <div class="flex gap-1.5 p-1 bg-slate-50 rounded-2xl border border-slate-100/50 flex-1">
+                            <button @click="historyTab = 'general'"
+                                :class="historyTab === 'general' ? 'bg-white text-indigo-500 shadow-sm' : 'text-slate-400 hover:text-slate-600'"
+                                class="flex-1 py-2 rounded-xl text-xs font-black tracking-wide transition-all">一般餐點</button>
+                            <button @click="historyTab = 'combo'"
+                                :class="historyTab === 'combo' ? 'bg-white text-indigo-500 shadow-sm' : 'text-slate-400 hover:text-slate-600'"
+                                class="flex-1 py-2 rounded-xl text-xs font-black tracking-wide transition-all">組合餐點</button>
+                        </div>
+                        <select v-model="historySortBy"
+                            class="pl-3 pr-8 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-black text-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%2364748b%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1rem_1rem] bg-[right_0.4rem_center] bg-no-repeat shrink-0">
+                            <option value="count">次數</option>
+                            <option value="calories">熱量</option>
+                            <option value="carbs">碳水</option>
+                            <option value="protein">蛋白</option>
+                            <option value="fat">脂肪</option>
+                        </select>
+                        <button @click="historySortOrder = historySortOrder === 'desc' ? 'asc' : 'desc'"
+                            class="w-10 h-10 flex items-center justify-center bg-slate-50 border border-slate-100 rounded-2xl text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 transition-all active:scale-90 shrink-0"
+                            :title="historySortOrder === 'desc' ? '由高到低' : '由低到高'">
+                            <svg v-if="historySortOrder === 'desc'" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
                             </svg>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <select v-model="historySortBy" 
-                                class="pl-4 pr-10 py-3.5 bg-slate-50 border border-slate-100 rounded-[1.25rem] text-xs font-black text-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%2364748b%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem_1.25rem] bg-[right_0.5rem_center] bg-no-repeat">
-                                <option value="count">次數</option>
-                                <option value="calories">熱量</option>
-                                <option value="carbs">碳水</option>
-                                <option value="protein">蛋白</option>
-                                <option value="fat">脂肪</option>
-                            </select>
-                            <button @click="historySortOrder = historySortOrder === 'desc' ? 'asc' : 'desc'"
-                                class="w-12 h-12 flex items-center justify-center bg-slate-50 border border-slate-100 rounded-[1.25rem] text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 transition-all active:scale-90"
-                                :title="historySortOrder === 'desc' ? '由高到低' : '由低到高'">
-                                <svg v-if="historySortOrder === 'desc'" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
-                                </svg>
-                                <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 8l4 4m0 0l4-4m-4 4V8" />
-                                </svg>
-                            </button>
-                        </div>
+                            <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 8l4 4m0 0l4-4m-4 4V8" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
 
