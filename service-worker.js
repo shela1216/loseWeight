@@ -3,12 +3,15 @@ const CACHE_NAME = 'diet-tracker-v0.0.12';
 
 // 需要快取的靜態資源列表
 const urlsToCache = [
+    '/',
     'index.html',
+    'app.js',
+    'styles.css',
     'manifest.json',
+    'leaf.png',
     'https://cdn.tailwindcss.com',
     'https://unpkg.com/vue@3/dist/vue.global.js',
-    'https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap', // Google Font CSS
-    'https://img.icons8.com/fluent@latest' // Icon library
+    'https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap'
 ];
 
 // 監聽 'install' 事件：安裝 Service Worker 時，快取所有核心資源
