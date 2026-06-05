@@ -25,7 +25,7 @@
 3.  **`service-worker.js` (快取控制)**:
     -   尋找 `const CACHE_NAME = 'diet-tracker-vX.X.X';` 並更新。
     -   *注意：更新此值是強制瀏覽器清除舊快取、載入新功能的唯一方式。*
-
+4. **[index.html](index.html)** — `<script type="module" src="app.js?v=X.X.X">`（快取破解參數）
 ---
 
 ## 3. 技術棧參考
