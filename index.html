@@ -943,7 +943,8 @@
             </div>
         </div>
         <!-- 彈出視窗：設定與目標計算 (方案B：步驟式介面) -->
-        <div v-if="showSettings" class="fixed inset-0 z-[150] flex items-center justify-center p-4" style="-webkit-transform: translateZ(0); transform: translateZ(0);">
+        <Teleport to="body">
+        <div v-if="showSettings" class="fixed inset-0 z-[150] flex items-center justify-center p-4">
             <div class="modal-overlay absolute inset-0" @click="showSettings = false"></div>
             <div class="bg-white w-full max-w-xl rounded-[2.5rem] relative z-10 shadow-2xl flex flex-col max-h-[90vh] border border-slate-100 overflow-hidden">
 
@@ -1200,6 +1201,7 @@
                 </div>
             </div>
         </div>
+        </Teleport>
 
         <!-- 確認刪除 Modal (餐點紀錄) -->
         <div v-if="mealToDelete !== null && mealToDelete !== undefined" class="fixed inset-0 z-[130] flex items-center justify-center p-4">
@@ -1604,7 +1606,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.0.19"></script>
+    <script type="module" src="app.js?v=0.0.20"></script>
 </body>
 
 </html>
