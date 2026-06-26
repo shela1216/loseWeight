@@ -19,7 +19,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.0.23');
+                console.log('App initialization starting... v0.0.24');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -304,7 +304,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.0.23');
+                const appVersion = ref('0.0.24');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -1042,6 +1042,69 @@
                     currentPlan: computed(() => {
                         const day = allData[selectedDate.value];
                         return activePlan(selectedDate.value, day);
+                    }),
+                    progressRingData: computed(() => {
+                        const C = 2 * Math.PI * 38; // ~238.76
+
+                        // 1. 目標 (Target)
+                        const day = allData[selectedDate.value];
+                        const plan = activePlan(selectedDate.value, day);
+                        const getVal = (k) => {
+                            const g = plan[k];
+                            return typeof g === 'object' ? (g.min + g.max) / 2 : (g || 0);
+                        };
+                        const cValT = getVal('carbs') * 4;
+                        const pValT = getVal('protein') * 4;
+                        const fValT = getVal('fat') * 9;
+                        const totalT = cValT + pValT + fValT || 1;
+
+                        const targetCarbsPct = cValT / totalT;
+                        const targetProteinPct = pValT / totalT;
+                        const targetFatPct = fValT / totalT;
+
+                        const bg = {
+                            carbs: { length: C * targetCarbsPct, offset: 0 },
+                            protein: { length: C * targetProteinPct, offset: C - (C * targetCarbsPct) },
+                            fat: { length: C * targetFatPct, offset: C - (C * targetCarbsPct + C * targetProteinPct) }
+                        };
+
+                        // 2. 實際 (Actual)
+                        const meals = day?.meals || [];
+                        const cAct = meals.reduce((s, m) => s + (Number(m.carbs) || 0), 0) * 4;
+                        const pAct = meals.reduce((s, m) => s + (Number(m.protein) || 0), 0) * 4;
+                        const fAct = meals.reduce((s, m) => s + (Number(m.fat) || 0), 0) * 9;
+                        const totalAct = cAct + pAct + fAct;
+
+                        // 攝取熱量佔目標中點的比例
+                        const caloriesSum = meals.reduce((s, m) => s + (Number(m.calories) || 0), 0);
+                        const goalCal = getVal('calories') || 1;
+                        const pProgress = Math.min(caloriesSum / goalCal, 1);
+
+                        let fg = {
+                            carbs: { length: 0, offset: 0 },
+                            protein: { length: 0, offset: 0 },
+                            fat: { length: 0, offset: 0 }
+                        };
+
+                        if (totalAct > 0) {
+                            const actCarbsPct = cAct / totalAct;
+                            const actProteinPct = pAct / totalAct;
+                            const actFatPct = fAct / totalAct;
+
+                            const lCarbs = C * pProgress * actCarbsPct;
+                            const lProtein = C * pProgress * actProteinPct;
+                            const lFat = C * pProgress * actFatPct;
+
+                            fg.carbs = { length: lCarbs, offset: 0 };
+                            fg.protein = { length: lProtein, offset: C - lCarbs };
+                            fg.fat = { length: lFat, offset: C - (lCarbs + lProtein) };
+                        }
+
+                        return {
+                            bg,
+                            fg,
+                            hasExceeded: caloriesSum > goalCal
+                        };
                     }),
                     getMealLabel, getPlanLabel,
                     getDailySum: (type) => (allData[selectedDate.value]?.meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0),
