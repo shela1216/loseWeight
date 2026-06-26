@@ -267,37 +267,13 @@
                             <!-- 進度圈 -->
                             <div class="relative shrink-0 w-[140px] h-[140px] sm:w-[240px] sm:h-[240px]">
                                 <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                                    <!-- 目標背景圈 (淡色) -->
-                                    <circle cx="50" cy="50" r="38" fill="none" stroke="#6366f1" stroke-width="5" class="opacity-10 dark:opacity-[0.15]"
-                                        :stroke-dasharray="`${progressRingData.bg.carbs.length} ${2 * 3.14159 * 38}`"
-                                        :stroke-dashoffset="progressRingData.bg.carbs.offset"
-                                        style="transition: stroke-dasharray 0.5s ease, stroke-dashoffset 0.5s ease" />
-                                    <circle cx="50" cy="50" r="38" fill="none" stroke="#8b5cf6" stroke-width="5" class="opacity-10 dark:opacity-[0.15]"
-                                        :stroke-dasharray="`${progressRingData.bg.protein.length} ${2 * 3.14159 * 38}`"
-                                        :stroke-dashoffset="progressRingData.bg.protein.offset"
-                                        style="transition: stroke-dasharray 0.5s ease, stroke-dashoffset 0.5s ease" />
-                                    <circle cx="50" cy="50" r="38" fill="none" stroke="#ec4899" stroke-width="5" class="opacity-10 dark:opacity-[0.15]"
-                                        :stroke-dasharray="`${progressRingData.bg.fat.length} ${2 * 3.14159 * 38}`"
-                                        :stroke-dashoffset="progressRingData.bg.fat.offset"
-                                        style="transition: stroke-dasharray 0.5s ease, stroke-dashoffset 0.5s ease" />
-
-                                    <!-- 實際攝取進度圈 (高亮) -->
-                                    <circle v-if="progressRingData.fg.carbs.length > 0" cx="50" cy="50" r="38" fill="none" stroke="#6366f1" stroke-width="6"
-                                        :stroke-dasharray="`${progressRingData.fg.carbs.length} ${2 * 3.14159 * 38}`"
-                                        :stroke-dashoffset="progressRingData.fg.carbs.offset"
-                                        style="transition: stroke-dasharray 1s cubic-bezier(0.4, 0, 0.2, 1), stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1)" />
-                                    <circle v-if="progressRingData.fg.protein.length > 0" cx="50" cy="50" r="38" fill="none" stroke="#8b5cf6" stroke-width="6"
-                                        :stroke-dasharray="`${progressRingData.fg.protein.length} ${2 * 3.14159 * 38}`"
-                                        :stroke-dashoffset="progressRingData.fg.protein.offset"
-                                        style="transition: stroke-dasharray 1s cubic-bezier(0.4, 0, 0.2, 1), stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1)" />
-                                    <circle v-if="progressRingData.fg.fat.length > 0" cx="50" cy="50" r="38" fill="none" stroke="#ec4899" stroke-width="6"
-                                        :stroke-dasharray="`${progressRingData.fg.fat.length} ${2 * 3.14159 * 38}`"
-                                        :stroke-dashoffset="progressRingData.fg.fat.offset"
-                                        style="transition: stroke-dasharray 1s cubic-bezier(0.4, 0, 0.2, 1), stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1)" />
-
-                                    <!-- 超標紅色外環 -->
-                                    <circle v-if="progressRingData.hasExceeded" cx="50" cy="50" r="42" fill="none" stroke="#ef4444" stroke-width="1.5" class="opacity-80"
-                                        style="transition: stroke 0.3s ease" />
+                                    <circle cx="50" cy="50" r="38" fill="none" stroke-width="5" class="opacity-10"
+                                        :stroke="{high:'#f59e0b', med:'#6366f1', low:'#f43f5e', rest:'#64748b'}[currentDayRecord.planType]" />
+                                    <circle cx="50" cy="50" r="38" fill="none" stroke-width="6" stroke-linecap="round"
+                                        :stroke="getGap('calories') < 0 ? '#ef4444' : ({high:'#f59e0b', med:'#6366f1', low:'#f43f5e', rest:'#64748b'}[currentDayRecord.planType])"
+                                        :stroke-dasharray="`${2 * 3.14159 * 38}`"
+                                        :stroke-dashoffset="2 * 3.14159 * 38 * (1 - Math.min(getDailySum('calories') / getGoalMidpoint('calories'), 1))"
+                                        style="transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s ease" />
                                 </svg>
                                 <div
                                     class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none px-2 sm:px-4">
@@ -1630,7 +1606,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.0.24"></script>
+    <script type="module" src="app.js?v=0.0.23"></script>
 </body>
 
 </html>
