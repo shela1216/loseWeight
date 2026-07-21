@@ -21,7 +21,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.0.23');
+                console.log('App initialization starting... v0.0.24');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -306,7 +306,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.0.23');
+                const appVersion = ref('0.0.24');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -540,7 +540,27 @@
                     historySortBy.value = 'recommend';
                     showHistory.value = true;
                 };
+                const closeHistory = () => {
+                    historyPickMode.value = null;
+                    showHistory.value = false;
+                };
                 const addFromHistory = (meal) => {
+                    if (historyPickMode.value !== null) {
+                        const item = editingMeal.items[historyPickMode.value];
+                        if (item) {
+                            item.name = meal.name;
+                            item.unit = meal.unit || '份';
+                            item.amount = 1;
+                            item.calories = Number(meal.calories) || 0;
+                            item.carbs = Number(meal.carbs) || 0;
+                            item.protein = Number(meal.protein) || 0;
+                            item.fat = Number(meal.fat) || 0;
+                            updateTotalsFromItems();
+                        }
+                        historyPickMode.value = null;
+                        showHistory.value = false;
+                        return;
+                    }
                     const newMeal = JSON.parse(JSON.stringify(meal));
                     if (newMeal.amount === undefined) newMeal.amount = 1;
                     if (newMeal.unit === undefined) newMeal.unit = '份';
@@ -1097,7 +1117,7 @@
                     appVersion, skipHistorySave,
                     isDark, toggleTheme,
                     initialized, user, saving, showSettings, showHistory, showMonthPicker, historySearch, historySortBy, historySortOrder, historyTab, selectedDate, pickerMonth, loginEmail, loginPassword,
-                    openHistory, historyPickMode, priorityNutrient, priorityNutrientLabel,
+                    openHistory, closeHistory, historyPickMode, priorityNutrient, priorityNutrientLabel,
                     editingIndex, isAddingMeal, mealToDelete, historyToDelete, nutrientKeys, profile, plans, tempPlans, allData, mealHistory, visibleMealHistory, handleHistoryScroll, editingMeal, showSyncModal, templates,
                     currentMonthYearDisplay, calculatedTDEE, formatNum, formatFloat, scaleNutrients, lastAmount, prepareScale, onlyNumber,
                     settingsStep, setCalorieCenter, setNutrientCenter,
