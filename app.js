@@ -50,7 +50,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.1.5');
+                console.log('App initialization starting... v0.1.6');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -335,14 +335,14 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.1.5');
+                const appVersion = ref('0.1.6');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
                 const updateTotalsFromItems = () => {
                     if (!editingMeal.items || editingMeal.items.length === 0) return;
-                    // 品項營養值為「每 1 單位」,總和需乘以份數
-                    const sumBy = (key) => editingMeal.items.reduce((sum, item) => sum + (Number(item[key]) || 0) * (Number(item.amount) || 1), 0);
+                    // 品項四格為該品項總量,直接相加即可(份數變動由 changeItemAmount 依比例縮放)
+                    const sumBy = (key) => editingMeal.items.reduce((sum, item) => sum + (Number(item[key]) || 0), 0);
                     editingMeal.calories = formatFloat(sumBy('calories'));
                     editingMeal.carbs = formatFloat(sumBy('carbs'));
                     editingMeal.protein = formatFloat(sumBy('protein'));
@@ -382,17 +382,34 @@
                     item.carbs = Number(template.carbs) || 0;
                     item.protein = Number(template.protein) || 0;
                     item.fat = Number(template.fat) || 0;
+                    item._amt = 1; // 記錄目前份數,供之後份數變動按比例縮放
                     activeSuggestItem.value = null;
                     updateTotalsFromItems();
                 };
 
                 const addItem = () => {
                     if (!editingMeal.items) editingMeal.items = [];
-                    editingMeal.items.unshift({ name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, qInput: '' });
+                    editingMeal.items.unshift({ name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, qInput: '', _amt: 1 });
                 };
 
                 const removeItem = (idx) => {
                     editingMeal.items.splice(idx, 1);
+                    updateTotalsFromItems();
+                };
+
+                // 份數變動時,依比例縮放該品項的四格營養值(四格為該品項總量)
+                const beginItemAmount = (item) => { item._amt = Number(item.amount) || 0; };
+                const changeItemAmount = (item) => {
+                    const oldA = Number(item._amt);
+                    const newA = Number(item.amount);
+                    if (oldA > 0 && newA > 0 && oldA !== newA) {
+                        const f = newA / oldA;
+                        item.calories = formatFloat((Number(item.calories) || 0) * f);
+                        item.carbs = formatFloat((Number(item.carbs) || 0) * f);
+                        item.protein = formatFloat((Number(item.protein) || 0) * f);
+                        item.fat = formatFloat((Number(item.fat) || 0) * f);
+                    }
+                    if (newA > 0) item._amt = newA;
                     updateTotalsFromItems();
                 };
                 const mealToDelete = ref(null);
@@ -596,6 +613,7 @@
                             item.carbs = Number(meal.carbs) || 0;
                             item.protein = Number(meal.protein) || 0;
                             item.fat = Number(meal.fat) || 0;
+                            item._amt = 1; // 記錄目前份數,供之後份數變動按比例縮放
                             updateTotalsFromItems();
                         }
                         historyPickMode.value = null;
@@ -1269,6 +1287,7 @@
                     openSettings, saveSettings,
                     addItem, removeItem, updateTotalsFromItems,
                     activeSuggestItem, itemSuggestions, applyItemSuggestion, itemSuggestPage, suggestPageCount, pagedSuggestions,
+                    beginItemAmount, changeItemAmount,
                     quickNutrientInput, parseQuickInput, parseItemInput,
                     showExportModal, isExporting, exportRange, exportPDF, getRangeStats,
                     excludedDates, exportDateList, toggleExcludedDate, toggleAllExportDates, setQuickRange,
