@@ -326,6 +326,27 @@
                     }
                 };
 
+                const activeSuggestItem = ref(null); // 目前展開自動完成的組合品項 index
+                const itemSuggestions = (term) => {
+                    const q = (term || '').toLowerCase().trim();
+                    if (!q) return [];
+                    return Object.values(templates)
+                        .filter(t => t && t.name && (!t.items || t.items.length === 0))
+                        .filter(t => t.name.toLowerCase().includes(q))
+                        .slice(0, 6);
+                };
+                const applyItemSuggestion = (item, template) => {
+                    item.name = template.name;
+                    item.unit = template.unit || '份';
+                    item.amount = 1;
+                    item.calories = Number(template.calories) || 0;
+                    item.carbs = Number(template.carbs) || 0;
+                    item.protein = Number(template.protein) || 0;
+                    item.fat = Number(template.fat) || 0;
+                    activeSuggestItem.value = null;
+                    updateTotalsFromItems();
+                };
+
                 const addItem = () => {
                     if (!editingMeal.items) editingMeal.items = [];
                     editingMeal.items.unshift({ name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, qInput: '' });
@@ -1186,6 +1207,7 @@
                     setPlanType, autoCalculatePlans, exportCSV, saveData, recalcCounts, isRecalculating,
                     openSettings, saveSettings,
                     addItem, removeItem, updateTotalsFromItems,
+                    activeSuggestItem, itemSuggestions, applyItemSuggestion,
                     quickNutrientInput, parseQuickInput, parseItemInput,
                     showExportModal, isExporting, exportRange, exportPDF, getRangeStats,
                     excludedDates, exportDateList, toggleExcludedDate, toggleAllExportDates, setQuickRange,
