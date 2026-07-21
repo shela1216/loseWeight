@@ -2,6 +2,8 @@
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { initializeFirestore, persistentLocalCache, doc, setDoc, updateDoc, onSnapshot, collection, query, where, getDocs, writeBatch, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        import { pickPriorityNutrient } from './recommend.js';
+
         const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
 
         if ('serviceWorker' in navigator) {
@@ -19,7 +21,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.0.23');
+                console.log('App initialization starting... v0.1.0');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -304,7 +306,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.0.23');
+                const appVersion = ref('0.1.0');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -322,6 +324,27 @@
                             editingMeal.name = names;
                         }
                     }
+                };
+
+                const activeSuggestItem = ref(null); // 目前展開自動完成的組合品項 index
+                const itemSuggestions = (term) => {
+                    const q = (term || '').toLowerCase().trim();
+                    if (!q) return [];
+                    return Object.values(templates)
+                        .filter(t => t && t.name && (!t.items || t.items.length === 0))
+                        .filter(t => t.name.toLowerCase().includes(q))
+                        .slice(0, 6);
+                };
+                const applyItemSuggestion = (item, template) => {
+                    item.name = template.name;
+                    item.unit = template.unit || '份';
+                    item.amount = 1;
+                    item.calories = Number(template.calories) || 0;
+                    item.carbs = Number(template.carbs) || 0;
+                    item.protein = Number(template.protein) || 0;
+                    item.fat = Number(template.fat) || 0;
+                    activeSuggestItem.value = null;
+                    updateTotalsFromItems();
                 };
 
                 const addItem = () => {
@@ -402,6 +425,39 @@
                     return Math.round(bmr * activity);
                 });
 
+                // 目標缺口/中點(本地版,供推薦排序與 return 物件的 getGap/getGoalMidpoint 共用)
+                const goalMidpoint = (type) => {
+                    const day = allData[selectedDate.value];
+                    const plan = activePlan(selectedDate.value, day);
+                    const goal = plan[type];
+                    if (typeof goal === 'object' && goal !== null) return Math.round((goal.min + goal.max) / 2);
+                    return goal || 1;
+                };
+                const goalGap = (type) => {
+                    const day = allData[selectedDate.value];
+                    const plan = activePlan(selectedDate.value, day);
+                    const goal = plan[type];
+                    const sum = (allData[selectedDate.value]?.meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0);
+                    if (typeof goal === 'object' && goal !== null) {
+                        const mid = Math.round((goal.min + goal.max) / 2);
+                        if (sum < goal.min) return mid - sum;
+                        if (sum > goal.max) return Math.round(goal.max - sum);
+                        return Math.round(goal.max - sum);
+                    }
+                    return Math.round((goal || 0) - sum);
+                };
+                const priorityNutrient = computed(() => pickPriorityNutrient({
+                    carbs:   { gap: goalGap('carbs'),   mid: goalMidpoint('carbs')   },
+                    protein: { gap: goalGap('protein'), mid: goalMidpoint('protein') },
+                    fat:     { gap: goalGap('fat'),     mid: goalMidpoint('fat')     },
+                }));
+                const priorityNutrientLabel = computed(() => {
+                    const k = priorityNutrient.value;
+                    if (!k) return '三大營養素皆達標,依常用度排序';
+                    const map = { carbs: '淨碳水', protein: '蛋白質', fat: '脂肪' };
+                    return '目前推薦補:' + map[k];
+                });
+
                 // 計算歷史紀錄 (食物資料庫)
                 const historyDisplayLimit = ref(20);
                 const mealHistory = computed(() => {
@@ -437,14 +493,18 @@
                     // 統一排序基準：g 單位的餐點換算為 per-100g 再比較
                     const sortScale = (item) => item.unit === 'g' ? 100 : 1;
 
+                    // 推薦排序:取當日最該補的營養素;皆達標時 recKey 為 null → 退回次數排序
+                    const recKey = sortBy === 'recommend' ? priorityNutrient.value : null;
+
                     list.sort((a, b) => {
                         let valA, valB;
-                        if (sortBy === 'count') {
+                        if (sortBy === 'count' || (sortBy === 'recommend' && !recKey)) {
                             valA = a.count;
                             valB = b.count;
                         } else {
-                            valA = (a[sortBy] || 0) * sortScale(a);
-                            valB = (b[sortBy] || 0) * sortScale(b);
+                            const key = sortBy === 'recommend' ? recKey : sortBy;
+                            valA = (a[key] || 0) * sortScale(a);
+                            valB = (b[key] || 0) * sortScale(b);
                         }
 
                         if (sortOrder === 'desc') {
@@ -474,7 +534,34 @@
                     }
                 };
 
+                const historyPickMode = ref(null); // null=加到當日;數字=填回組合品項 index
+                const openHistory = (pickIdx = null) => {
+                    historyPickMode.value = pickIdx;
+                    historySortBy.value = 'recommend';
+                    historySortOrder.value = 'desc'; // 推薦排序需由高到低,避免沿用上次的 asc
+                    showHistory.value = true;
+                };
+                const closeHistory = () => {
+                    historyPickMode.value = null;
+                    showHistory.value = false;
+                };
                 const addFromHistory = (meal) => {
+                    if (historyPickMode.value !== null) {
+                        const item = editingMeal.items[historyPickMode.value];
+                        if (item) {
+                            item.name = meal.name;
+                            item.unit = meal.unit || '份';
+                            item.amount = 1;
+                            item.calories = Number(meal.calories) || 0;
+                            item.carbs = Number(meal.carbs) || 0;
+                            item.protein = Number(meal.protein) || 0;
+                            item.fat = Number(meal.fat) || 0;
+                            updateTotalsFromItems();
+                        }
+                        historyPickMode.value = null;
+                        showHistory.value = false;
+                        return;
+                    }
                     const newMeal = JSON.parse(JSON.stringify(meal));
                     if (newMeal.amount === undefined) newMeal.amount = 1;
                     if (newMeal.unit === undefined) newMeal.unit = '份';
@@ -1031,6 +1118,7 @@
                     appVersion, skipHistorySave,
                     isDark, toggleTheme,
                     initialized, user, saving, showSettings, showHistory, showMonthPicker, historySearch, historySortBy, historySortOrder, historyTab, selectedDate, pickerMonth, loginEmail, loginPassword,
+                    openHistory, closeHistory, historyPickMode, priorityNutrient, priorityNutrientLabel,
                     editingIndex, isAddingMeal, mealToDelete, historyToDelete, nutrientKeys, profile, plans, tempPlans, allData, mealHistory, visibleMealHistory, handleHistoryScroll, editingMeal, showSyncModal, templates,
                     currentMonthYearDisplay, calculatedTDEE, formatNum, formatFloat, scaleNutrients, lastAmount, prepareScale, onlyNumber,
                     settingsStep, setCalorieCenter, setNutrientCenter,
@@ -1054,20 +1142,7 @@
                         }
                         return goal || 0;
                     },
-                    getGap: (type) => {
-                        const day = allData[selectedDate.value];
-                        const plan = activePlan(selectedDate.value, day);
-                        const goal = plan[type];
-                        const sum = (allData[selectedDate.value]?.meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0);
-
-                        if (typeof goal === 'object' && goal !== null) {
-                            const mid = Math.round((goal.min + goal.max) / 2);
-                            if (sum < goal.min) return mid - sum;              // 未達最低，顯示距目標中心還差多少
-                            if (sum > goal.max) return Math.round(goal.max - sum); // 超出最高（負數）
-                            return Math.round(goal.max - sum);                     // 在範圍內，顯示距上限還剩多少
-                        }
-                        return Math.round((goal || 0) - sum);
-                    },
+                    getGap: (type) => goalGap(type),
                     isGoalInRange: (type) => {
                         const day = allData[selectedDate.value];
                         const plan = activePlan(selectedDate.value, day);
@@ -1078,15 +1153,7 @@
                         }
                         return false;
                     },
-                    getGoalMidpoint: (type) => {
-                        const day = allData[selectedDate.value];
-                        const plan = activePlan(selectedDate.value, day);
-                        const goal = plan[type];
-                        if (typeof goal === 'object' && goal !== null) {
-                            return Math.round((goal.min + goal.max) / 2);
-                        }
-                        return goal || 1;
-                    },
+                    getGoalMidpoint: (type) => goalMidpoint(type),
                     changeMonth: async (dir) => {
                         const d = new Date(selectedDate.value);
                         const oldDay = d.getDate();
@@ -1161,6 +1228,7 @@
                     setPlanType, autoCalculatePlans, exportCSV, saveData, recalcCounts, isRecalculating,
                     openSettings, saveSettings,
                     addItem, removeItem, updateTotalsFromItems,
+                    activeSuggestItem, itemSuggestions, applyItemSuggestion,
                     quickNutrientInput, parseQuickInput, parseItemInput,
                     showExportModal, isExporting, exportRange, exportPDF, getRangeStats,
                     excludedDates, exportDateList, toggleExcludedDate, toggleAllExportDates, setQuickRange,

@@ -395,7 +395,7 @@
                                     currentDayRecord.meals.length }})</p>
                             </div>
                             <div class="flex gap-4 sm:gap-6 items-center">
-                                <button @click="showHistory = true" class="btn-circular" title="食物資料庫">
+                                <button @click="openHistory()" class="btn-circular" title="食物資料庫">
                                     <div class="icon-wrapper">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
                                             viewBox="0 0 24 24">
@@ -619,7 +619,7 @@
                                 placeholder="食物名稱..."></textarea>
                             <div class="absolute -bottom-1 left-0 w-10 h-1 bg-indigo-500 rounded-full"></div>
                         </div>
-                        <button v-if="isAddingMeal" @click="showHistory = true"
+                        <button v-if="isAddingMeal" @click="openHistory()"
                             class="shrink-0 bg-indigo-50 text-indigo-600 text-xs font-black uppercase tracking-widest hover:bg-indigo-100 px-4 py-2.5 rounded-xl transition-all shadow-sm">
                             食物資料庫
                         </button>
@@ -658,8 +658,30 @@
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
                                 </button>
                                 <div class="flex flex-col sm:flex-row gap-2">
-                                    <input v-model="item.name" @input="updateTotalsFromItems" class="flex-1 bg-white px-4 py-2.5 rounded-xl text-sm font-black outline-none border border-transparent focus:border-indigo-200 shadow-sm transition-all" placeholder="品項名稱 (如：蔥花蛋)">
+                                    <div class="relative flex-1">
+                                        <input v-model="item.name"
+                                            @input="activeSuggestItem = idx; updateTotalsFromItems()"
+                                            @focus="activeSuggestItem = idx"
+                                            @blur="activeSuggestItem = null"
+                                            class="w-full bg-white px-4 py-2.5 rounded-xl text-sm font-black outline-none border border-transparent focus:border-indigo-200 shadow-sm transition-all"
+                                            placeholder="品項名稱 (如：蔥花蛋)">
+                                        <div v-if="activeSuggestItem === idx && itemSuggestions(item.name).length > 0"
+                                            class="absolute z-30 left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden">
+                                            <button v-for="s in itemSuggestions(item.name)" :key="s.name" type="button"
+                                                @mousedown.prevent="applyItemSuggestion(item, s)"
+                                                class="w-full text-left px-4 py-2 text-xs font-bold text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors flex justify-between gap-2">
+                                                <span class="truncate">{{ s.name }}</span>
+                                                <span class="text-slate-300 shrink-0 whitespace-nowrap">{{ formatFloat(s.calories) }}kcal</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                     <div class="flex items-center gap-2 w-full sm:w-auto">
+                                        <button type="button" @click="openHistory(idx)" title="從資料庫挑選"
+                                            class="w-10 shrink-0 flex items-center justify-center bg-indigo-50 text-indigo-500 rounded-xl hover:bg-indigo-100 transition-all active:scale-95">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2 3 3 8 3s8-1 8-3V7M4 7c0 2 3 3 8 3s8-1 8-3M4 7c0-2 3-3 8-3s8 1 8 3" />
+                                            </svg>
+                                        </button>
                                         <div class="flex-1 sm:w-28 flex items-center bg-white px-3 py-2 rounded-xl border border-transparent focus-within:border-indigo-200 shadow-sm transition-all">
                                             <input type="number" v-model.number="item.amount" @input="updateTotalsFromItems" class="w-full bg-transparent text-sm font-black outline-none text-center" placeholder="份量">
                                         </div>
@@ -823,7 +845,7 @@
 
         <!-- 食物資料庫 Modal -->
         <div v-if="showHistory" class="fixed inset-0 z-[110] flex items-center justify-center p-4">
-            <div class="modal-overlay absolute inset-0" @click="showHistory = false"></div>
+            <div class="modal-overlay absolute inset-0" @click="closeHistory()"></div>
             <div
                 class="bg-white w-full max-w-lg rounded-[2.5rem] p-8 relative z-10 shadow-2xl flex flex-col max-h-[85vh] border border-slate-100">
                 <div class="flex justify-between items-center mb-8 px-2 shrink-0">
@@ -838,7 +860,7 @@
                             title="從所有歷史紀錄重新計算使用次數">
                             {{ isRecalculating ? '計算中...' : '重算次數' }}
                         </button>
-                        <button @click="showHistory = false"
+                        <button @click="closeHistory()"
                             class="w-10 h-10 flex items-center justify-center bg-slate-50 rounded-2xl text-slate-400 hover:text-slate-600 transition-colors"><svg
                                 class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path d="M6 18L18 6M6 6l12 12"></path>
@@ -871,6 +893,7 @@
                         </div>
                         <select v-model="historySortBy"
                             class="pl-3 pr-8 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-black text-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%2364748b%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1rem_1rem] bg-[right_0.4rem_center] bg-no-repeat shrink-0">
+                            <option value="recommend">推薦</option>
                             <option value="count">次數</option>
                             <option value="calories">熱量</option>
                             <option value="carbs">碳水</option>
@@ -888,6 +911,10 @@
                             </svg>
                         </button>
                     </div>
+                </div>
+
+                <div v-if="historySortBy === 'recommend'" class="px-2 mb-3 shrink-0">
+                    <span class="text-[10px] font-black text-emerald-600 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-lg inline-block">{{ priorityNutrientLabel }}</span>
                 </div>
 
                 <div class="flex-1 overflow-y-auto overflow-x-hidden custom-scroll space-y-4 px-2 pb-4" @scroll="handleHistoryScroll">
@@ -1606,7 +1633,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.0.23"></script>
+    <script type="module" src="app.js?v=0.1.0"></script>
 </body>
 
 </html>
