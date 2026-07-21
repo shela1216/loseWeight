@@ -21,7 +21,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.1.2');
+                console.log('App initialization starting... v0.1.3');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -306,7 +306,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.1.2');
+                const appVersion = ref('0.1.3');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -327,13 +327,21 @@
                 };
 
                 const activeSuggestItem = ref(null); // 目前展開自動完成的組合品項 index
+                const SUGGEST_PAGE_SIZE = 6;
+                const itemSuggestPage = ref(0); // 自動完成下拉目前頁碼(0-based)
+                // 相符的一般品項(排除組合餐),依套用次數由高到低排序;不分頁,分頁交給下方 helper
                 const itemSuggestions = (term) => {
                     const q = (term || '').toLowerCase().trim();
                     if (!q) return [];
                     return Object.values(templates)
                         .filter(t => t && t.name && (!t.items || t.items.length === 0))
                         .filter(t => t.name.toLowerCase().includes(q))
-                        .slice(0, 6);
+                        .sort((a, b) => (Number(b.count) || 0) - (Number(a.count) || 0));
+                };
+                const suggestPageCount = (term) => Math.max(1, Math.ceil(itemSuggestions(term).length / SUGGEST_PAGE_SIZE));
+                const pagedSuggestions = (term) => {
+                    const start = itemSuggestPage.value * SUGGEST_PAGE_SIZE;
+                    return itemSuggestions(term).slice(start, start + SUGGEST_PAGE_SIZE);
                 };
                 const applyItemSuggestion = (item, template) => {
                     item.name = template.name;
@@ -1229,7 +1237,7 @@
                     setPlanType, autoCalculatePlans, exportCSV, saveData, recalcCounts, isRecalculating,
                     openSettings, saveSettings,
                     addItem, removeItem, updateTotalsFromItems,
-                    activeSuggestItem, itemSuggestions, applyItemSuggestion,
+                    activeSuggestItem, itemSuggestions, applyItemSuggestion, itemSuggestPage, suggestPageCount, pagedSuggestions,
                     quickNutrientInput, parseQuickInput, parseItemInput,
                     showExportModal, isExporting, exportRange, exportPDF, getRangeStats,
                     excludedDates, exportDateList, toggleExcludedDate, toggleAllExportDates, setQuickRange,
