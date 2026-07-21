@@ -538,6 +538,7 @@
                 const openHistory = (pickIdx = null) => {
                     historyPickMode.value = pickIdx;
                     historySortBy.value = 'recommend';
+                    historySortOrder.value = 'desc'; // 推薦排序需由高到低,避免沿用上次的 asc
                     showHistory.value = true;
                 };
                 const closeHistory = () => {
