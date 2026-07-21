@@ -21,7 +21,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.1.1');
+                console.log('App initialization starting... v0.1.2');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -306,7 +306,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.1.1');
+                const appVersion = ref('0.1.2');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -539,6 +539,7 @@
                     historyPickMode.value = pickIdx;
                     historySortBy.value = 'recommend';
                     historySortOrder.value = 'desc'; // 推薦排序需由高到低,避免沿用上次的 asc
+                    if (pickIdx !== null) historyTab.value = 'general'; // 挑入組合品項時只列一般餐點
                     showHistory.value = true;
                 };
                 const closeHistory = () => {

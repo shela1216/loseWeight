@@ -883,7 +883,7 @@
 
                     <!-- 分類 Tab + 排序：同行 -->
                     <div class="flex items-center gap-2">
-                        <div class="flex gap-1.5 p-1 bg-slate-50 rounded-2xl border border-slate-100/50 flex-1">
+                        <div v-if="historyPickMode === null" class="flex gap-1.5 p-1 bg-slate-50 rounded-2xl border border-slate-100/50 flex-1">
                             <button @click="historyTab = 'general'"
                                 :class="historyTab === 'general' ? 'bg-white text-indigo-500 shadow-sm' : 'text-slate-400 hover:text-slate-600'"
                                 class="flex-1 py-2 rounded-xl text-xs font-black tracking-wide transition-all">一般餐點</button>
@@ -1633,7 +1633,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.1.1"></script>
+    <script type="module" src="app.js?v=0.1.2"></script>
 </body>
 
 </html>
