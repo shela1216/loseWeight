@@ -7,10 +7,39 @@
         const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
 
         if ('serviceWorker' in navigator) {
+            let reloadOnControllerChange = false;
+            // 新版接手後自動重新載入一次(僅在偵測到更新時,首次安裝不觸發)
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (reloadOnControllerChange) {
+                    reloadOnControllerChange = false;
+                    window.location.reload();
+                }
+            });
+
+            const promote = (worker) => {
+                if (!worker) return;
+                reloadOnControllerChange = true;
+                worker.postMessage({ type: 'SKIP_WAITING' });
+            };
+
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(registration => {
                         console.log('Service Worker registered with scope:', registration.scope);
+                        // 進站時已有等待中的新版(先前卡住的情況)→ 立即接手
+                        if (registration.waiting && navigator.serviceWorker.controller) {
+                            promote(registration.waiting);
+                        }
+                        // 之後偵測到新版:安裝完成且已有舊版控制 = 更新,標記為需重載
+                        registration.addEventListener('updatefound', () => {
+                            const nw = registration.installing;
+                            if (!nw) return;
+                            nw.addEventListener('statechange', () => {
+                                if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+                                    promote(nw);
+                                }
+                            });
+                        });
                     })
                     .catch(error => {
                         console.error('Service Worker registration failed:', error);
@@ -21,7 +50,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.1.3');
+                console.log('App initialization starting... v0.1.4');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -306,7 +335,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.1.3');
+                const appVersion = ref('0.1.4');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 

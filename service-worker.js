@@ -1,5 +1,5 @@
 // 快取版本號
-const CACHE_NAME = 'diet-tracker-v0.1.3';
+const CACHE_NAME = 'diet-tracker-v0.1.4';
 
 // 需要快取的靜態資源列表
 const urlsToCache = [
@@ -51,52 +51,61 @@ self.addEventListener('activate', (event) => {
     return self.clients.claim();
 });
 
-// 監聽 'fetch' 事件：攔截網路請求並使用快取優先策略
+// 允許頁面端要求等待中的新版立即接手(避免卡在 waiting)
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
+});
+
+// 監聽 'fetch' 事件
 self.addEventListener('fetch', (event) => {
     // 僅處理 GET 請求
     if (event.request.method !== 'GET') {
         return;
     }
-    
-    event.respondWith(
-        caches.match(event.request)
-            .then((response) => {
-                // 1. 如果在快取中找到回應，則直接返回
-                if (response) {
-                    return response;
-                }
-                
-                // 2. 如果快取中找不到，則發出網路請求
-                return fetch(event.request).then((networkResponse) => {
-                    // 檢查回應是否有效
-                    if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic' && networkResponse.type !== 'opaque') {
-                        return networkResponse;
-                    }
 
-                    // 3. 將網路回應複製一份，並存入快取 (快取新下載的資源)
-                    const responseToCache = networkResponse.clone();
-                    
-                    // 僅快取核心資源或特定的跨來源資源
-                    if (urlsToCache.some(url => event.request.url.includes(url))) {
-                        caches.open(CACHE_NAME)
-                            .then((cache) => {
-                                // 限制快取大小，避免快取過大的圖片等
-                                if (event.request.url.includes('fonts.gstatic.com')) {
-                                    // 針對字體等特殊資源快取
-                                    return cache.put(event.request, responseToCache);
-                                }
-                                // 快取應用程式外殼的其他內容
-                                return cache.put(event.request, responseToCache);
-                            });
-                    }
+    const req = event.request;
+    const url = new URL(req.url);
 
+    // 應用程式外殼(導覽/HTML/app.js)採「網路優先」：確保永遠拿到最新版，離線才退回快取
+    const isAppShell = req.mode === 'navigate'
+        || url.pathname === '/'
+        || url.pathname.endsWith('/index.html')
+        || url.pathname.endsWith('/app.js');
+
+    if (isAppShell) {
+        event.respondWith(
+            fetch(req)
+                .then((networkResponse) => {
+                    const copy = networkResponse.clone();
+                    caches.open(CACHE_NAME).then((cache) => cache.put(req, copy)).catch(() => {});
                     return networkResponse;
-                }).catch((error) => {
-                    // 4. 網路錯誤時的處理，這是在離線時發生的
-                    console.error('[Service Worker] 獲取失敗:', error);
-                    // 如果快取和網路都失敗，可以返回一個離線頁面 (這裡我們沒有離線頁面，所以只返回錯誤)
-                    return new Response('應用程式處於離線狀態，且資源不在快取中。', { status: 503 });
-                });
-            })
+                })
+                .catch(() => caches.match(req).then((r) => r || caches.match('index.html')))
+        );
+        return;
+    }
+
+    // 其他靜態資源：快取優先
+    event.respondWith(
+        caches.match(req).then((response) => {
+            if (response) {
+                return response;
+            }
+            return fetch(req).then((networkResponse) => {
+                if (!networkResponse || networkResponse.status !== 200 || (networkResponse.type !== 'basic' && networkResponse.type !== 'opaque')) {
+                    return networkResponse;
+                }
+                const responseToCache = networkResponse.clone();
+                if (urlsToCache.some((u) => req.url.includes(u))) {
+                    caches.open(CACHE_NAME).then((cache) => cache.put(req, responseToCache)).catch(() => {});
+                }
+                return networkResponse;
+            }).catch((error) => {
+                console.error('[Service Worker] 獲取失敗:', error);
+                return new Response('應用程式處於離線狀態，且資源不在快取中。', { status: 503 });
+            });
+        })
     );
 });
