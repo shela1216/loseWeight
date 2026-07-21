@@ -657,8 +657,8 @@
                                 <button @click="removeItem(idx)" class="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-lg bg-white text-slate-300 hover:text-rose-500 hover:shadow-sm transition-all">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
                                 </button>
-                                <div class="flex flex-col sm:flex-row gap-2">
-                                    <div class="relative flex-1">
+                                <div class="flex flex-col gap-2">
+                                    <div class="relative w-full">
                                         <input v-model="item.name"
                                             @input="activeSuggestItem = idx; updateTotalsFromItems()"
                                             @focus="activeSuggestItem = idx"
@@ -675,7 +675,7 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                                    <div class="flex items-center gap-2 w-full">
                                         <button type="button" @click="openHistory(idx)" title="從資料庫挑選"
                                             class="w-10 shrink-0 flex items-center justify-center bg-indigo-50 text-indigo-500 rounded-xl hover:bg-indigo-100 transition-all active:scale-95">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -1633,7 +1633,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.1.0"></script>
+    <script type="module" src="app.js?v=0.1.1"></script>
 </body>
 
 </html>
