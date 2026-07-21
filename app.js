@@ -50,7 +50,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.1.4');
+                console.log('App initialization starting... v0.1.5');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -335,16 +335,18 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.1.4');
+                const appVersion = ref('0.1.5');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
                 const updateTotalsFromItems = () => {
                     if (!editingMeal.items || editingMeal.items.length === 0) return;
-                    editingMeal.calories = formatFloat(editingMeal.items.reduce((sum, item) => sum + (Number(item.calories) || 0), 0));
-                    editingMeal.carbs = formatFloat(editingMeal.items.reduce((sum, item) => sum + (Number(item.carbs) || 0), 0));
-                    editingMeal.protein = formatFloat(editingMeal.items.reduce((sum, item) => sum + (Number(item.protein) || 0), 0));
-                    editingMeal.fat = formatFloat(editingMeal.items.reduce((sum, item) => sum + (Number(item.fat) || 0), 0));
+                    // 品項營養值為「每 1 單位」,總和需乘以份數
+                    const sumBy = (key) => editingMeal.items.reduce((sum, item) => sum + (Number(item[key]) || 0) * (Number(item.amount) || 1), 0);
+                    editingMeal.calories = formatFloat(sumBy('calories'));
+                    editingMeal.carbs = formatFloat(sumBy('carbs'));
+                    editingMeal.protein = formatFloat(sumBy('protein'));
+                    editingMeal.fat = formatFloat(sumBy('fat'));
                     
                     // 自動生成名稱：只要 isNameAuto 為 true，就持續同步
                     if (isNameAuto.value) {
