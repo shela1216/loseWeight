@@ -5,10 +5,6 @@ module.exports = {
     theme: {
         extend: {
             colors: {
-                indigo: {
-                    500: '#6366f1',
-                    600: '#4f46e5',
-                }, // 暫留，Task 2 遷移後刪
                 brand: 'rgb(var(--c-brand-rgb) / <alpha-value>)',
                 'brand-soft': 'var(--c-brand-soft)',
                 surface: 'var(--c-surface)',
@@ -16,10 +12,10 @@ module.exports = {
                 ink: 'rgb(var(--c-ink-rgb) / <alpha-value>)',
                 muted: 'var(--c-muted)',
                 line: 'var(--c-line)',
-                high: 'var(--c-high)',
-                med: 'var(--c-med)',
-                low: 'var(--c-low)',
-                rest: 'var(--c-rest)',
+                high: 'rgb(var(--c-high-rgb) / <alpha-value>)',
+                med: 'rgb(var(--c-med-rgb) / <alpha-value>)',
+                low: 'rgb(var(--c-low-rgb) / <alpha-value>)',
+                rest: 'rgb(var(--c-rest-rgb) / <alpha-value>)',
                 good: 'var(--c-good)',
                 danger: 'var(--c-danger)',
             },
@@ -30,6 +26,10 @@ module.exports = {
                 panel: 'var(--r-panel)',
                 '4xl': '2rem',
                 '5xl': '2.5rem',
+            },
+            opacity: {
+                // 8：預設 opacity scale 無此值，供 bg-high/8 等分類卡軟色調底使用
+                '8': '0.08',
             }
         }
     },
