@@ -54,7 +54,7 @@
                 <div class="premium-card-main p-8 sm:p-10 space-y-6">
                     <div class="space-y-4">
                         <div class="relative">
-                            <svg class="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"
+                            <svg class="w-5 h-5 text-muted absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
@@ -64,7 +64,7 @@
                                 placeholder="電子郵件">
                         </div>
                         <div class="relative">
-                            <svg class="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"
+                            <svg class="w-5 h-5 text-muted absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -129,7 +129,7 @@
                             <div class="flex items-center gap-1.5 min-w-0 flex-1">
                                 <!-- 電腦展開：上個月 -->
                                 <button v-if="isCalendarExpanded && !isMobile" @click="changeMonth(-1)"
-                                    class="w-7 h-7 shrink-0 flex items-center justify-center rounded-lg transition-all hover:bg-slate-100 dark:hover:bg-slate-700"
+                                    class="w-7 h-7 shrink-0 flex items-center justify-center rounded-lg transition-all hover:bg-line"
                                     style="border:1px solid var(--border-color); color:var(--text-muted);" title="上個月">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
                                 </button>
@@ -156,7 +156,7 @@
 
                                 <!-- 電腦展開：下個月 -->
                                 <button v-if="isCalendarExpanded && !isMobile" @click="changeMonth(1)"
-                                    class="w-7 h-7 shrink-0 flex items-center justify-center rounded-lg transition-all hover:bg-slate-100 dark:hover:bg-slate-700"
+                                    class="w-7 h-7 shrink-0 flex items-center justify-center rounded-lg transition-all hover:bg-line"
                                     style="border:1px solid var(--border-color); color:var(--text-muted);" title="下個月">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
                                 </button>
@@ -171,7 +171,7 @@
                                 </button>
                                 <!-- 收合/展開按鈕：電腦版才顯示，帶文字標籤 -->
                                 <button @click="toggleCalendar()"
-                                    class="hidden lg:flex items-center gap-1 h-8 px-2.5 rounded-lg font-black text-xs transition-all hover:bg-slate-100 dark:hover:bg-slate-700"
+                                    class="hidden lg:flex items-center gap-1 h-8 px-2.5 rounded-lg font-black text-xs transition-all hover:bg-line"
                                     style="background:var(--bg-main); border:1px solid var(--border-color); color:var(--text-muted);">
                                     <svg class="w-3.5 h-3.5 transition-transform duration-300"
                                         :class="isCalendarExpanded ? 'rotate-180' : ''"
@@ -216,7 +216,7 @@
                                     </div>
                                 </div>
                                 <!-- 顏色對照說明 -->
-                                <div class="flex flex-wrap justify-center gap-x-4 gap-y-1 pt-4 mt-2 border-t border-slate-100 dark:border-slate-800">
+                                <div class="flex flex-wrap justify-center gap-x-4 gap-y-1 pt-4 mt-2 border-t border-line">
                                     <div v-for="l in [{c:'#f59e0b',t:'高碳日'},{c:'#6366f1',t:'中碳日'},{c:'#f43f5e',t:'低碳日'},{c:'#64748b',t:'自由日'}]" :key="l.t"
                                         class="flex items-center gap-1.5">
                                         <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" :style="{background: l.c}"></span>
@@ -387,7 +387,7 @@
 
                     <!-- 餐點紀錄區塊 -->
                     <section class="relative">
-                        <div class="flex justify-between items-center mb-6 sm:mb-8 px-4 py-4 sticky top-0 z-[90] backdrop-blur-xl bg-[#f4f4f5]/90 dark:bg-[#1f1d2b]/90 -mx-4 sm:-mx-2 sm:px-6 shadow-sm border-b border-slate-200/50 dark:border-slate-700/50 transition-all" :style="showSettings ? 'visibility:hidden' : ''">
+                        <div class="flex justify-between items-center mb-6 sm:mb-8 px-4 py-4 sticky top-0 z-[90] backdrop-blur-xl bg-[#f4f4f5]/90 dark:bg-[#1f1d2b]/90 -mx-4 sm:-mx-2 sm:px-6 shadow-sm border-b border-line transition-all" :style="showSettings ? 'visibility:hidden' : ''">
                             <div>
                                 <h3 class="text-2xl sm:text-3xl font-black tracking-tight">餐點紀錄</h3>
                                 <p class="text-[10px] sm:text-xs text-muted font-bold mt-1 uppercase tracking-widest"
@@ -440,7 +440,7 @@
                                                         meal.name || '未命名餐點' }}</span>
                                                 </div>
                                                 <div v-if="meal.items && meal.items.length > 0" class="flex flex-wrap gap-2 mb-3">
-                                                    <span v-for="item in meal.items" :key="item.name" class="text-[10px] font-black bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md">
+                                                    <span v-for="item in meal.items" :key="item.name" class="text-[10px] font-black bg-line text-muted px-2 py-0.5 rounded-md">
                                                         {{ item.name }} ({{ item.amount }}{{ item.unit }})
                                                     </span>
                                                 </div>
@@ -511,7 +511,7 @@
                     
                     <!-- 版本號顯示 -->
                     <div class="mt-8 pb-12 text-center">
-                        <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Version {{ appVersion }}</p>
+                        <p class="text-[10px] font-black text-muted opacity-60 uppercase tracking-widest">Version {{ appVersion }}</p>
                     </div>
                 </div>
             </div>
@@ -536,7 +536,7 @@
                             <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z" />
                         </svg>
                     </div>
-                    <span class="lg:absolute lg:right-20 bg-slate-800 text-white border border-slate-700 dark:bg-white dark:text-slate-900 dark:border-slate-100 px-3 py-1.5 rounded-lg text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">{{ isDark ? '淺色模式' : '深色模式' }}</span>
+                    <span class="lg:absolute lg:right-20 bg-ink text-surface border border-ink px-3 py-1.5 rounded-lg text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">{{ isDark ? '淺色模式' : '深色模式' }}</span>
                 </button>
                 <button @click="showExportModal = true; showMobileMenu = false" class="btn-circular group flex items-center flex-row-reverse lg:flex-col gap-3 lg:gap-0" title="匯出報告與分析">
                     <div class="icon-wrapper shadow-lg lg:shadow-none">
@@ -546,7 +546,7 @@
                         </svg>
                     </div>
                     <span
-                        class="lg:absolute lg:right-20 bg-slate-800 text-white border border-slate-700 dark:bg-white dark:text-slate-900 dark:border-slate-100 px-3 py-1.5 rounded-lg text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">匯出報告</span>
+                        class="lg:absolute lg:right-20 bg-ink text-surface border border-ink px-3 py-1.5 rounded-lg text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">匯出報告</span>
                 </button>
                 <button @click="reloadData" class="btn-circular group flex items-center flex-row-reverse lg:flex-col gap-3 lg:gap-0" title="重新載入資料">
                     <div class="icon-wrapper shadow-lg lg:shadow-none">
@@ -554,7 +554,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         </svg>
                     </div>
-                    <span class="lg:absolute lg:right-20 bg-slate-800 text-white border border-slate-700 dark:bg-white dark:text-slate-900 dark:border-slate-100 px-3 py-1.5 rounded-lg text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">重載</span>
+                    <span class="lg:absolute lg:right-20 bg-ink text-surface border border-ink px-3 py-1.5 rounded-lg text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">重載</span>
                 </button>
                 <button @click="openSettings(); showMobileMenu = false" class="btn-circular group flex items-center flex-row-reverse lg:flex-col gap-3 lg:gap-0" title="設定目標">
                     <div class="icon-wrapper shadow-lg lg:shadow-none">
@@ -566,7 +566,7 @@
                         </svg>
                     </div>
                     <span
-                        class="lg:absolute lg:right-20 bg-slate-800 text-white border border-slate-700 dark:bg-white dark:text-slate-900 dark:border-slate-100 px-3 py-1.5 rounded-lg text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">設定</span>
+                        class="lg:absolute lg:right-20 bg-ink text-surface border border-ink px-3 py-1.5 rounded-lg text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">設定</span>
                 </button>
                 <button @click="handleLogout" class="btn-circular group flex items-center flex-row-reverse lg:flex-col gap-3 lg:gap-0" title="登出帳號">
                     <div class="icon-wrapper shadow-lg lg:shadow-none">
@@ -577,7 +577,7 @@
                         </svg>
                     </div>
                     <span
-                        class="lg:absolute lg:right-20 bg-slate-800 text-white border border-slate-700 dark:bg-white dark:text-slate-900 dark:border-slate-100 px-3 py-1.5 rounded-lg text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">登出</span>
+                        class="lg:absolute lg:right-20 bg-ink text-surface border border-ink px-3 py-1.5 rounded-lg text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">登出</span>
                 </button>
             </div>
         </div>
@@ -587,21 +587,21 @@
         <div v-if="editingIndex !== null" class="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
             <div class="modal-overlay absolute inset-0" @click="cancelEdit"></div>
             <div
-                class="bg-white w-full max-w-lg rounded-t-[12px] sm:rounded-[12px] relative z-10 shadow-2xl flex flex-col max-h-[92vh] border-t border-x border-slate-100 sm:border overflow-hidden animate-in fade-in slide-in-from-bottom-10 duration-300">
+                class="bg-surface w-full max-w-lg rounded-t-[12px] sm:rounded-[12px] relative z-10 shadow-2xl flex flex-col max-h-[92vh] border-t border-x border-line sm:border overflow-hidden animate-in fade-in slide-in-from-bottom-10 duration-300">
 
                 <!-- 控制手柄 (僅行動端顯示) -->
-                <div class="sm:hidden w-12 h-1.5 bg-slate-200 rounded-full mx-auto mt-4 mb-2"></div>
+                <div class="sm:hidden w-12 h-1.5 bg-line rounded-full mx-auto mt-4 mb-2"></div>
 
                 <!-- Header: 簡潔、大標題 -->
                 <div class="px-5 sm:px-6 pt-5 sm:pt-6 pb-4 flex justify-between items-center">
                     <div>
-                        <h3 class="text-3xl font-black text-slate-900 tracking-tight">{{ isAddingMeal ? '新增餐點' : '編輯餐點'
+                        <h3 class="text-3xl font-black text-ink tracking-tight">{{ isAddingMeal ? '新增餐點' : '編輯餐點'
                             }}</h3>
-                        <p class="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">Calorie Intelligence
+                        <p class="text-xs font-bold text-muted mt-1 uppercase tracking-widest">Calorie Intelligence
                         </p>
                     </div>
                     <button @click="cancelEdit"
-                        class="w-10 h-10 flex items-center justify-center bg-slate-50 rounded-full text-slate-400 hover:text-slate-600 transition-all hover:rotate-90">
+                        class="w-10 h-10 flex items-center justify-center bg-page rounded-full text-muted hover:text-muted transition-all hover:rotate-90">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
                             <path d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -615,7 +615,7 @@
                         <div class="flex-1 relative">
                             <textarea v-model="editingMeal.name" 
                                 @input="if (!editingMeal.name) { isNameAuto = true; updateTotalsFromItems(); } else { isNameAuto = false; }"
-                                class="w-full px-3 py-1 text-2xl font-black placeholder:text-slate-200 text-slate-900 bg-transparent border-none outline-none resize-none min-h-[60px] leading-tight"
+                                class="w-full px-3 py-1 text-2xl font-black placeholder:text-muted placeholder:opacity-60 text-ink bg-transparent border-none outline-none resize-none min-h-[60px] leading-tight"
                                 placeholder="食物名稱..."></textarea>
                             <div class="absolute -bottom-1 left-0 w-10 h-1 bg-brand rounded-full"></div>
                         </div>
@@ -632,20 +632,20 @@
                             :key="t.k" @click="editingMeal.type = t.k"
                             class="flex flex-col items-center gap-2 group transition-all">
                             <div class="w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300"
-                                :class="editingMeal.type === t.k ? 'bg-brand text-white shadow-xl shadow-brand-soft scale-110' : 'bg-slate-50 text-slate-400 grayscale opacity-50 hover:opacity-100 hover:grayscale-0'">
+                                :class="editingMeal.type === t.k ? 'bg-brand text-white shadow-xl shadow-brand-soft scale-110' : 'bg-page text-muted grayscale opacity-50 hover:opacity-100 hover:grayscale-0'">
                                 {{ t.i }}
                             </div>
                             <span class="text-xs font-black transition-colors"
-                                :class="editingMeal.type === t.k ? 'text-slate-900' : 'text-slate-400'">{{ t.l }}</span>
+                                :class="editingMeal.type === t.k ? 'text-ink' : 'text-muted'">{{ t.l }}</span>
                         </button>
                     </div>
 
                     <!-- 品項組合區 (組合餐功能) -->
-                    <div class="space-y-4 border-t border-slate-50 pt-6">
+                    <div class="space-y-4 border-t border-line pt-6">
                         <div class="flex justify-between items-center px-1">
                             <div>
-                                <label class="text-xs font-black text-slate-400 uppercase tracking-widest">餐點組成品項 (選填)</label>
-                                <p class="text-[9px] text-slate-300 font-bold uppercase mt-0.5">Components & Details</p>
+                                <label class="text-xs font-black text-muted uppercase tracking-widest">餐點組成品項 (選填)</label>
+                                <p class="text-[9px] text-muted opacity-60 font-bold uppercase mt-0.5">Components & Details</p>
                             </div>
                             <button @click="addItem" class="flex items-center gap-1.5 text-[10px] font-black text-brand bg-brand-soft px-3 py-1.5 rounded-xl hover:brightness-95 transition-all shadow-sm">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
@@ -653,8 +653,8 @@
                             </button>
                         </div>
                         <div v-if="editingMeal.items && editingMeal.items.length > 0" class="space-y-3">
-                            <div v-for="(item, idx) in editingMeal.items" :key="idx" class="bg-slate-50/80 rounded-2xl p-4 border border-slate-100/50 space-y-3 relative group">
-                                <button @click="removeItem(idx)" class="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-lg bg-white text-slate-300 hover:text-rose-500 hover:shadow-sm transition-all">
+                            <div v-for="(item, idx) in editingMeal.items" :key="idx" class="bg-page rounded-2xl p-4 border border-line space-y-3 relative group">
+                                <button @click="removeItem(idx)" class="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-lg bg-surface text-muted opacity-60 hover:text-rose-500 hover:shadow-sm transition-all">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
                                 </button>
                                 <div class="flex flex-col gap-2">
@@ -663,27 +663,27 @@
                                             @input="activeSuggestItem = idx; itemSuggestPage = 0; updateTotalsFromItems()"
                                             @focus="activeSuggestItem = idx; itemSuggestPage = 0"
                                             @blur="activeSuggestItem = null"
-                                            class="w-full bg-white px-4 py-2.5 rounded-xl text-sm font-black outline-none border border-transparent focus:border-brand shadow-sm transition-all"
+                                            class="w-full bg-surface px-4 py-2.5 rounded-xl text-sm font-black outline-none border border-transparent focus:border-brand shadow-sm transition-all"
                                             placeholder="品項名稱 (如：蔥花蛋)">
                                         <div v-if="activeSuggestItem === idx && itemSuggestions(item.name).length > 0"
-                                            class="absolute z-30 left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden">
-                                            <div class="flex items-center justify-between px-4 py-2 border-b border-slate-100 bg-slate-50/50">
-                                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">推薦帶入</span>
+                                            class="absolute z-30 left-0 right-0 mt-1 bg-surface rounded-xl shadow-xl border border-line overflow-hidden">
+                                            <div class="flex items-center justify-between px-4 py-2 border-b border-line bg-page">
+                                                <span class="text-[9px] font-black text-muted uppercase tracking-widest">推薦帶入</span>
                                                 <button type="button" @mousedown.prevent="activeSuggestItem = null" title="關閉"
-                                                    class="w-6 h-6 flex items-center justify-center rounded-lg text-slate-300 hover:text-rose-500 hover:bg-white transition-all">
+                                                    class="w-6 h-6 flex items-center justify-center rounded-lg text-muted opacity-60 hover:text-rose-500 hover:bg-surface transition-all">
                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
                                                 </button>
                                             </div>
                                             <button v-for="s in pagedSuggestions(item.name)" :key="s.name" type="button"
                                                 @mousedown.prevent="applyItemSuggestion(item, s)"
-                                                class="w-full text-left px-4 py-2 text-xs font-bold text-slate-600 hover:bg-brand-soft hover:text-brand transition-colors flex justify-between gap-2">
+                                                class="w-full text-left px-4 py-2 text-xs font-bold text-muted hover:bg-brand-soft hover:text-brand transition-colors flex justify-between gap-2">
                                                 <span class="truncate">{{ s.name }}</span>
-                                                <span class="text-slate-300 shrink-0 whitespace-nowrap">{{ s.count || 0 }}次 · {{ formatFloat(s.calories) }}kcal</span>
+                                                <span class="text-muted opacity-60 shrink-0 whitespace-nowrap">{{ s.count || 0 }}次 · {{ formatFloat(s.calories) }}kcal</span>
                                             </button>
-                                            <div v-if="suggestPageCount(item.name) > 1" class="flex items-center justify-between px-3 py-2 border-t border-slate-100 bg-slate-50/50">
+                                            <div v-if="suggestPageCount(item.name) > 1" class="flex items-center justify-between px-3 py-2 border-t border-line bg-page">
                                                 <button type="button" @mousedown.prevent="itemSuggestPage = Math.max(0, itemSuggestPage - 1)" :disabled="itemSuggestPage === 0"
                                                     class="px-2 py-1 text-[10px] font-black text-brand rounded-md hover:bg-brand-soft disabled:opacity-30 disabled:hover:bg-transparent transition-all">上一頁</button>
-                                                <span class="text-[10px] font-black text-slate-400">第 {{ itemSuggestPage + 1 }} / {{ suggestPageCount(item.name) }} 頁</span>
+                                                <span class="text-[10px] font-black text-muted">第 {{ itemSuggestPage + 1 }} / {{ suggestPageCount(item.name) }} 頁</span>
                                                 <button type="button" @mousedown.prevent="itemSuggestPage = Math.min(suggestPageCount(item.name) - 1, itemSuggestPage + 1)" :disabled="itemSuggestPage >= suggestPageCount(item.name) - 1"
                                                     class="px-2 py-1 text-[10px] font-black text-brand rounded-md hover:bg-brand-soft disabled:opacity-30 disabled:hover:bg-transparent transition-all">下一頁</button>
                                             </div>
@@ -696,11 +696,11 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2 3 3 8 3s8-1 8-3V7M4 7c0 2 3 3 8 3s8-1 8-3M4 7c0-2 3-3 8-3s8 1 8 3" />
                                             </svg>
                                         </button>
-                                        <div class="flex-1 sm:w-28 flex items-center bg-white px-3 py-2 rounded-xl border border-transparent focus-within:border-brand shadow-sm transition-all">
+                                        <div class="flex-1 sm:w-28 flex items-center bg-surface px-3 py-2 rounded-xl border border-transparent focus-within:border-brand shadow-sm transition-all">
                                             <input type="number" v-model.number="item.amount" @focus="beginItemAmount(item)" @input="changeItemAmount(item)" class="w-full bg-transparent text-sm font-black outline-none text-center" placeholder="份量">
                                         </div>
-                                        <div class="w-20 shrink-0 flex items-center bg-white px-2 py-2 rounded-xl border border-transparent focus-within:border-brand shadow-sm transition-all">
-                                            <select v-model="item.unit" @change="updateTotalsFromItems" class="w-full bg-transparent text-xs font-black text-slate-600 outline-none cursor-pointer">
+                                        <div class="w-20 shrink-0 flex items-center bg-surface px-2 py-2 rounded-xl border border-transparent focus-within:border-brand shadow-sm transition-all">
+                                            <select v-model="item.unit" @change="updateTotalsFromItems" class="w-full bg-transparent text-xs font-black text-muted outline-none cursor-pointer">
                                                 <option value="份">份</option>
                                                 <option value="g">g</option>
                                                 <option value="ml">ml</option>
@@ -713,7 +713,7 @@
                                         <label class="text-[9px] font-black text-brand uppercase tracking-widest pl-1 mb-1 block">快速輸入 (熱/碳/蛋/脂)</label>
                                         <div class="flex gap-2">
                                             <input v-model="item.qInput" @keyup.enter="parseItemInput(item)" 
-                                                class="flex-1 bg-white px-4 py-2.5 rounded-xl text-sm font-black outline-none border border-transparent focus:border-brand shadow-sm transition-all" 
+                                                class="flex-1 bg-surface px-4 py-2.5 rounded-xl text-sm font-black outline-none border border-transparent focus:border-brand shadow-sm transition-all" 
                                                 placeholder="70/7/5/1">
                                             <button @click="parseItemInput(item)" 
                                                 class="px-4 bg-brand-soft text-brand rounded-xl text-[10px] font-black hover:brightness-95 transition-all active:scale-95">
@@ -721,17 +721,17 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <div class="grid grid-cols-4 gap-2 bg-white/60 rounded-2xl p-3 border border-slate-100/50">
+                                    <div class="grid grid-cols-4 gap-2 bg-surface rounded-2xl p-3 border border-line">
                                         <div v-for="n in [{k:'calories',l:'熱量',u:'k'},{k:'carbs',l:'碳水',u:'g'},{k:'protein',l:'蛋白',u:'g'},{k:'fat',l:'脂肪',u:'g'}]" :key="n.k" class="text-center transition-all">
-                                            <div class="text-[8px] font-bold text-slate-400 uppercase leading-none mb-1.5">{{ n.l }}</div>
+                                            <div class="text-[8px] font-bold text-muted uppercase leading-none mb-1.5">{{ n.l }}</div>
                                             <input type="number" v-model.number="item[n.k]" @input="updateTotalsFromItems"
-                                                class="w-full bg-transparent text-center text-sm font-black text-slate-800 leading-none outline-none py-1 focus:text-brand">
+                                                class="w-full bg-transparent text-center text-sm font-black text-ink leading-none outline-none py-1 focus:text-brand">
                                             <div class="text-[7px] opacity-30 font-bold uppercase mt-1">{{ n.u }}</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <p class="text-center text-[9px] font-bold text-slate-300 uppercase tracking-widest py-2">總計數值將自動同步至下方主欄位</p>
+                            <p class="text-center text-[9px] font-bold text-muted opacity-60 uppercase tracking-widest py-2">總計數值將自動同步至下方主欄位</p>
                         </div>
                     </div>
 
@@ -749,7 +749,7 @@
                         <div class="flex gap-2 mb-5">
                             <input v-model="quickNutrientInput" @keyup.enter="parseQuickInput"
                                 :disabled="editingMeal.items && editingMeal.items.length > 0"
-                                class="flex-1 min-w-0 bg-white px-5 py-3.5 rounded-2xl text-base font-black outline-none border border-transparent focus:border-brand shadow-md transition-all disabled:opacity-50 disabled:bg-slate-50 disabled:cursor-not-allowed"
+                                class="flex-1 min-w-0 bg-surface px-5 py-3.5 rounded-2xl text-base font-black outline-none border border-transparent focus:border-brand shadow-md transition-all disabled:opacity-50 disabled:bg-page disabled:cursor-not-allowed"
                                 :placeholder="editingMeal.items && editingMeal.items.length > 0 ? '請直接修改上方品項內容' : '範例：70/7/5/1'">
                             <button @click="parseQuickInput" 
                                 :disabled="editingMeal.items && editingMeal.items.length > 0"
@@ -761,12 +761,12 @@
                         <!-- 數值預覽與手動修正格 -->
                         <div class="grid grid-cols-4 gap-2">
                             <div v-for="n in [{k:'calories',l:'熱量',u:'kcal',c:'orange'},{k:'carbs',l:'淨碳水',u:'g',c:'brand'},{k:'protein',l:'蛋白',u:'g',c:'violet'},{k:'fat',l:'脂肪',u:'g',c:'pink'}]"
-                                :key="n.k" class="bg-white rounded-2xl p-2.5 border border-slate-50 text-center shadow-sm focus-within:border-brand transition-all">
-                                <div class="text-[9px] font-black text-slate-400 uppercase mb-1">{{ n.l }}</div>
+                                :key="n.k" class="bg-surface rounded-2xl p-2.5 border border-line text-center shadow-sm focus-within:border-brand transition-all">
+                                <div class="text-[9px] font-black text-muted uppercase mb-1">{{ n.l }}</div>
                                 <input type="number" v-model.number="editingMeal[n.k]"
                                     :disabled="editingMeal.items && editingMeal.items.length > 0"
                                     class="w-full bg-transparent text-center text-lg font-black leading-none outline-none disabled:opacity-30" :class="n.c === 'brand' ? 'text-brand' : 'text-'+n.c+'-600'">
-                                <div class="text-[8px] font-bold text-slate-300 uppercase mt-1">{{ n.u }}</div>
+                                <div class="text-[8px] font-bold text-muted opacity-60 uppercase mt-1">{{ n.u }}</div>
                             </div>
                         </div>
                     </div>
@@ -775,18 +775,18 @@
                     <div class="flex flex-col gap-3">
                         <div class="flex items-center gap-3">
                             <div
-                                class="flex-1 bg-slate-50 rounded-2xl px-5 py-4 flex flex-col border border-transparent focus-within:border-brand focus-within:bg-white transition-all">
-                                <label class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">份量數值 (調整會縮放營養素)</label>
+                                class="flex-1 bg-page rounded-2xl px-5 py-4 flex flex-col border border-transparent focus-within:border-brand focus-within:bg-surface transition-all">
+                                <label class="text-xs font-black text-muted uppercase tracking-widest mb-1">份量數值 (調整會縮放營養素)</label>
                                 <input type="number" inputmode="decimal" pattern="[0-9]*"
                                     v-model.number="editingMeal.amount" @focus="prepareScale" @input="scaleNutrients"
                                     class="bg-transparent px-3 py-1 text-2xl font-black outline-none w-full" step="any"
                                     @keypress="onlyNumber">
                             </div>
                             <div
-                                class="w-1/3 bg-slate-50 rounded-2xl px-5 py-4 flex flex-col border border-transparent focus-within:border-brand focus-within:bg-white transition-all">
-                                <label class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">單位</label>
+                                class="w-1/3 bg-page rounded-2xl px-5 py-4 flex flex-col border border-transparent focus-within:border-brand focus-within:bg-surface transition-all">
+                                <label class="text-xs font-black text-muted uppercase tracking-widest mb-1">單位</label>
                                 <select v-model="editingMeal.unit"
-                                    class="bg-transparent text-base font-black text-slate-700 outline-none cursor-pointer appearance-none">
+                                    class="bg-transparent text-base font-black text-muted outline-none cursor-pointer appearance-none">
                                     <option value="份">份</option>
                                     <option value="g">公克</option>
                                     <option value="ml">毫升</option>
@@ -796,12 +796,12 @@
 
                         <!-- 不存入歷史紀錄選項 -->
                         <div class="flex items-center">
-                            <label class="flex items-center gap-3 cursor-pointer group bg-slate-50/50 px-4 py-3 rounded-2xl border border-transparent hover:border-slate-100 transition-all w-full">
+                            <label class="flex items-center gap-3 cursor-pointer group bg-page px-4 py-3 rounded-2xl border border-transparent hover:border-line transition-all w-full">
                                 <input type="checkbox" v-model="skipHistorySave" 
-                                    class="w-5 h-5 rounded-lg border-2 border-slate-200 text-brand focus:ring-brand transition-all cursor-pointer">
+                                    class="w-5 h-5 rounded-lg border-2 border-line text-brand focus:ring-brand transition-all cursor-pointer">
                                 <div class="flex flex-col">
-                                    <span class="text-xs font-black text-slate-700 group-hover:text-brand transition-colors">本次不存入食物資料庫</span>
-                                    <span class="text-[9px] text-slate-400 font-bold uppercase tracking-tight">One-time entry only</span>
+                                    <span class="text-xs font-black text-muted group-hover:text-brand transition-colors">本次不存入食物資料庫</span>
+                                    <span class="text-[9px] text-muted font-bold uppercase tracking-tight">One-time entry only</span>
                                 </div>
                             </label>
                         </div>
@@ -809,9 +809,9 @@
                 </div>
 
                 <!-- Footer: 緊湊操作 -->
-                <div class="px-6 pb-8 pt-2 bg-white flex flex-col gap-3">
+                <div class="px-6 pb-8 pt-2 bg-surface flex flex-col gap-3">
                     <button @click="saveMeal()"
-                        class="w-full py-4 bg-slate-900 text-white rounded-2xl text-base font-black shadow-lg hover:bg-brand active:scale-95 transition-all flex items-center justify-center gap-2">
+                        class="w-full py-4 bg-ink text-surface rounded-2xl text-base font-black shadow-lg hover:bg-brand active:scale-95 transition-all flex items-center justify-center gap-2">
                         <span>保存餐點紀錄</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
                             <path d="M5 13l4 4L19 7"></path>
@@ -826,7 +826,7 @@
                         </svg>
                     </button>
                     <button @click="cancelEdit"
-                        class="w-full mt-1 text-slate-300 text-xs font-black uppercase tracking-[0.2em] hover:text-slate-500 transition-colors text-center">捨棄變更</button>
+                        class="w-full mt-1 text-muted opacity-60 text-xs font-black uppercase tracking-[0.2em] hover:text-muted transition-colors text-center">捨棄變更</button>
                 </div>
             </div>
         </div>
@@ -835,7 +835,7 @@
         <div v-if="showSyncModal" class="fixed inset-0 z-[120] flex items-center justify-center p-4">
             <div class="modal-overlay absolute inset-0"></div>
             <div
-                class="bg-white rounded-[12px] p-6 relative z-10 w-full max-sm text-center shadow-2xl border border-slate-100">
+                class="bg-surface rounded-[12px] p-6 relative z-10 w-full max-sm text-center shadow-2xl border border-line">
                 <div
                     class="w-20 h-20 bg-amber-50 text-amber-500 rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-inner">
                     <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2"
@@ -845,14 +845,14 @@
                         </path>
                     </svg>
                 </div>
-                <h4 class="text-xl font-black text-slate-900 mb-3 tracking-tight">更新資料庫？</h4>
-                <p class="text-sm text-slate-500 mb-8 leading-relaxed">檢測到營養成分與資料庫紀錄不同，要將此設定存為「{{ editingMeal.name
+                <h4 class="text-xl font-black text-ink mb-3 tracking-tight">更新資料庫？</h4>
+                <p class="text-sm text-muted mb-8 leading-relaxed">檢測到營養成分與資料庫紀錄不同，要將此設定存為「{{ editingMeal.name
                     }}」的新預設值嗎？</p>
                 <div class="space-y-3">
                     <button @click="saveMeal('sync')"
                         class="w-full py-4 bg-brand text-white rounded-2xl font-black text-sm shadow-xl shadow-brand-soft hover:brightness-95 active:scale-95 transition-all">同步至資料庫</button>
                     <button @click="saveMeal('only_once')"
-                        class="w-full py-4 bg-slate-50 text-slate-500 rounded-2xl font-black text-sm hover:bg-slate-100 active:scale-95 transition-all">僅儲存此次紀錄</button>
+                        class="w-full py-4 bg-page text-muted rounded-2xl font-black text-sm hover:bg-line active:scale-95 transition-all">僅儲存此次紀錄</button>
                 </div>
             </div>
         </div>
@@ -861,21 +861,21 @@
         <div v-if="showHistory" class="fixed inset-0 z-[110] flex items-center justify-center p-4">
             <div class="modal-overlay absolute inset-0" @click="closeHistory()"></div>
             <div
-                class="bg-white w-full max-w-lg rounded-[2.5rem] p-8 relative z-10 shadow-2xl flex flex-col max-h-[85vh] border border-slate-100">
+                class="bg-surface w-full max-w-lg rounded-[2.5rem] p-8 relative z-10 shadow-2xl flex flex-col max-h-[85vh] border border-line">
                 <div class="flex justify-between items-center mb-8 px-2 shrink-0">
                     <div>
-                        <h3 class="text-2xl font-black text-slate-900 tracking-tight">食物資料庫</h3>
-                        <p class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">
+                        <h3 class="text-2xl font-black text-ink tracking-tight">食物資料庫</h3>
+                        <p class="text-[10px] sm:text-xs text-muted font-bold uppercase tracking-widest mt-1">
                             快速選取餐點並管理</p>
                     </div>
                     <div class="flex items-center gap-2">
                         <button @click="recalcCounts" :disabled="isRecalculating"
-                            class="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-xl bg-slate-50 text-slate-400 hover:bg-brand-soft hover:text-brand transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            class="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-xl bg-page text-muted hover:bg-brand-soft hover:text-brand transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             title="從所有歷史紀錄重新計算使用次數">
                             {{ isRecalculating ? '計算中...' : '重算次數' }}
                         </button>
                         <button @click="closeHistory()"
-                            class="w-10 h-10 flex items-center justify-center bg-slate-50 rounded-2xl text-slate-400 hover:text-slate-600 transition-colors"><svg
+                            class="w-10 h-10 flex items-center justify-center bg-page rounded-2xl text-muted hover:text-muted transition-colors"><svg
                                 class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path d="M6 18L18 6M6 6l12 12"></path>
                             </svg></button>
@@ -886,9 +886,9 @@
                     <!-- 搜尋框：全寬 -->
                     <div class="relative">
                         <input type="text" v-model="historySearch"
-                            class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-100 rounded-[1.25rem] text-sm font-bold outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand focus:bg-white transition-all"
+                            class="w-full pl-12 pr-4 py-3.5 bg-page border border-line rounded-[1.25rem] text-sm font-bold outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand focus:bg-surface transition-all"
                             placeholder="搜尋餐點名稱...">
-                        <svg class="w-5 h-5 text-slate-300 absolute left-4 top-1/2 -translate-y-1/2" fill="none"
+                        <svg class="w-5 h-5 text-muted opacity-60 absolute left-4 top-1/2 -translate-y-1/2" fill="none"
                             stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -897,16 +897,16 @@
 
                     <!-- 分類 Tab + 排序：同行 -->
                     <div class="flex items-center gap-2">
-                        <div v-if="historyPickMode === null" class="flex gap-1.5 p-1 bg-slate-50 rounded-2xl border border-slate-100/50 flex-1">
+                        <div v-if="historyPickMode === null" class="flex gap-1.5 p-1 bg-page rounded-2xl border border-line flex-1">
                             <button @click="historyTab = 'general'"
-                                :class="historyTab === 'general' ? 'bg-white text-brand shadow-sm' : 'text-slate-400 hover:text-slate-600'"
+                                :class="historyTab === 'general' ? 'bg-surface text-brand shadow-sm' : 'text-muted hover:text-muted'"
                                 class="flex-1 py-2 rounded-xl text-xs font-black tracking-wide transition-all">一般餐點</button>
                             <button @click="historyTab = 'combo'"
-                                :class="historyTab === 'combo' ? 'bg-white text-brand shadow-sm' : 'text-slate-400 hover:text-slate-600'"
+                                :class="historyTab === 'combo' ? 'bg-surface text-brand shadow-sm' : 'text-muted hover:text-muted'"
                                 class="flex-1 py-2 rounded-xl text-xs font-black tracking-wide transition-all">組合餐點</button>
                         </div>
                         <select v-model="historySortBy"
-                            class="pl-3 pr-8 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-black text-slate-600 outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand transition-all cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%2364748b%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1rem_1rem] bg-[right_0.4rem_center] bg-no-repeat shrink-0">
+                            class="pl-3 pr-8 py-2.5 bg-page border border-line rounded-2xl text-xs font-black text-muted outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand transition-all cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%2364748b%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1rem_1rem] bg-[right_0.4rem_center] bg-no-repeat shrink-0">
                             <option value="recommend">推薦</option>
                             <option value="count">次數</option>
                             <option value="calories">熱量</option>
@@ -915,7 +915,7 @@
                             <option value="fat">脂肪</option>
                         </select>
                         <button @click="historySortOrder = historySortOrder === 'desc' ? 'asc' : 'desc'"
-                            class="w-10 h-10 flex items-center justify-center bg-slate-50 border border-slate-100 rounded-2xl text-slate-400 hover:text-brand hover:bg-brand-soft transition-all active:scale-90 shrink-0"
+                            class="w-10 h-10 flex items-center justify-center bg-page border border-line rounded-2xl text-muted hover:text-brand hover:bg-brand-soft transition-all active:scale-90 shrink-0"
                             :title="historySortOrder === 'desc' ? '由高到低' : '由低到高'">
                             <svg v-if="historySortOrder === 'desc'" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
@@ -933,50 +933,50 @@
 
                 <div class="flex-1 overflow-y-auto overflow-x-hidden custom-scroll space-y-4 px-2 pb-4" @scroll="handleHistoryScroll">
                     <div v-for="item in visibleMealHistory" :key="item.name"
-                        class="p-4 sm:p-5 bg-white border border-slate-100 rounded-3xl hover:bg-brand-soft hover:border-brand/20 cursor-pointer flex justify-between items-center transition-all group active:scale-[0.98] overflow-hidden">
+                        class="p-4 sm:p-5 bg-surface border border-line rounded-3xl hover:bg-brand-soft hover:border-brand/20 cursor-pointer flex justify-between items-center transition-all group active:scale-[0.98] overflow-hidden">
                         <div class="flex-1 mr-3 min-w-0" @click="addFromHistory(item)">
                             <div class="flex items-center gap-3 mb-2 min-w-0">
-                                <span class="font-black text-slate-900 text-base break-words">{{ item.name }}</span>
+                                <span class="font-black text-ink text-base break-words">{{ item.name }}</span>
                                 <span
-                                    class="text-[10px] sm:text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-lg font-black uppercase group-hover:bg-brand-soft group-hover:text-brand transition-colors shrink-0 whitespace-nowrap">{{
+                                    class="text-[10px] sm:text-xs bg-line text-muted px-2 py-0.5 rounded-lg font-black uppercase group-hover:bg-brand-soft group-hover:text-brand transition-colors shrink-0 whitespace-nowrap">{{
                                     item.count }} 次記錄</span>
                                 <span v-if="item.unit === 'g'"
                                     class="text-[10px] bg-teal-50 text-teal-500 border border-teal-100 px-2 py-0.5 rounded-lg font-black shrink-0 whitespace-nowrap">per 100g</span>
                             </div>
                             <div v-if="item.items && item.items.length > 0" class="flex flex-wrap gap-1.5 mb-2.5">
-                                <span v-for="sub in item.items" :key="sub.name" class="text-[9px] font-bold bg-slate-50 text-slate-400 px-2 py-0.5 rounded-md border border-slate-100/50">
+                                <span v-for="sub in item.items" :key="sub.name" class="text-[9px] font-bold bg-page text-muted px-2 py-0.5 rounded-md border border-line">
                                     {{ sub.name }} {{ sub.amount }}{{ sub.unit }}
                                 </span>
                             </div>
                             <div class="space-y-1">
                                 <p class="flex items-center gap-2 text-sm">
                                     <span class="font-black text-brand">{{ item.unit === 'g' ? '100g' : (item.amount + (item.unit || '份')) }}</span>
-                                    <span class="text-slate-200">•</span>
-                                    <span class="font-black text-slate-900">{{ item.unit === 'g' ? formatFloat(item.calories * 100) : formatFloat(item.calories) }}kcal</span>
+                                    <span class="text-muted opacity-60">•</span>
+                                    <span class="font-black text-ink">{{ item.unit === 'g' ? formatFloat(item.calories * 100) : formatFloat(item.calories) }}kcal</span>
                                 </p>
-                                <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-tighter">
-                                    碳:<span class="text-slate-900 font-black mr-2">{{ item.unit === 'g' ? formatFloat(item.carbs * 100) : formatFloat(item.carbs) }}</span>
-                                    蛋:<span class="text-slate-900 font-black mr-2">{{ item.unit === 'g' ? formatFloat(item.protein * 100) : formatFloat(item.protein) }}</span>
-                                    脂:<span class="text-slate-900 font-black">{{ item.unit === 'g' ? formatFloat(item.fat * 100) : formatFloat(item.fat) }}</span>
+                                <p class="text-[10px] sm:text-xs font-bold text-muted uppercase tracking-tighter">
+                                    碳:<span class="text-ink font-black mr-2">{{ item.unit === 'g' ? formatFloat(item.carbs * 100) : formatFloat(item.carbs) }}</span>
+                                    蛋:<span class="text-ink font-black mr-2">{{ item.unit === 'g' ? formatFloat(item.protein * 100) : formatFloat(item.protein) }}</span>
+                                    脂:<span class="text-ink font-black">{{ item.unit === 'g' ? formatFloat(item.fat * 100) : formatFloat(item.fat) }}</span>
                                 </p>
                             </div>
                         </div>
                         <!-- 刪除歷史紀錄按鈕 -->
                         <button @click.stop="confirmDeleteHistory(item)"
-                            class="p-3 text-slate-300 hover:text-rose-500 transition-all hover:bg-rose-50 rounded-2xl">
+                            class="p-3 text-muted opacity-60 hover:text-rose-500 transition-all hover:bg-rose-50 rounded-2xl">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
                         </button>
                     </div>
                     <div v-if="mealHistory.length === 0" class="py-16 text-center">
-                        <div class="w-16 h-16 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-8 h-8 text-slate-200" fill="none" stroke="currentColor" stroke-width="2"
+                        <div class="w-16 h-16 bg-page rounded-3xl flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-muted opacity-60" fill="none" stroke="currentColor" stroke-width="2"
                                 viewBox="0 0 24 24">
                                 <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
                         </div>
-                        <p class="text-slate-400 text-sm font-black uppercase tracking-widest">
+                        <p class="text-muted text-sm font-black uppercase tracking-widest">
                             {{ historySearch ? '找不到相符餐點' : '尚無紀錄' }}
                         </p>
                     </div>
@@ -987,20 +987,20 @@
         <Teleport to="body">
         <div v-if="showSettings" class="fixed inset-0 z-[150] flex items-center justify-center p-4">
             <div class="modal-overlay absolute inset-0" @click="showSettings = false"></div>
-            <div class="bg-white w-full max-w-xl rounded-[2.5rem] relative z-10 shadow-2xl flex flex-col max-h-[90vh] border border-slate-100 overflow-hidden">
+            <div class="bg-surface w-full max-w-xl rounded-[2.5rem] relative z-10 shadow-2xl flex flex-col max-h-[90vh] border border-line overflow-hidden">
 
                 <!-- 固定 Header -->
                 <div class="flex justify-between items-center px-8 sm:px-10 pt-8 pb-4 shrink-0">
                     <div>
-                        <h3 class="text-2xl font-black text-slate-900 tracking-tight">
+                        <h3 class="text-2xl font-black text-ink tracking-tight">
                             {{ settingsStep === 1 ? '基本資料' : '調整目標' }}
                         </h3>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
+                        <p class="text-[10px] text-muted font-bold uppercase tracking-widest mt-0.5">
                             步驟 {{ settingsStep }}/2 &mdash; {{ settingsStep === 1 ? '填寫身體數據' : '確認各計畫熱量' }}
                         </p>
                     </div>
                     <button @click="showSettings = false"
-                        class="w-11 h-11 flex items-center justify-center bg-slate-50 rounded-2xl text-slate-400 hover:text-slate-600 transition-colors">
+                        class="w-11 h-11 flex items-center justify-center bg-page rounded-2xl text-muted hover:text-muted transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -1010,8 +1010,8 @@
                 <!-- 步驟進度條 -->
                 <div class="px-8 sm:px-10 pb-5 shrink-0">
                     <div class="flex gap-2">
-                        <div class="flex-1 h-1.5 rounded-full transition-all duration-300" :class="settingsStep >= 1 ? 'bg-brand' : 'bg-slate-100'"></div>
-                        <div class="flex-1 h-1.5 rounded-full transition-all duration-300" :class="settingsStep >= 2 ? 'bg-brand' : 'bg-slate-100'"></div>
+                        <div class="flex-1 h-1.5 rounded-full transition-all duration-300" :class="settingsStep >= 1 ? 'bg-brand' : 'bg-line'"></div>
+                        <div class="flex-1 h-1.5 rounded-full transition-all duration-300" :class="settingsStep >= 2 ? 'bg-brand' : 'bg-line'"></div>
                     </div>
                 </div>
 
@@ -1023,16 +1023,16 @@
 
                         <!-- 性別 -->
                         <div class="space-y-2">
-                            <label class="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">性別</label>
+                            <label class="text-xs font-black text-muted uppercase tracking-widest pl-1">性別</label>
                             <div class="flex gap-2">
                                 <button @click="profile.gender='male'"
                                     class="flex-1 py-3.5 rounded-2xl font-black text-sm transition-all border"
-                                    :class="profile.gender === 'male' ? 'bg-brand text-white border-brand shadow-lg shadow-brand-soft' : 'bg-slate-50 text-slate-500 border-slate-100 hover:border-brand/20'">
+                                    :class="profile.gender === 'male' ? 'bg-brand text-white border-brand shadow-lg shadow-brand-soft' : 'bg-page text-muted border-line hover:border-brand/20'">
                                     男性
                                 </button>
                                 <button @click="profile.gender='female'"
                                     class="flex-1 py-3.5 rounded-2xl font-black text-sm transition-all border"
-                                    :class="profile.gender === 'female' ? 'bg-brand text-white border-brand shadow-lg shadow-brand-soft' : 'bg-slate-50 text-slate-500 border-slate-100 hover:border-brand/20'">
+                                    :class="profile.gender === 'female' ? 'bg-brand text-white border-brand shadow-lg shadow-brand-soft' : 'bg-page text-muted border-line hover:border-brand/20'">
                                     女性
                                 </button>
                             </div>
@@ -1041,62 +1041,62 @@
                         <!-- 體重/身高/年齡 -->
                         <div class="grid grid-cols-3 gap-3">
                             <div class="space-y-2">
-                                <label class="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">體重</label>
+                                <label class="text-xs font-black text-muted uppercase tracking-widest pl-1">體重</label>
                                 <div class="relative">
                                     <input type="number" v-model.number="profile.weight"
-                                        class="w-full bg-slate-50 px-3 py-3.5 rounded-2xl text-sm border border-slate-100 font-black outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand transition-all pr-8">
-                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-300 font-bold pointer-events-none">kg</span>
+                                        class="w-full bg-page px-3 py-3.5 rounded-2xl text-sm border border-line font-black outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand transition-all pr-8">
+                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted opacity-60 font-bold pointer-events-none">kg</span>
                                 </div>
                             </div>
                             <div class="space-y-2">
-                                <label class="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">身高</label>
+                                <label class="text-xs font-black text-muted uppercase tracking-widest pl-1">身高</label>
                                 <div class="relative">
                                     <input type="number" v-model.number="profile.height"
-                                        class="w-full bg-slate-50 px-3 py-3.5 rounded-2xl text-sm border border-slate-100 font-black outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand transition-all pr-9">
-                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-300 font-bold pointer-events-none">cm</span>
+                                        class="w-full bg-page px-3 py-3.5 rounded-2xl text-sm border border-line font-black outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand transition-all pr-9">
+                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted opacity-60 font-bold pointer-events-none">cm</span>
                                 </div>
                             </div>
                             <div class="space-y-2">
-                                <label class="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">年齡</label>
+                                <label class="text-xs font-black text-muted uppercase tracking-widest pl-1">年齡</label>
                                 <div class="relative">
                                     <input type="number" v-model.number="profile.age"
-                                        class="w-full bg-slate-50 px-3 py-3.5 rounded-2xl text-sm border border-slate-100 font-black outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand transition-all pr-8">
-                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-300 font-bold pointer-events-none">歲</span>
+                                        class="w-full bg-page px-3 py-3.5 rounded-2xl text-sm border border-line font-black outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand transition-all pr-8">
+                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted opacity-60 font-bold pointer-events-none">歲</span>
                                 </div>
                             </div>
                         </div>
 
                         <!-- 目標 -->
                         <div class="space-y-2">
-                            <label class="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">目標</label>
+                            <label class="text-xs font-black text-muted uppercase tracking-widest pl-1">目標</label>
                             <div class="grid grid-cols-2 gap-3">
                                 <button @click="profile.goal='lose'"
                                     class="p-4 rounded-2xl text-left border transition-all"
-                                    :class="profile.goal === 'lose' ? 'bg-rose-50 border-rose-300 shadow-md shadow-rose-50' : 'bg-slate-50 border-slate-100 hover:border-rose-100'">
+                                    :class="profile.goal === 'lose' ? 'bg-rose-50 border-rose-300 shadow-md shadow-rose-50' : 'bg-page border-line hover:border-rose-100'">
                                     <div class="text-xl mb-1">🔥</div>
-                                    <div class="font-black text-slate-900 text-sm">減重</div>
-                                    <div class="text-[10px] text-slate-400 font-bold mt-0.5">TDEE &minus; 400 kcal</div>
+                                    <div class="font-black text-ink text-sm">減重</div>
+                                    <div class="text-[10px] text-muted font-bold mt-0.5">TDEE &minus; 400 kcal</div>
                                 </button>
                                 <button @click="profile.goal='maintain'"
                                     class="p-4 rounded-2xl text-left border transition-all"
-                                    :class="profile.goal === 'maintain' ? 'bg-brand-soft border-brand shadow-md shadow-brand-soft' : 'bg-slate-50 border-slate-100 hover:border-brand/20'">
+                                    :class="profile.goal === 'maintain' ? 'bg-brand-soft border-brand shadow-md shadow-brand-soft' : 'bg-page border-line hover:border-brand/20'">
                                     <div class="text-xl mb-1">⚖️</div>
-                                    <div class="font-black text-slate-900 text-sm">維持身材</div>
-                                    <div class="text-[10px] text-slate-400 font-bold mt-0.5">維持 TDEE 攝取</div>
+                                    <div class="font-black text-ink text-sm">維持身材</div>
+                                    <div class="text-[10px] text-muted font-bold mt-0.5">維持 TDEE 攝取</div>
                                 </button>
                             </div>
                         </div>
 
                         <!-- 活動程度 -->
                         <div class="space-y-2">
-                            <label class="text-xs font-black text-slate-400 uppercase tracking-widest pl-1">活動程度</label>
+                            <label class="text-xs font-black text-muted uppercase tracking-widest pl-1">活動程度</label>
                             <div class="grid grid-cols-2 gap-2">
                                 <button v-for="a in [{v:1.2,l:'久坐',d:'幾乎不運動'},{v:1.375,l:'輕度活動',d:'每週 1-3 天'},{v:1.55,l:'中度活動',d:'每週 3-5 天'},{v:1.725,l:'高度活動',d:'每週 6-7 天'}]"
                                     :key="a.v" @click="profile.activity=a.v"
                                     class="p-3.5 rounded-2xl text-left border transition-all"
-                                    :class="profile.activity === a.v ? 'bg-brand border-brand shadow-md shadow-brand-soft' : 'bg-slate-50 border-slate-100 hover:border-brand/20'">
-                                    <div class="font-black text-sm" :class="profile.activity === a.v ? 'text-white' : 'text-slate-800'">{{ a.l }}</div>
-                                    <div class="text-[10px] font-bold mt-0.5" :class="profile.activity === a.v ? 'text-white/70' : 'text-slate-400'">{{ a.d }}</div>
+                                    :class="profile.activity === a.v ? 'bg-brand border-brand shadow-md shadow-brand-soft' : 'bg-page border-line hover:border-brand/20'">
+                                    <div class="font-black text-sm" :class="profile.activity === a.v ? 'text-white' : 'text-ink'">{{ a.l }}</div>
+                                    <div class="text-[10px] font-bold mt-0.5" :class="profile.activity === a.v ? 'text-white/70' : 'text-muted'">{{ a.d }}</div>
                                     <div class="text-xs font-black mt-1.5 tabular-nums"
                                         :class="profile.activity === a.v ? 'text-white' : 'text-brand'">
                                         ~ {{ formatNum(calculatedTDEE / profile.activity * a.v).toLocaleString() }} kcal/日
@@ -1134,7 +1134,7 @@
                                 'bg-amber-50/60 border-amber-100': key === 'high',
                                 'bg-brand-soft border-brand/20': key === 'med',
                                 'bg-rose-50/60 border-rose-100': key === 'low',
-                                'bg-slate-50 border-slate-200': key === 'rest'
+                                'bg-page border-line': key === 'rest'
                             }">
 
                             <!-- 計畫標題列 -->
@@ -1143,46 +1143,46 @@
                                     <span class="w-3 h-3 rounded-full shadow-sm flex-shrink-0" :style="{
                                         background: key === 'high' ? '#f59e0b' : key === 'med' ? '#6366f1' : key === 'low' ? '#f43f5e' : '#64748b'
                                     }"></span>
-                                    <span class="font-black text-slate-900 text-sm">{{ getPlanLabel(key) }}</span>
-                                    <span class="text-[10px] text-slate-400 font-bold hidden sm:inline">
+                                    <span class="font-black text-ink text-sm">{{ getPlanLabel(key) }}</span>
+                                    <span class="text-[10px] text-muted font-bold hidden sm:inline">
                                         {{ key === 'high' ? '· 訓練日' : key === 'med' ? '· 一般活動日' : key === 'low' ? '· 輕度活動日' : '· 休息恢復日' }}
                                     </span>
                                 </div>
                                 <div class="flex items-center gap-1">
                                     <input type="number" v-model.number="p.calories.min"
                                         min="500" max="4000" step="50"
-                                        class="no-spin w-16 text-center text-sm font-black border rounded-lg p-1.5 bg-white outline-none transition-all focus:ring-2"
+                                        class="no-spin w-16 text-center text-sm font-black border rounded-lg p-1.5 bg-surface outline-none transition-all focus:ring-2"
                                         :class="{
                                             'border-amber-200 text-amber-500 focus:ring-amber-500/10 focus:border-amber-400': key === 'high',
                                             'border-brand/20 text-brand focus:ring-brand/10 focus:border-brand': key === 'med',
                                             'border-rose-200 text-rose-500 focus:ring-rose-500/10 focus:border-rose-400': key === 'low',
-                                            'border-slate-200 text-slate-500 focus:ring-slate-500/10 focus:border-slate-400': key === 'rest'
+                                            'border-line text-muted focus:ring-muted focus:border-muted': key === 'rest'
                                         }"
                                         placeholder="最小">
                                     <span class="font-bold text-xs opacity-30">–</span>
                                     <input type="number" v-model.number="p.calories.max"
                                         min="500" max="4000" step="50"
-                                        class="no-spin w-16 text-center text-sm font-black border rounded-lg p-1.5 bg-white outline-none transition-all focus:ring-2"
+                                        class="no-spin w-16 text-center text-sm font-black border rounded-lg p-1.5 bg-surface outline-none transition-all focus:ring-2"
                                         :class="{
                                             'border-amber-200 text-amber-500 focus:ring-amber-500/10 focus:border-amber-400': key === 'high',
                                             'border-brand/20 text-brand focus:ring-brand/10 focus:border-brand': key === 'med',
                                             'border-rose-200 text-rose-500 focus:ring-rose-500/10 focus:border-rose-400': key === 'low',
-                                            'border-slate-200 text-slate-500 focus:ring-slate-500/10 focus:border-slate-400': key === 'rest'
+                                            'border-line text-muted focus:ring-muted focus:border-muted': key === 'rest'
                                         }"
                                         placeholder="最大">
-                                    <span class="text-xs font-bold text-slate-300">kcal</span>
+                                    <span class="text-xs font-bold text-muted opacity-60">kcal</span>
                                 </div>
                             </div>
 
                             <!-- TDEE 差距進度條 -->
                             <div class="mb-5">
                                 <div class="flex justify-between items-end mb-2">
-                                    <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">與 TDEE 差距</div>
+                                    <div class="text-[10px] font-black text-muted uppercase tracking-widest">與 TDEE 差距</div>
                                     <div class="text-xs font-black" :class="Math.round((p.calories.min + p.calories.max) / 2) > calculatedTDEE ? 'text-rose-500' : 'text-brand'">
                                         {{ Math.round((p.calories.min + p.calories.max) / 2) > calculatedTDEE ? '+' : '' }}{{ Math.round((p.calories.min + p.calories.max) / 2) - calculatedTDEE }} kcal
                                     </div>
                                 </div>
-                                <div class="h-2 bg-slate-100 rounded-full overflow-hidden flex">
+                                <div class="h-2 bg-line rounded-full overflow-hidden flex">
                                     <!-- 負差距 (攝取 < TDEE) -->
                                     <div v-if="Math.round((p.calories.min + p.calories.max) / 2) < calculatedTDEE" 
                                         class="h-full bg-brand transition-all duration-500"
@@ -1213,12 +1213,12 @@
                                     <!-- 輸入框：手機 flex-1 撐開，電腦正常寬度 -->
                                     <div class="flex items-center gap-1 flex-1 sm:flex-none">
                                         <input type="number" v-model.number="p[n.k].min"
-                                            class="no-spin w-full text-center text-sm sm:text-xs p-2 sm:p-1.5 bg-white border rounded-lg font-black outline-none focus:ring-2 transition-all"
+                                            class="no-spin w-full text-center text-sm sm:text-xs p-2 sm:p-1.5 bg-surface border rounded-lg font-black outline-none focus:ring-2 transition-all"
                                             :class="[n.border, n.ring]"
                                             placeholder="最小">
                                         <span class="font-bold text-sm sm:text-xs flex-shrink-0 opacity-30" :class="n.text">–</span>
                                         <input type="number" v-model.number="p[n.k].max"
-                                            class="no-spin w-full text-center text-sm sm:text-xs p-2 sm:p-1.5 bg-white border rounded-lg font-black outline-none focus:ring-2 transition-all"
+                                            class="no-spin w-full text-center text-sm sm:text-xs p-2 sm:p-1.5 bg-surface border rounded-lg font-black outline-none focus:ring-2 transition-all"
                                             :class="[n.border, n.ring]"
                                             placeholder="最大">
                                     </div>
@@ -1229,11 +1229,11 @@
                         <!-- 操作按鈕 -->
                         <div class="flex gap-3 pt-2">
                             <button @click="settingsStep=1"
-                                class="flex-1 py-4 bg-slate-50 text-slate-500 rounded-[1.5rem] font-black text-sm hover:bg-slate-100 active:scale-95 transition-all border border-slate-100">
+                                class="flex-1 py-4 bg-page text-muted rounded-[1.5rem] font-black text-sm hover:bg-line active:scale-95 transition-all border border-line">
                                 以 TDEE 重新計算
                             </button>
                             <button @click="saveSettings"
-                                class="flex-1 py-4 bg-slate-900 text-white rounded-[1.5rem] font-black text-sm shadow-2xl hover:bg-black active:scale-95 transition-all tracking-tight">
+                                class="flex-1 py-4 bg-ink text-surface rounded-[1.5rem] font-black text-sm shadow-2xl hover:bg-black active:scale-95 transition-all tracking-tight">
                                 確定並儲存
                             </button>
                         </div>
@@ -1248,7 +1248,7 @@
         <div v-if="mealToDelete !== null && mealToDelete !== undefined" class="fixed inset-0 z-[130] flex items-center justify-center p-4">
             <div class="modal-overlay absolute inset-0"></div>
             <div
-                class="bg-white rounded-[2.5rem] p-10 relative z-10 w-full max-w-xs text-center shadow-2xl border border-slate-100">
+                class="bg-surface rounded-[2.5rem] p-10 relative z-10 w-full max-w-xs text-center shadow-2xl border border-line">
                 <div
                     class="w-20 h-20 bg-rose-50 text-rose-500 rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-inner">
                     <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -1257,11 +1257,11 @@
                         </path>
                     </svg>
                 </div>
-                <h4 class="text-xl font-black text-slate-900 mb-2 tracking-tight">確定要刪除嗎？</h4>
-                <p class="text-sm text-slate-500 mb-8 leading-relaxed">此動作無法復原，您確定要刪除這筆餐點紀錄嗎？</p>
+                <h4 class="text-xl font-black text-ink mb-2 tracking-tight">確定要刪除嗎？</h4>
+                <p class="text-sm text-muted mb-8 leading-relaxed">此動作無法復原，您確定要刪除這筆餐點紀錄嗎？</p>
                 <div class="flex gap-3">
                     <button @click="mealToDelete = null"
-                        class="flex-1 py-4 bg-slate-50 text-slate-500 rounded-2xl font-black text-sm hover:bg-slate-100 active:scale-95 transition-all">取消</button>
+                        class="flex-1 py-4 bg-page text-muted rounded-2xl font-black text-sm hover:bg-line active:scale-95 transition-all">取消</button>
                     <button @click="executeDelete"
                         class="flex-1 py-4 bg-rose-500 text-white rounded-2xl font-black text-sm shadow-xl shadow-rose-100 hover:bg-rose-600 active:scale-95 transition-all">刪除</button>
                 </div>
@@ -1272,7 +1272,7 @@
         <div v-if="historyToDelete" class="fixed inset-0 z-[130] flex items-center justify-center p-4">
             <div class="modal-overlay absolute inset-0"></div>
             <div
-                class="bg-white rounded-[2.5rem] p-10 relative z-10 w-full max-w-xs text-center shadow-2xl border border-slate-100">
+                class="bg-surface rounded-[2.5rem] p-10 relative z-10 w-full max-w-xs text-center shadow-2xl border border-line">
                 <div
                     class="w-20 h-20 bg-rose-50 text-rose-500 rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-inner">
                     <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -1281,11 +1281,11 @@
                         </path>
                     </svg>
                 </div>
-                <h4 class="text-xl font-black text-slate-900 mb-2 tracking-tight">從資料庫移除？</h4>
-                <p class="text-sm text-slate-500 mb-8 leading-relaxed">確定要將「{{ historyToDelete?.name }}」從資料庫中永久移除嗎？</p>
+                <h4 class="text-xl font-black text-ink mb-2 tracking-tight">從資料庫移除？</h4>
+                <p class="text-sm text-muted mb-8 leading-relaxed">確定要將「{{ historyToDelete?.name }}」從資料庫中永久移除嗎？</p>
                 <div class="flex gap-3">
                     <button @click="historyToDelete = null"
-                        class="flex-1 py-4 bg-slate-50 text-slate-500 rounded-2xl font-black text-sm hover:bg-slate-100 active:scale-95 transition-all">取消</button>
+                        class="flex-1 py-4 bg-page text-muted rounded-2xl font-black text-sm hover:bg-line active:scale-95 transition-all">取消</button>
                     <button @click="executeDeleteHistory"
                         class="flex-1 py-4 bg-rose-500 text-white rounded-2xl font-black text-sm shadow-xl shadow-rose-100 hover:bg-rose-600 active:scale-95 transition-all">刪除</button>
                 </div>
@@ -1293,7 +1293,7 @@
         </div>
 
         <div v-if="saving"
-            class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-md text-white px-6 py-3 rounded-full text-xs font-black shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4">
+            class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-ink backdrop-blur-md text-surface px-6 py-3 rounded-full text-xs font-black shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4">
             <div class="w-2 h-2 bg-brand rounded-full animate-pulse shadow-[0_0_8px_rgb(var(--c-brand-rgb)/0.8)]"></div>
             同步數據中...
         </div>
@@ -1302,15 +1302,15 @@
         <div v-if="showExportModal" class="fixed inset-0 z-[140] flex items-center justify-center p-4">
             <div class="modal-overlay absolute inset-0" @click="showExportModal = false"></div>
             <div
-                class="bg-white rounded-[2.5rem] p-8 relative z-10 w-full max-w-md shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
-                <h3 class="text-2xl font-black text-slate-900 mb-6">匯出健康報告</h3>
+                class="bg-surface rounded-[2.5rem] p-8 relative z-10 w-full max-w-md shadow-2xl border border-line animate-in fade-in zoom-in-95 duration-200">
+                <h3 class="text-2xl font-black text-ink mb-6">匯出健康報告</h3>
                 <div class="space-y-4 mb-6">
                     <!-- 快速選取按鈕 -->
                     <div class="flex flex-wrap gap-2 px-1">
                         <button
                             v-for="r in [{k:'thisWeek',l:'本週'},{k:'lastWeek',l:'上週'},{k:'thisMonth',l:'本月'},{k:'lastMonth',l:'上月'},{k:'thisYear',l:'今年'}]"
                             :key="r.k" @click="setQuickRange(r.k)"
-                            class="px-3 py-1.5 bg-slate-50 hover:bg-brand-soft hover:text-brand rounded-lg text-[10px] font-black text-slate-500 transition-all border border-slate-100/50 hover:border-brand/20">
+                            class="px-3 py-1.5 bg-page hover:bg-brand-soft hover:text-brand rounded-lg text-[10px] font-black text-muted transition-all border border-line hover:border-brand/20">
                             {{ r.l }}
                         </button>
                     </div>
@@ -1318,39 +1318,39 @@
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label
-                                class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">開始日期</label>
+                                class="text-[10px] font-black text-muted uppercase tracking-widest block mb-2 px-1">開始日期</label>
                             <input type="date" v-model="exportRange.start"
-                                class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl font-black text-slate-700 outline-none focus:ring-4 focus:ring-brand/10 text-xs">
+                                class="w-full px-4 py-3 bg-page border border-line rounded-xl font-black text-muted outline-none focus:ring-4 focus:ring-brand/10 text-xs">
                         </div>
                         <div>
                             <label
-                                class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">結束日期</label>
+                                class="text-[10px] font-black text-muted uppercase tracking-widest block mb-2 px-1">結束日期</label>
                             <input type="date" v-model="exportRange.end"
-                                class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl font-black text-slate-700 outline-none focus:ring-4 focus:ring-brand/10 text-xs">
+                                class="w-full px-4 py-3 bg-page border border-line rounded-xl font-black text-muted outline-none focus:ring-4 focus:ring-brand/10 text-xs">
                         </div>
                     </div>
 
                     <!-- 排除日期清單 -->
                     <div v-if="exportDateList.length > 0" class="mt-4">
                         <div class="flex justify-between items-center mb-2 px-1">
-                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">選取欲匯出的日期 ({{
+                            <label class="text-[10px] font-black text-muted uppercase tracking-widest">選取欲匯出的日期 ({{
                                 exportDateList.length - excludedDates.size }} 天)</label>
                             <div class="flex gap-2">
                                 <button @click="toggleAllExportDates(true)"
                                     class="text-[9px] font-black text-brand hover:brightness-75 uppercase">全選</button>
-                                <span class="text-slate-200 text-[9px]">|</span>
+                                <span class="text-muted opacity-60 text-[9px]">|</span>
                                 <button @click="toggleAllExportDates(false)"
-                                    class="text-[9px] font-black text-slate-400 hover:text-slate-600 uppercase">全不選</button>
+                                    class="text-[9px] font-black text-muted hover:text-muted uppercase">全不選</button>
                             </div>
                         </div>
                         <div
-                            class="max-h-40 overflow-y-auto custom-scroll border border-slate-50 rounded-2xl p-2 bg-slate-50/50">
+                            class="max-h-40 overflow-y-auto custom-scroll border border-line rounded-2xl p-2 bg-page">
                             <div class="grid grid-cols-2 gap-2">
                                 <div v-for="date in exportDateList" :key="date" @click="toggleExcludedDate(date)"
                                     class="flex items-center gap-2 p-2 rounded-xl cursor-pointer transition-all border"
-                                    :class="!excludedDates.has(date) ? 'bg-white border-brand/20 text-brand shadow-sm' : 'bg-slate-100 border-transparent text-slate-400 grayscale opacity-60'">
+                                    :class="!excludedDates.has(date) ? 'bg-surface border-brand/20 text-brand shadow-sm' : 'bg-line border-transparent text-muted grayscale opacity-60'">
                                     <div class="w-4 h-4 rounded-md flex items-center justify-center border"
-                                        :class="!excludedDates.has(date) ? 'bg-brand border-brand' : 'bg-white border-slate-200'">
+                                        :class="!excludedDates.has(date) ? 'bg-brand border-brand' : 'bg-surface border-line'">
                                         <svg v-if="!excludedDates.has(date)" class="w-3 h-3 text-white" fill="none"
                                             stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4"
@@ -1366,14 +1366,14 @@
                 </div>
                 <div class="flex gap-3">
                     <button @click="showExportModal = false"
-                        class="flex-1 py-4 bg-slate-50 text-slate-500 rounded-2xl font-black text-sm">取消</button>
+                        class="flex-1 py-4 bg-page text-muted rounded-2xl font-black text-sm">取消</button>
                     <button @click="exportPDF" :disabled="isExporting"
-                        class="flex-1 py-4 bg-brand text-white rounded-2xl font-black text-sm shadow-xl shadow-brand-soft disabled:bg-slate-300">
+                        class="flex-1 py-4 bg-brand text-white rounded-2xl font-black text-sm shadow-xl shadow-brand-soft disabled:bg-line">
                         {{ isExporting ? '生成中...' : '匯出 PDF 報告' }}
                     </button>
                 </div>
                 <button @click="exportCSV"
-                    class="w-full mt-4 text-xs font-bold text-slate-300 hover:text-brand transition-colors">或僅匯出原始
+                    class="w-full mt-4 text-xs font-bold text-muted opacity-60 hover:text-brand transition-colors">或僅匯出原始
                     CSV 數據</button>
             </div>
         </div>
@@ -1381,39 +1381,39 @@
         <!-- 日曆月份跳轉 Modal -->
         <div v-if="showCalendarModal" class="fixed inset-0 z-[300] flex items-end sm:items-center justify-center p-0 sm:p-4">
             <div class="modal-overlay absolute inset-0" @click="showCalendarModal = false"></div>
-            <div class="bg-white w-full max-w-lg rounded-t-[2.5rem] sm:rounded-[2.5rem] relative z-10 shadow-2xl flex flex-col max-h-[90vh] border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-10 duration-300">
+            <div class="bg-surface w-full max-w-lg rounded-t-[2.5rem] sm:rounded-[2.5rem] relative z-10 shadow-2xl flex flex-col max-h-[90vh] border border-line overflow-hidden animate-in fade-in slide-in-from-bottom-10 duration-300">
                 <div class="p-6 sm:p-8">
                     <div class="flex justify-between items-center mb-6">
                         <div class="flex items-center gap-3">
-                            <h3 class="text-xl font-black text-slate-900">{{ currentMonthYearDisplay }}</h3>
+                            <h3 class="text-xl font-black text-ink">{{ currentMonthYearDisplay }}</h3>
                             <button @click="showMonthModal = true; jumpYear = pickerMonth.getFullYear()" 
                                 class="w-8 h-8 flex items-center justify-center bg-brand-soft text-brand rounded-xl hover:brightness-95 transition-all">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
                             </button>
                         </div>
-                        <button @click="showCalendarModal = false" class="w-10 h-10 flex items-center justify-center bg-slate-50 rounded-2xl text-slate-400 hover:text-slate-600">
+                        <button @click="showCalendarModal = false" class="w-10 h-10 flex items-center justify-center bg-page rounded-2xl text-muted hover:text-muted">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
                         </button>
                     </div>
                     
                     <div class="flex justify-between items-center mb-6 gap-2">
-                        <button @click="changeMonth(-1)" class="flex-1 py-3 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 hover:text-brand transition-all border border-slate-100/50">
+                        <button @click="changeMonth(-1)" class="flex-1 py-3 bg-page rounded-2xl flex items-center justify-center text-muted hover:text-brand transition-all border border-line">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
                         </button>
                         <button @click="goToToday(); showCalendarModal = false" class="px-6 py-3 bg-brand-soft text-brand rounded-2xl font-black text-xs uppercase tracking-widest hover:brightness-95 transition-all border border-brand/50">回今日</button>
-                        <button @click="changeMonth(1)" class="flex-1 py-3 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 hover:text-brand transition-all border border-slate-100/50">
+                        <button @click="changeMonth(1)" class="flex-1 py-3 bg-page rounded-2xl flex items-center justify-center text-muted hover:text-brand transition-all border border-line">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
                         </button>
                     </div>
 
                     <div class="grid grid-cols-7 gap-1 mb-4 text-center">
-                        <div v-for="d in ['一','二','三','四','五','六','日']" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ d }}</div>
+                        <div v-for="d in ['一','二','三','四','五','六','日']" class="text-[10px] font-black text-muted uppercase tracking-widest">{{ d }}</div>
                     </div>
                     <div class="grid grid-cols-7 gap-2">
                         <div v-for="day in calendarDays" :key="day.date"
                             @click="selectedDate = day.date; showCalendarModal = false"
                             class="calendar-day-cell rounded-2xl cursor-pointer transition-all aspect-square"
-                            :class="[day.currentMonth ? 'text-slate-900' : 'opacity-10', selectedDate === day.date ? 'selected-day-ring font-black bg-brand-soft' : 'hover:bg-slate-50']">
+                            :class="[day.currentMonth ? 'text-ink' : 'opacity-10', selectedDate === day.date ? 'selected-day-ring font-black bg-brand-soft' : 'hover:bg-page']">
                             <svg v-if="getDayStats(day.date)" class="day-progress-svg p-1.5" viewBox="0 0 100 100">
                                 <circle cx="50" cy="50" r="38" fill="none" :stroke="getDayStats(day.date).color" stroke-width="6" class="opacity-[0.15]" />
                                 <circle cx="50" cy="50" r="38" fill="none" :stroke="getDayStats(day.date).color" stroke-width="8" stroke-linecap="round" :stroke-dasharray="2 * Math.PI * 38" :stroke-dashoffset="2 * Math.PI * 38 * (1 - Math.min(getDayStats(day.date).percent / 100, 1))" style="transition: stroke-dashoffset 0.5s ease" />
@@ -1424,11 +1424,11 @@
                         </div>
                     </div>
                     <!-- 顏色對照說明 -->
-                    <div class="flex flex-wrap justify-center gap-x-4 gap-y-1 pt-4 mt-2 border-t border-slate-100">
+                    <div class="flex flex-wrap justify-center gap-x-4 gap-y-1 pt-4 mt-2 border-t border-line">
                         <div v-for="l in [{c:'#f59e0b',t:'高碳日'},{c:'#6366f1',t:'中碳日'},{c:'#f43f5e',t:'低碳日'},{c:'#64748b',t:'自由日'}]" :key="l.t"
                             class="flex items-center gap-1.5">
                             <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" :style="{background: l.c}"></span>
-                            <span class="text-[10px] font-bold text-slate-400">{{ l.t }}</span>
+                            <span class="text-[10px] font-bold text-muted">{{ l.t }}</span>
                         </div>
                     </div>
                 </div>
@@ -1438,13 +1438,13 @@
         <!-- 獨立的月份/年份選擇彈窗 -->
         <div v-if="showMonthModal" class="fixed inset-0 z-[200] flex items-center justify-center p-4">
             <div class="modal-overlay absolute inset-0" @click="showMonthModal = false"></div>
-            <div class="bg-white w-full max-w-xs rounded-[2.5rem] p-8 relative z-10 shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
+            <div class="bg-surface w-full max-w-xs rounded-[2.5rem] p-8 relative z-10 shadow-2xl border border-line animate-in fade-in zoom-in-95 duration-200">
                 <div class="flex justify-between items-center mb-8 px-2">
-                    <button @click="jumpYear--" class="w-10 h-10 flex items-center justify-center bg-slate-50 rounded-xl text-slate-400 hover:text-brand transition-all">
+                    <button @click="jumpYear--" class="w-10 h-10 flex items-center justify-center bg-page rounded-xl text-muted hover:text-brand transition-all">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" /></svg>
                     </button>
-                    <span class="text-xl font-black text-slate-900 tracking-tight">{{ jumpYear }}年</span>
-                    <button @click="jumpYear++" class="w-10 h-10 flex items-center justify-center bg-slate-50 rounded-xl text-slate-400 hover:text-brand transition-all">
+                    <span class="text-xl font-black text-ink tracking-tight">{{ jumpYear }}年</span>
+                    <button @click="jumpYear++" class="w-10 h-10 flex items-center justify-center bg-page rounded-xl text-muted hover:text-brand transition-all">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" /></svg>
                     </button>
                 </div>
@@ -1452,11 +1452,11 @@
                     <button v-for="(m, idx) in ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月']"
                         :key="idx" @click="jumpToMonth(idx)"
                         class="py-3.5 rounded-2xl text-xs font-black transition-all border border-transparent"
-                        :class="idx === pickerMonth.getMonth() && jumpYear === pickerMonth.getFullYear() ? 'bg-brand text-white shadow-xl shadow-brand-soft' : 'bg-slate-50 text-slate-400 hover:bg-white hover:border-brand/20 hover:text-brand'">
+                        :class="idx === pickerMonth.getMonth() && jumpYear === pickerMonth.getFullYear() ? 'bg-brand text-white shadow-xl shadow-brand-soft' : 'bg-page text-muted hover:bg-surface hover:border-brand/20 hover:text-brand'">
                         {{ m }}
                     </button>
                 </div>
-                <button @click="showMonthModal = false" class="w-full mt-8 py-4 bg-slate-50 text-slate-400 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:text-rose-500 transition-all">取消選取</button>
+                <button @click="showMonthModal = false" class="w-full mt-8 py-4 bg-page text-muted rounded-2xl text-[10px] font-black uppercase tracking-widest hover:text-rose-500 transition-all">取消選取</button>
             </div>
         </div>
 
