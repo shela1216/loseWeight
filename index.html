@@ -811,7 +811,7 @@
                 <!-- Footer: 緊湊操作 -->
                 <div class="px-6 pb-8 pt-2 bg-surface flex flex-col gap-3">
                     <button @click="saveMeal()"
-                        class="w-full py-4 bg-ink text-surface rounded-2xl text-base font-black shadow-lg hover:bg-brand active:scale-95 transition-all flex items-center justify-center gap-2">
+                        class="w-full py-4 bg-ink text-surface dark:bg-brand dark:text-white rounded-2xl text-base font-black shadow-lg hover:bg-brand active:scale-95 transition-all flex items-center justify-center gap-2">
                         <span>保存餐點紀錄</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
                             <path d="M5 13l4 4L19 7"></path>
@@ -826,7 +826,7 @@
                         </svg>
                     </button>
                     <button @click="cancelEdit"
-                        class="w-full mt-1 text-muted opacity-60 text-xs font-black uppercase tracking-[0.2em] hover:text-muted transition-colors text-center">捨棄變更</button>
+                        class="w-full mt-1 text-muted opacity-60 text-xs font-black uppercase tracking-[0.2em] hover:text-ink transition-colors text-center">捨棄變更</button>
                 </div>
             </div>
         </div>
@@ -875,7 +875,7 @@
                             {{ isRecalculating ? '計算中...' : '重算次數' }}
                         </button>
                         <button @click="closeHistory()"
-                            class="w-10 h-10 flex items-center justify-center bg-page rounded-2xl text-muted hover:text-muted transition-colors"><svg
+                            class="w-10 h-10 flex items-center justify-center bg-page rounded-2xl text-muted hover:text-ink transition-colors"><svg
                                 class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path d="M6 18L18 6M6 6l12 12"></path>
                             </svg></button>
@@ -899,10 +899,10 @@
                     <div class="flex items-center gap-2">
                         <div v-if="historyPickMode === null" class="flex gap-1.5 p-1 bg-page rounded-2xl border border-line flex-1">
                             <button @click="historyTab = 'general'"
-                                :class="historyTab === 'general' ? 'bg-surface text-brand shadow-sm' : 'text-muted hover:text-muted'"
+                                :class="historyTab === 'general' ? 'bg-surface text-brand shadow-sm' : 'text-muted hover:text-ink'"
                                 class="flex-1 py-2 rounded-xl text-xs font-black tracking-wide transition-all">一般餐點</button>
                             <button @click="historyTab = 'combo'"
-                                :class="historyTab === 'combo' ? 'bg-surface text-brand shadow-sm' : 'text-muted hover:text-muted'"
+                                :class="historyTab === 'combo' ? 'bg-surface text-brand shadow-sm' : 'text-muted hover:text-ink'"
                                 class="flex-1 py-2 rounded-xl text-xs font-black tracking-wide transition-all">組合餐點</button>
                         </div>
                         <select v-model="historySortBy"
@@ -1000,7 +1000,7 @@
                         </p>
                     </div>
                     <button @click="showSettings = false"
-                        class="w-11 h-11 flex items-center justify-center bg-page rounded-2xl text-muted hover:text-muted transition-colors">
+                        class="w-11 h-11 flex items-center justify-center bg-page rounded-2xl text-muted hover:text-ink transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -1233,7 +1233,7 @@
                                 以 TDEE 重新計算
                             </button>
                             <button @click="saveSettings"
-                                class="flex-1 py-4 bg-ink text-surface rounded-[1.5rem] font-black text-sm shadow-2xl hover:bg-black active:scale-95 transition-all tracking-tight">
+                                class="flex-1 py-4 bg-ink text-surface dark:bg-brand dark:text-white rounded-[1.5rem] font-black text-sm shadow-2xl hover:bg-black active:scale-95 transition-all tracking-tight">
                                 確定並儲存
                             </button>
                         </div>
@@ -1293,7 +1293,7 @@
         </div>
 
         <div v-if="saving"
-            class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-ink backdrop-blur-md text-surface px-6 py-3 rounded-full text-xs font-black shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4">
+            class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-ink backdrop-blur-md text-surface dark:bg-brand dark:text-white px-6 py-3 rounded-full text-xs font-black shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4">
             <div class="w-2 h-2 bg-brand rounded-full animate-pulse shadow-[0_0_8px_rgb(var(--c-brand-rgb)/0.8)]"></div>
             同步數據中...
         </div>
@@ -1340,7 +1340,7 @@
                                     class="text-[9px] font-black text-brand hover:brightness-75 uppercase">全選</button>
                                 <span class="text-muted opacity-60 text-[9px]">|</span>
                                 <button @click="toggleAllExportDates(false)"
-                                    class="text-[9px] font-black text-muted hover:text-muted uppercase">全不選</button>
+                                    class="text-[9px] font-black text-muted hover:text-ink uppercase">全不選</button>
                             </div>
                         </div>
                         <div
@@ -1391,7 +1391,7 @@
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
                             </button>
                         </div>
-                        <button @click="showCalendarModal = false" class="w-10 h-10 flex items-center justify-center bg-page rounded-2xl text-muted hover:text-muted">
+                        <button @click="showCalendarModal = false" class="w-10 h-10 flex items-center justify-center bg-page rounded-2xl text-muted hover:text-ink">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
                         </button>
                     </div>
