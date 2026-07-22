@@ -1474,7 +1474,7 @@
                             style="font-size: 14px; font-weight: 700; color: #94a3b8; margin-top: 5px; text-transform: uppercase; letter-spacing: 2px;">
                             {{ exportRange.start }} ~ {{ exportRange.end }}</p>
                     </div>
-                    <div style="background-color: #4f46e5; padding: 15px; border-radius: 20px; color: white;">
+                    <div style="background-color: #F97316; padding: 15px; border-radius: 20px; color: white;">
                         <svg style="width: 30px; height: 30px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
@@ -1490,7 +1490,7 @@
                         <p
                             style="font-size: 11px; font-weight: 800; color: #94a3b8; margin-bottom: 5px; text-transform: uppercase;">
                             平均熱量</p>
-                        <p style="font-size: 22px; font-weight: 900; color: #4f46e5;">{{ getRangeStats().avgCalories }}
+                        <p style="font-size: 22px; font-weight: 900; color: #F97316;">{{ getRangeStats().avgCalories }}
                             <span style="font-size: 12px;">kcal</span></p>
                     </div>
                     <div
@@ -1498,7 +1498,7 @@
                         <p
                             style="font-size: 11px; font-weight: 800; color: #94a3b8; margin-bottom: 5px; text-transform: uppercase;">
                             淨碳水比例</p>
-                        <p style="font-size: 22px; font-weight: 900; color: #6366f1;">{{
+                        <p style="font-size: 22px; font-weight: 900; color: #F97316;">{{
                             getRangeStats().nutrientPercents.carbs }}%</p>
                     </div>
                     <div
@@ -1523,7 +1523,7 @@
                 <div style="display: flex; gap: 10px; margin-bottom: 40px; justify-content: center;">
                     <div v-for="(count, type) in getRangeStats().daysByType" :key="type"
                         style="padding: 8px 16px; border-radius: 12px; font-size: 12px; font-weight: 800;"
-                        :style="{ backgroundColor: {high:'#eef2ff', med:'#f5f3ff', low:'#fdf2f8', rest:'#f8fafc'}[type], color: {high:'#4338ca', med:'#6d28d9', low:'#be185d', rest:'#64748b'}[type] }">
+                        :style="{ backgroundColor: {high:'#E6F7F0', med:'#EEF0FE', low:'#FEECEF', rest:'#F1F5F9'}[type], color: {high:'#0A9C6D', med:'#4F46E5', low:'#BE123C', rest:'#475569'}[type] }">
                         {{ {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[type] }}: {{ count }}天
                     </div>
                 </div>
@@ -1531,7 +1531,7 @@
                 <!-- Plan Goals Table -->
                 <div style="margin-bottom: 40px;">
                     <h3
-                        style="font-size: 14px; font-weight: 800; color: #64748b; margin-bottom: 15px; text-transform: uppercase; border-left: 4px solid #4f46e5; padding-left: 10px;">
+                        style="font-size: 14px; font-weight: 800; color: #64748b; margin-bottom: 15px; text-transform: uppercase; border-left: 4px solid #F97316; padding-left: 10px;">
                         計畫目標概覽</h3>
                     <table
                         style="width: 100%; border-collapse: collapse; border-radius: 20px; overflow: hidden; border: 1px solid #f1f5f9;">
@@ -1595,7 +1595,7 @@
                 <!-- Daily Details -->
                 <div>
                     <h3
-                        style="font-size: 14px; font-weight: 800; color: #64748b; margin-bottom: 25px; text-transform: uppercase; border-left: 4px solid #4f46e5; padding-left: 10px;">
+                        style="font-size: 14px; font-weight: 800; color: #64748b; margin-bottom: 25px; text-transform: uppercase; border-left: 4px solid #F97316; padding-left: 10px;">
                         每日飲食詳情</h3>
                     <div style="display: flex; flex-direction: column; gap: 30px;">
                         <div v-for="day in getRangeStats().dailyRecords" :key="day.date">
@@ -1604,7 +1604,7 @@
                                     style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding-bottom: 8px;">
                                     <span style="font-size: 14px; font-weight: 900; color: #1e293b;">📅 {{ day.date }}
                                         ({{ {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[day.planType] || '-' }})</span>
-                                    <span style="font-size: 12px; font-weight: 800; color: #6366f1;">當日總計: {{
+                                    <span style="font-size: 12px; font-weight: 800; color: #F97316;">當日總計: {{
                                         day.totalCalories }} kcal</span>
                                 </div>
                                 <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -1612,7 +1612,7 @@
                                         style="display: flex; justify-content: space-between; align-items: center; background-color: #fff; border: 1px solid #f1f5f9; padding: 12px 20px; border-radius: 15px;">
                                         <div style="display: flex; align-items: center; gap: 10px;">
                                             <span
-                                                style="font-size: 10px; font-weight: 900; color: #4f46e5; background: #eef2ff; padding: 2px 8px; border-radius: 6px;">{{
+                                                style="font-size: 10px; font-weight: 900; color: #F97316; background: #eef2ff; padding: 2px 8px; border-radius: 6px;">{{
                                                 getMealLabel(m.type).split(' ')[1] }}</span>
                                             <span style="font-size: 14px; font-weight: 800; color: #1e293b;">{{ m.name
                                                 }}</span>
