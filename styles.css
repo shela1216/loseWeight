@@ -8,8 +8,8 @@
     --text-muted: #71717a;
     --border-color: #e4e4e7;
     --accent-primary: #6d73c9;
-    --card-radius-main: 1.5rem;
-    --card-radius-sub: 1rem;
+    --card-radius-main: var(--r-panel);
+    --card-radius-sub: var(--r-card);
     --btn-bg: #ffffff;
     --btn-bg-hover: #f4f4f5;
     --ring-color: rgba(99, 102, 241, 0.1);
@@ -105,7 +105,7 @@ input, select, textarea {
     background-color: var(--bg-card);
     border: 1px solid var(--border-color);
     color: var(--text-main);
-    border-radius: 1.5rem;
+    border-radius: var(--r-control);
     padding: 0.75rem 1.25rem;
     outline: none;
     font-weight: 600;
@@ -181,7 +181,7 @@ input:focus, select:focus, textarea:focus {
 .btn-circular .icon-wrapper {
     width: 48px;
     height: 48px;
-    border-radius: 1.25rem;
+    border-radius: var(--r-control);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -223,7 +223,7 @@ input:focus, select:focus, textarea:focus {
 .segmented-control {
     background: var(--bg-main);
     padding: 6px;
-    border-radius: 1.5rem;
+    border-radius: var(--r-card);
     display: flex;
     position: relative;
     border: 1px solid var(--border-color);
@@ -253,7 +253,7 @@ input:focus, select:focus, textarea:focus {
     top: 6px;
     bottom: 6px;
     left: 6px;
-    border-radius: 1.15rem;
+    border-radius: var(--r-card);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 0;
 }
@@ -339,7 +339,7 @@ input:focus, select:focus, textarea:focus {
 .modal-input {
     background: var(--btn-bg);
     border: 1.5px solid var(--border-color);
-    border-radius: 1rem;
+    border-radius: var(--r-control);
     padding: 0.75rem 1.25rem;
     color: var(--text-main);
     font-weight: 700;
