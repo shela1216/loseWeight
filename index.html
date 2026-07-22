@@ -188,7 +188,7 @@
                             <div class="animate-in fade-in slide-in-from-top-4 duration-500 pb-2">
                                 <div class="grid grid-cols-7 gap-1 mb-2 px-1 text-center">
                                     <div v-for="d in ['一','二','三','四','五','六','日']"
-                                        class="text-[10px] font-black text-muted py-2 uppercase tracking-tighter">
+                                        class="text-[10px] font-bold text-muted py-2 uppercase tracking-tighter">
                                         {{ d }}</div>
                                 </div>
                                 <div class="grid grid-cols-7 gap-1.5">
@@ -231,7 +231,7 @@
                     <div class="premium-card-sub p-6">
                         <div class="flex items-center gap-2 mb-6 px-1">
                             <div class="w-1.5 h-4 bg-brand rounded-full"></div>
-                            <h3 class="text-xs font-black text-muted uppercase tracking-widest">今日計劃切換</h3>
+                            <h3 class="text-xs font-bold text-muted uppercase tracking-widest">今日計劃切換</h3>
                         </div>
                         <div class="segmented-control relative">
                             <div class="segment-indicator shadow-xl shadow-brand/30"
@@ -350,7 +350,7 @@
                                                 class="text-[10px] sm:text-xs font-bold ml-0.5 uppercase"
                                                 :class="isGoalInRange(n.key) ? 'text-teal-400' : 'text-muted'">g</span></span>
                                     </div>
-                                    <div class="text-[9px] font-black uppercase tracking-wider mt-0.5"
+                                    <div class="text-[9px] font-bold uppercase tracking-wider mt-0.5"
                                         :class="isGoalInRange(n.key) ? 'text-teal-500' : getGap(n.key) < 0 ? 'text-rose-400' : 'text-muted opacity-60'">
                                         {{ isGoalInRange(n.key) ? '已達標' : getGap(n.key) >= 0 ? '還可以吃' : '已超出' }}
                                     </div>
@@ -426,7 +426,7 @@
                                             class="text-base sm:text-lg font-black tracking-wider uppercase">
                                             {{ typeObj.label }}</h4>
                                         <span
-                                            class="text-[11px] font-black text-muted ml-auto uppercase tracking-widest">{{
+                                            class="text-[11px] font-bold text-muted ml-auto uppercase tracking-widest">{{
                                             getMealsByType(typeObj.key).length }} items</span>
                                     </div>
                                     <div class="space-y-4 sm:space-y-6">
@@ -436,16 +436,16 @@
                                                 class="p-5 pr-24 sm:p-7 sm:pr-32">
                                                 <div class="flex items-center gap-3 mb-2 min-w-0">
                                                     <span
-                                                        class="text-lg sm:text-xl font-black break-words min-w-0 leading-tight">{{
+                                                        class="text-lg sm:text-xl font-semibold break-words min-w-0 leading-tight">{{
                                                         meal.name || '未命名餐點' }}</span>
                                                 </div>
                                                 <div v-if="meal.items && meal.items.length > 0" class="flex flex-wrap gap-2 mb-3">
-                                                    <span v-for="item in meal.items" :key="item.name" class="text-[10px] font-black bg-line text-muted px-2 py-0.5 rounded-chip">
+                                                    <span v-for="item in meal.items" :key="item.name" class="text-[10px] font-bold bg-line text-muted px-2 py-0.5 rounded-chip">
                                                         {{ item.name }} ({{ item.amount }}{{ item.unit }})
                                                     </span>
                                                 </div>
                                                 <div
-                                                    class="flex items-center text-sm font-black mb-3">
+                                                    class="flex items-center text-sm font-semibold mb-3">
                                                     <span
                                                         class="text-brand bg-brand/10 px-2 py-1 rounded-chip">{{
                                                         meal.amount }}{{ meal.unit || '份' }}</span>
@@ -456,15 +456,15 @@
                                                 <div class="flex items-center gap-5">
                                                     <span
                                                         class="text-[10px] font-bold text-muted uppercase tracking-widest">C:<span
-                                                            class="text-main font-black ml-1">{{
+                                                            class="text-main font-semibold ml-1">{{
                                                             formatFloat(meal.carbs) }}g</span></span>
                                                     <span
                                                         class="text-[10px] font-bold text-muted uppercase tracking-widest">P:<span
-                                                            class="text-main font-black ml-1">{{
+                                                            class="text-main font-semibold ml-1">{{
                                                             formatFloat(meal.protein) }}g</span></span>
                                                     <span
                                                         class="text-[10px] font-bold text-muted uppercase tracking-widest">F:<span
-                                                            class="text-main font-black ml-1">{{
+                                                            class="text-main font-semibold ml-1">{{
                                                             formatFloat(meal.fat) }}g</span></span>
                                                 </div>
                                             </div>
@@ -511,7 +511,7 @@
                     
                     <!-- 版本號顯示 -->
                     <div class="mt-8 pb-12 text-center">
-                        <p class="text-[10px] font-black text-muted opacity-60 uppercase tracking-widest">Version {{ appVersion }}</p>
+                        <p class="text-[10px] font-bold text-muted opacity-60 uppercase tracking-widest">Version {{ appVersion }}</p>
                     </div>
                 </div>
             </div>
@@ -536,7 +536,7 @@
                             <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z" />
                         </svg>
                     </div>
-                    <span class="lg:absolute lg:right-20 bg-ink text-surface border border-ink px-3 py-1.5 rounded-chip text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">{{ isDark ? '淺色模式' : '深色模式' }}</span>
+                    <span class="lg:absolute lg:right-20 bg-ink text-surface border border-ink px-3 py-1.5 rounded-chip text-xs lg:text-[10px] font-bold shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">{{ isDark ? '淺色模式' : '深色模式' }}</span>
                 </button>
                 <button @click="showExportModal = true; showMobileMenu = false" class="btn-circular group flex items-center flex-row-reverse lg:flex-col gap-3 lg:gap-0" title="匯出報告與分析">
                     <div class="icon-wrapper shadow-lg lg:shadow-none">
@@ -546,7 +546,7 @@
                         </svg>
                     </div>
                     <span
-                        class="lg:absolute lg:right-20 bg-ink text-surface border border-ink px-3 py-1.5 rounded-chip text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">匯出報告</span>
+                        class="lg:absolute lg:right-20 bg-ink text-surface border border-ink px-3 py-1.5 rounded-chip text-xs lg:text-[10px] font-bold shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">匯出報告</span>
                 </button>
                 <button @click="reloadData" class="btn-circular group flex items-center flex-row-reverse lg:flex-col gap-3 lg:gap-0" title="重新載入資料">
                     <div class="icon-wrapper shadow-lg lg:shadow-none">
@@ -554,7 +554,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         </svg>
                     </div>
-                    <span class="lg:absolute lg:right-20 bg-ink text-surface border border-ink px-3 py-1.5 rounded-chip text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">重載</span>
+                    <span class="lg:absolute lg:right-20 bg-ink text-surface border border-ink px-3 py-1.5 rounded-chip text-xs lg:text-[10px] font-bold shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">重載</span>
                 </button>
                 <button @click="openSettings(); showMobileMenu = false" class="btn-circular group flex items-center flex-row-reverse lg:flex-col gap-3 lg:gap-0" title="設定目標">
                     <div class="icon-wrapper shadow-lg lg:shadow-none">
@@ -566,7 +566,7 @@
                         </svg>
                     </div>
                     <span
-                        class="lg:absolute lg:right-20 bg-ink text-surface border border-ink px-3 py-1.5 rounded-chip text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">設定</span>
+                        class="lg:absolute lg:right-20 bg-ink text-surface border border-ink px-3 py-1.5 rounded-chip text-xs lg:text-[10px] font-bold shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">設定</span>
                 </button>
                 <button @click="handleLogout" class="btn-circular group flex items-center flex-row-reverse lg:flex-col gap-3 lg:gap-0" title="登出帳號">
                     <div class="icon-wrapper shadow-lg lg:shadow-none">
@@ -577,7 +577,7 @@
                         </svg>
                     </div>
                     <span
-                        class="lg:absolute lg:right-20 bg-ink text-surface border border-ink px-3 py-1.5 rounded-chip text-xs lg:text-[10px] font-black shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">登出</span>
+                        class="lg:absolute lg:right-20 bg-ink text-surface border border-ink px-3 py-1.5 rounded-chip text-xs lg:text-[10px] font-bold shadow-xl lg:opacity-0 lg:group-hover:opacity-100 lg:translate-x-2 lg:group-hover:translate-x-0 pointer-events-none transition-all duration-300 whitespace-nowrap">登出</span>
                 </button>
             </div>
         </div>
@@ -644,7 +644,7 @@
                     <div class="space-y-4 border-t border-line pt-6">
                         <div class="flex justify-between items-center px-1">
                             <div>
-                                <label class="text-xs font-black text-muted uppercase tracking-widest">餐點組成品項 (選填)</label>
+                                <label class="text-xs font-bold text-muted uppercase tracking-widest">餐點組成品項 (選填)</label>
                                 <p class="text-[9px] text-muted opacity-60 font-bold uppercase mt-0.5">Components & Details</p>
                             </div>
                             <button @click="addItem" class="flex items-center gap-1.5 text-[10px] font-black text-brand bg-brand-soft px-3 py-1.5 rounded-control hover:brightness-95 transition-all shadow-sm">
@@ -668,7 +668,7 @@
                                         <div v-if="activeSuggestItem === idx && itemSuggestions(item.name).length > 0"
                                             class="absolute z-30 left-0 right-0 mt-1 bg-surface rounded-card shadow-xl border border-line overflow-hidden">
                                             <div class="flex items-center justify-between px-4 py-2 border-b border-line bg-page">
-                                                <span class="text-[9px] font-black text-muted uppercase tracking-widest">推薦帶入</span>
+                                                <span class="text-[9px] font-bold text-muted uppercase tracking-widest">推薦帶入</span>
                                                 <button type="button" @mousedown.prevent="activeSuggestItem = null" title="關閉"
                                                     class="w-6 h-6 flex items-center justify-center rounded-control text-muted opacity-60 hover:text-rose-500 hover:bg-surface transition-all">
                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -683,7 +683,7 @@
                                             <div v-if="suggestPageCount(item.name) > 1" class="flex items-center justify-between px-3 py-2 border-t border-line bg-page">
                                                 <button type="button" @mousedown.prevent="itemSuggestPage = Math.max(0, itemSuggestPage - 1)" :disabled="itemSuggestPage === 0"
                                                     class="px-2 py-1 text-[10px] font-black text-brand rounded-control hover:bg-brand-soft disabled:opacity-30 disabled:hover:bg-transparent transition-all">上一頁</button>
-                                                <span class="text-[10px] font-black text-muted">第 {{ itemSuggestPage + 1 }} / {{ suggestPageCount(item.name) }} 頁</span>
+                                                <span class="text-[10px] font-bold text-muted">第 {{ itemSuggestPage + 1 }} / {{ suggestPageCount(item.name) }} 頁</span>
                                                 <button type="button" @mousedown.prevent="itemSuggestPage = Math.min(suggestPageCount(item.name) - 1, itemSuggestPage + 1)" :disabled="itemSuggestPage >= suggestPageCount(item.name) - 1"
                                                     class="px-2 py-1 text-[10px] font-black text-brand rounded-control hover:bg-brand-soft disabled:opacity-30 disabled:hover:bg-transparent transition-all">下一頁</button>
                                             </div>
@@ -710,7 +710,7 @@
                                 </div>
                                 <div class="flex flex-col gap-3">
                                     <div class="w-full">
-                                        <label class="text-[9px] font-black text-brand uppercase tracking-widest pl-1 mb-1 block">快速輸入 (熱/碳/蛋/脂)</label>
+                                        <label class="text-[9px] font-bold text-brand uppercase tracking-widest pl-1 mb-1 block">快速輸入 (熱/碳/蛋/脂)</label>
                                         <div class="flex gap-2">
                                             <input v-model="item.qInput" @keyup.enter="parseItemInput(item)" 
                                                 class="flex-1 bg-surface px-4 py-2.5 rounded-control text-sm font-black outline-none border border-transparent focus:border-brand shadow-sm transition-all" 
@@ -739,10 +739,10 @@
                     <div class="bg-brand-soft rounded-card p-5 border border-brand/50 shadow-inner">
                         <div class="flex justify-between items-center mb-3 px-1">
                             <div>
-                                <label class="text-xs font-black text-brand uppercase tracking-widest">營養素快速輸入</label>
+                                <label class="text-xs font-bold text-brand uppercase tracking-widest">營養素快速輸入</label>
                                 <p class="text-[9px] text-brand font-bold uppercase">Batch Nutrient Entry</p>
                             </div>
-                            <span v-if="editingMeal.items && editingMeal.items.length > 0" class="text-[10px] font-black text-amber-500 bg-amber-50 px-2 py-1 rounded-chip border border-amber-100">已啟用組合餐同步</span>
+                            <span v-if="editingMeal.items && editingMeal.items.length > 0" class="text-[10px] font-bold text-amber-500 bg-amber-50 px-2 py-1 rounded-chip border border-amber-100">已啟用組合餐同步</span>
                         </div>
                         
                         <!-- 輸入框 -->
@@ -762,7 +762,7 @@
                         <div class="grid grid-cols-4 gap-2">
                             <div v-for="n in [{k:'calories',l:'熱量',u:'kcal',c:'orange'},{k:'carbs',l:'淨碳水',u:'g',c:'brand'},{k:'protein',l:'蛋白',u:'g',c:'violet'},{k:'fat',l:'脂肪',u:'g',c:'pink'}]"
                                 :key="n.k" class="bg-surface rounded-control p-2.5 border border-line text-center shadow-sm focus-within:border-brand transition-all">
-                                <div class="text-[9px] font-black text-muted uppercase mb-1">{{ n.l }}</div>
+                                <div class="text-[9px] font-bold text-muted uppercase mb-1">{{ n.l }}</div>
                                 <input type="number" v-model.number="editingMeal[n.k]"
                                     :disabled="editingMeal.items && editingMeal.items.length > 0"
                                     class="w-full bg-transparent text-center text-lg font-black leading-none outline-none disabled:opacity-30" :class="n.c === 'brand' ? 'text-brand' : 'text-'+n.c+'-600'">
@@ -776,7 +776,7 @@
                         <div class="flex items-center gap-3">
                             <div
                                 class="flex-1 bg-page rounded-control px-5 py-4 flex flex-col border border-transparent focus-within:border-brand focus-within:bg-surface transition-all">
-                                <label class="text-xs font-black text-muted uppercase tracking-widest mb-1">份量數值 (調整會縮放營養素)</label>
+                                <label class="text-xs font-bold text-muted uppercase tracking-widest mb-1">份量數值 (調整會縮放營養素)</label>
                                 <input type="number" inputmode="decimal" pattern="[0-9]*"
                                     v-model.number="editingMeal.amount" @focus="prepareScale" @input="scaleNutrients"
                                     class="bg-transparent px-3 py-1 text-2xl font-black outline-none w-full" step="any"
@@ -784,7 +784,7 @@
                             </div>
                             <div
                                 class="w-1/3 bg-page rounded-control px-5 py-4 flex flex-col border border-transparent focus-within:border-brand focus-within:bg-surface transition-all">
-                                <label class="text-xs font-black text-muted uppercase tracking-widest mb-1">單位</label>
+                                <label class="text-xs font-bold text-muted uppercase tracking-widest mb-1">單位</label>
                                 <select v-model="editingMeal.unit"
                                     class="bg-transparent text-base font-black text-muted outline-none cursor-pointer appearance-none">
                                     <option value="份">份</option>
@@ -800,7 +800,7 @@
                                 <input type="checkbox" v-model="skipHistorySave" 
                                     class="w-5 h-5 rounded-control border-2 border-line text-brand focus:ring-brand transition-all cursor-pointer">
                                 <div class="flex flex-col">
-                                    <span class="text-xs font-black text-muted group-hover:text-brand transition-colors">本次不存入食物資料庫</span>
+                                    <span class="text-xs font-semibold text-muted group-hover:text-brand transition-colors">本次不存入食物資料庫</span>
                                     <span class="text-[9px] text-muted font-bold uppercase tracking-tight">One-time entry only</span>
                                 </div>
                             </label>
@@ -928,7 +928,7 @@
                 </div>
 
                 <div v-if="historySortBy === 'recommend'" class="px-2 mb-3 shrink-0">
-                    <span class="text-[10px] font-black text-emerald-600 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-chip inline-block">{{ priorityNutrientLabel }}</span>
+                    <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-chip inline-block">{{ priorityNutrientLabel }}</span>
                 </div>
 
                 <div class="flex-1 overflow-y-auto overflow-x-hidden custom-scroll space-y-4 px-2 pb-4" @scroll="handleHistoryScroll">
@@ -936,12 +936,12 @@
                         class="p-4 sm:p-5 bg-surface border border-line rounded-card hover:bg-brand-soft hover:border-brand/20 cursor-pointer flex justify-between items-center transition-all group active:scale-[0.98] overflow-hidden">
                         <div class="flex-1 mr-3 min-w-0" @click="addFromHistory(item)">
                             <div class="flex items-center gap-3 mb-2 min-w-0">
-                                <span class="font-black text-ink text-base break-words">{{ item.name }}</span>
+                                <span class="font-semibold text-ink text-base break-words">{{ item.name }}</span>
                                 <span
-                                    class="text-[10px] sm:text-xs bg-line text-muted px-2 py-0.5 rounded-chip font-black uppercase group-hover:bg-brand-soft group-hover:text-brand transition-colors shrink-0 whitespace-nowrap">{{
+                                    class="text-[10px] sm:text-xs bg-line text-muted px-2 py-0.5 rounded-chip font-bold uppercase group-hover:bg-brand-soft group-hover:text-brand transition-colors shrink-0 whitespace-nowrap">{{
                                     item.count }} 次記錄</span>
                                 <span v-if="item.unit === 'g'"
-                                    class="text-[10px] bg-teal-50 text-teal-500 border border-teal-100 px-2 py-0.5 rounded-chip font-black shrink-0 whitespace-nowrap">per 100g</span>
+                                    class="text-[10px] bg-teal-50 text-teal-500 border border-teal-100 px-2 py-0.5 rounded-chip font-bold shrink-0 whitespace-nowrap">per 100g</span>
                             </div>
                             <div v-if="item.items && item.items.length > 0" class="flex flex-wrap gap-1.5 mb-2.5">
                                 <span v-for="sub in item.items" :key="sub.name" class="text-[9px] font-bold bg-page text-muted px-2 py-0.5 rounded-chip border border-line">
@@ -950,14 +950,14 @@
                             </div>
                             <div class="space-y-1">
                                 <p class="flex items-center gap-2 text-sm">
-                                    <span class="font-black text-brand">{{ item.unit === 'g' ? '100g' : (item.amount + (item.unit || '份')) }}</span>
+                                    <span class="font-semibold text-brand">{{ item.unit === 'g' ? '100g' : (item.amount + (item.unit || '份')) }}</span>
                                     <span class="text-muted opacity-60">•</span>
-                                    <span class="font-black text-ink">{{ item.unit === 'g' ? formatFloat(item.calories * 100) : formatFloat(item.calories) }}kcal</span>
+                                    <span class="font-semibold text-ink">{{ item.unit === 'g' ? formatFloat(item.calories * 100) : formatFloat(item.calories) }}kcal</span>
                                 </p>
                                 <p class="text-[10px] sm:text-xs font-bold text-muted uppercase tracking-tighter">
-                                    碳:<span class="text-ink font-black mr-2">{{ item.unit === 'g' ? formatFloat(item.carbs * 100) : formatFloat(item.carbs) }}</span>
-                                    蛋:<span class="text-ink font-black mr-2">{{ item.unit === 'g' ? formatFloat(item.protein * 100) : formatFloat(item.protein) }}</span>
-                                    脂:<span class="text-ink font-black">{{ item.unit === 'g' ? formatFloat(item.fat * 100) : formatFloat(item.fat) }}</span>
+                                    碳:<span class="text-ink font-semibold mr-2">{{ item.unit === 'g' ? formatFloat(item.carbs * 100) : formatFloat(item.carbs) }}</span>
+                                    蛋:<span class="text-ink font-semibold mr-2">{{ item.unit === 'g' ? formatFloat(item.protein * 100) : formatFloat(item.protein) }}</span>
+                                    脂:<span class="text-ink font-semibold">{{ item.unit === 'g' ? formatFloat(item.fat * 100) : formatFloat(item.fat) }}</span>
                                 </p>
                             </div>
                         </div>
@@ -976,7 +976,7 @@
                                 <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
                         </div>
-                        <p class="text-muted text-sm font-black uppercase tracking-widest">
+                        <p class="text-muted text-sm font-bold uppercase tracking-widest">
                             {{ historySearch ? '找不到相符餐點' : '尚無紀錄' }}
                         </p>
                     </div>
@@ -1023,7 +1023,7 @@
 
                         <!-- 性別 -->
                         <div class="space-y-2">
-                            <label class="text-xs font-black text-muted uppercase tracking-widest pl-1">性別</label>
+                            <label class="text-xs font-bold text-muted uppercase tracking-widest pl-1">性別</label>
                             <div class="flex gap-2">
                                 <button @click="profile.gender='male'"
                                     class="flex-1 py-3.5 rounded-control font-black text-sm transition-all border"
@@ -1041,7 +1041,7 @@
                         <!-- 體重/身高/年齡 -->
                         <div class="grid grid-cols-3 gap-3">
                             <div class="space-y-2">
-                                <label class="text-xs font-black text-muted uppercase tracking-widest pl-1">體重</label>
+                                <label class="text-xs font-bold text-muted uppercase tracking-widest pl-1">體重</label>
                                 <div class="relative">
                                     <input type="number" v-model.number="profile.weight"
                                         class="w-full bg-page px-3 py-3.5 rounded-control text-sm border border-line font-black outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand transition-all pr-8">
@@ -1049,7 +1049,7 @@
                                 </div>
                             </div>
                             <div class="space-y-2">
-                                <label class="text-xs font-black text-muted uppercase tracking-widest pl-1">身高</label>
+                                <label class="text-xs font-bold text-muted uppercase tracking-widest pl-1">身高</label>
                                 <div class="relative">
                                     <input type="number" v-model.number="profile.height"
                                         class="w-full bg-page px-3 py-3.5 rounded-control text-sm border border-line font-black outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand transition-all pr-9">
@@ -1057,7 +1057,7 @@
                                 </div>
                             </div>
                             <div class="space-y-2">
-                                <label class="text-xs font-black text-muted uppercase tracking-widest pl-1">年齡</label>
+                                <label class="text-xs font-bold text-muted uppercase tracking-widest pl-1">年齡</label>
                                 <div class="relative">
                                     <input type="number" v-model.number="profile.age"
                                         class="w-full bg-page px-3 py-3.5 rounded-control text-sm border border-line font-black outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand transition-all pr-8">
@@ -1068,7 +1068,7 @@
 
                         <!-- 目標 -->
                         <div class="space-y-2">
-                            <label class="text-xs font-black text-muted uppercase tracking-widest pl-1">目標</label>
+                            <label class="text-xs font-bold text-muted uppercase tracking-widest pl-1">目標</label>
                             <div class="grid grid-cols-2 gap-3">
                                 <button @click="profile.goal='lose'"
                                     class="p-4 rounded-card text-left border transition-all"
@@ -1089,7 +1089,7 @@
 
                         <!-- 活動程度 -->
                         <div class="space-y-2">
-                            <label class="text-xs font-black text-muted uppercase tracking-widest pl-1">活動程度</label>
+                            <label class="text-xs font-bold text-muted uppercase tracking-widest pl-1">活動程度</label>
                             <div class="grid grid-cols-2 gap-2">
                                 <button v-for="a in [{v:1.2,l:'久坐',d:'幾乎不運動'},{v:1.375,l:'輕度活動',d:'每週 1-3 天'},{v:1.55,l:'中度活動',d:'每週 3-5 天'},{v:1.725,l:'高度活動',d:'每週 6-7 天'}]"
                                     :key="a.v" @click="profile.activity=a.v"
@@ -1108,7 +1108,7 @@
                         <!-- TDEE 即時顯示 -->
                         <div class="p-5 bg-brand-soft border border-brand/20 rounded-card flex items-center justify-between">
                             <div>
-                                <div class="text-[10px] font-black text-brand uppercase tracking-widest mb-1">預估每日消耗</div>
+                                <div class="text-[10px] font-bold text-brand uppercase tracking-widest mb-1">預估每日消耗</div>
                                 <div class="text-3xl font-black text-brand leading-none">{{ calculatedTDEE }} <span class="text-sm text-brand font-bold">kcal</span></div>
                             </div>
                             <div class="text-right">
@@ -1177,7 +1177,7 @@
                             <!-- TDEE 差距進度條 -->
                             <div class="mb-5">
                                 <div class="flex justify-between items-end mb-2">
-                                    <div class="text-[10px] font-black text-muted uppercase tracking-widest">與 TDEE 差距</div>
+                                    <div class="text-[10px] font-bold text-muted uppercase tracking-widest">與 TDEE 差距</div>
                                     <div class="text-xs font-black" :class="Math.round((p.calories.min + p.calories.max) / 2) > calculatedTDEE ? 'text-rose-500' : 'text-brand'">
                                         {{ Math.round((p.calories.min + p.calories.max) / 2) > calculatedTDEE ? '+' : '' }}{{ Math.round((p.calories.min + p.calories.max) / 2) - calculatedTDEE }} kcal
                                     </div>
@@ -1207,7 +1207,7 @@
                                     :class="[n.bg, n.border]">
                                     <!-- 標籤：手機靠左固定寬，電腦置中 -->
                                     <div class="w-14 shrink-0 sm:w-auto sm:text-center sm:mb-2">
-                                        <div class="font-black text-xs" :class="n.text">{{ n.l }}</div>
+                                        <div class="font-bold text-xs" :class="n.text">{{ n.l }}</div>
                                         <div class="text-[10px] font-bold opacity-50 mt-0.5" :class="n.text">{{ n.u }}</div>
                                     </div>
                                     <!-- 輸入框：手機 flex-1 撐開，電腦正常寬度 -->
@@ -1293,7 +1293,7 @@
         </div>
 
         <div v-if="saving"
-            class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-ink backdrop-blur-md text-surface dark:bg-brand dark:text-white px-6 py-3 rounded-full text-xs font-black shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4">
+            class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-ink backdrop-blur-md text-surface dark:bg-brand dark:text-white px-6 py-3 rounded-full text-xs font-semibold shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4">
             <div class="w-2 h-2 bg-brand rounded-full animate-pulse shadow-[0_0_8px_rgb(var(--c-brand-rgb)/0.8)]"></div>
             同步數據中...
         </div>
@@ -1318,13 +1318,13 @@
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label
-                                class="text-[10px] font-black text-muted uppercase tracking-widest block mb-2 px-1">開始日期</label>
+                                class="text-[10px] font-bold text-muted uppercase tracking-widest block mb-2 px-1">開始日期</label>
                             <input type="date" v-model="exportRange.start"
                                 class="w-full px-4 py-3 bg-page border border-line rounded-control font-black text-muted outline-none focus:ring-4 focus:ring-brand/10 text-xs">
                         </div>
                         <div>
                             <label
-                                class="text-[10px] font-black text-muted uppercase tracking-widest block mb-2 px-1">結束日期</label>
+                                class="text-[10px] font-bold text-muted uppercase tracking-widest block mb-2 px-1">結束日期</label>
                             <input type="date" v-model="exportRange.end"
                                 class="w-full px-4 py-3 bg-page border border-line rounded-control font-black text-muted outline-none focus:ring-4 focus:ring-brand/10 text-xs">
                         </div>
@@ -1333,7 +1333,7 @@
                     <!-- 排除日期清單 -->
                     <div v-if="exportDateList.length > 0" class="mt-4">
                         <div class="flex justify-between items-center mb-2 px-1">
-                            <label class="text-[10px] font-black text-muted uppercase tracking-widest">選取欲匯出的日期 ({{
+                            <label class="text-[10px] font-bold text-muted uppercase tracking-widest">選取欲匯出的日期 ({{
                                 exportDateList.length - excludedDates.size }} 天)</label>
                             <div class="flex gap-2">
                                 <button @click="toggleAllExportDates(true)"
@@ -1357,7 +1357,7 @@
                                                 d="M5 13l4 4L19 7"></path>
                                         </svg>
                                     </div>
-                                    <span class="text-[11px] font-black">{{ date.slice(5) }} ({{
+                                    <span class="text-[11px] font-bold">{{ date.slice(5) }} ({{
                                         ['日','一','二','三','四','五','六'][new Date(date).getDay()] }})</span>
                                 </div>
                             </div>
@@ -1407,7 +1407,7 @@
                     </div>
 
                     <div class="grid grid-cols-7 gap-1 mb-4 text-center">
-                        <div v-for="d in ['一','二','三','四','五','六','日']" class="text-[10px] font-black text-muted uppercase tracking-widest">{{ d }}</div>
+                        <div v-for="d in ['一','二','三','四','五','六','日']" class="text-[10px] font-bold text-muted uppercase tracking-widest">{{ d }}</div>
                     </div>
                     <div class="grid grid-cols-7 gap-2">
                         <div v-for="day in calendarDays" :key="day.date"
@@ -1647,7 +1647,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.1.8"></script>
+    <script type="module" src="app.js?v=0.1.9"></script>
 </body>
 
 </html>
