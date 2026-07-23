@@ -454,15 +454,13 @@
                             <div v-for="typeObj in mealTypes" :key="typeObj.key">
                                 <div v-if="getMealsByType(typeObj.key).length > 0"
                                     class="premium-card-sub p-6 sm:p-10">
-                                    <div class="flex items-center gap-4 mb-6 sm:mb-10 px-1">
-                                        <span class="w-2 h-7 rounded-full"
-                                            :style="{ backgroundColor: {breakfast:'#6366f1', lunch:'#8b5cf6', dinner:'#3b82f6', snack:'#ec4899'}[typeObj.key] }"></span>
-                                        <h4
-                                            class="text-base sm:text-lg font-black tracking-wider uppercase">
-                                            {{ typeObj.label }}</h4>
-                                        <span
-                                            class="text-[11px] font-bold text-muted ml-auto uppercase tracking-widest">{{
-                                            getMealsByType(typeObj.key).length }} items</span>
+                                    <div class="card-head mb-6 sm:mb-8">
+                                        <span class="meal-cat-chip"
+                                            :style="{ color: {breakfast:'var(--c-med)', lunch:'var(--accent-primary)', dinner:'var(--c-high)', snack:'var(--c-low)'}[typeObj.key] }">
+                                            {{ typeObj.label }}
+                                            <span class="opacity-90">· {{ formatFloat(getMealsByType(typeObj.key).reduce((s,m)=>s+(m.calories||0),0)) }} kcal</span>
+                                        </span>
+                                        <span class="text-[11px] font-bold text-muted">{{ getMealsByType(typeObj.key).length }} 項</span>
                                     </div>
                                     <div class="space-y-4 sm:space-y-6">
                                         <div v-for="meal in getMealsByType(typeObj.key)" :key="meal.originalIndex"
@@ -488,19 +486,10 @@
                                                     <span class="">{{ formatFloat(meal.calories) }} <span
                                                             class="text-[10px] text-muted uppercase ml-0.5">kcal</span></span>
                                                 </div>
-                                                <div class="flex items-center gap-5">
-                                                    <span
-                                                        class="text-[10px] font-bold text-muted uppercase tracking-widest">C:<span
-                                                            class="text-ink font-semibold ml-1">{{
-                                                            formatFloat(meal.carbs) }}g</span></span>
-                                                    <span
-                                                        class="text-[10px] font-bold text-muted uppercase tracking-widest">P:<span
-                                                            class="text-ink font-semibold ml-1">{{
-                                                            formatFloat(meal.protein) }}g</span></span>
-                                                    <span
-                                                        class="text-[10px] font-bold text-muted uppercase tracking-widest">F:<span
-                                                            class="text-ink font-semibold ml-1">{{
-                                                            formatFloat(meal.fat) }}g</span></span>
+                                                <div class="flex flex-wrap items-center gap-2">
+                                                    <span class="meal-cat-chip" style="color:var(--accent-primary)">碳水 {{ formatFloat(meal.carbs) }}g</span>
+                                                    <span class="meal-cat-chip" style="color:var(--c-med)">蛋白質 {{ formatFloat(meal.protein) }}g</span>
+                                                    <span class="meal-cat-chip" style="color:var(--c-low)">脂肪 {{ formatFloat(meal.fat) }}g</span>
                                                 </div>
                                             </div>
                                             <div v-if="editingIndex !== meal.originalIndex"
