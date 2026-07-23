@@ -67,9 +67,12 @@
   --c-line: #ECE7E2;
   --c-high: #10B981; --c-med: #6366F1; --c-low: #F43F5E; --c-rest: #64748B;
   --c-good: #14B8A6; --c-danger: #F43F5E;
-  --r-sm: 12px; --r-md: 16px; --r-lg: 20px; --r-xl: 24px; --r-full: 9999px;
+  /* 圓角採「角色命名」，避免與 Tailwind 內建 sm/md/lg/xl 撞名（既有 markup 已用 48 次） */
+  --r-chip: 12px; --r-control: 16px; --r-card: 20px; --r-panel: 24px;
 }
 ```
+
+> **命名決定**：圓角 token 用角色名 `chip/control/card/panel` 而非 `sm/md/lg/xl`。原因：後者會**覆寫** Tailwind 內建同名圓角，導致既有 `rounded-lg` 等 48 處立刻位移（8px→20px），破壞本任務「畫面不變」的前提。角色名走 `extend`（新增而非覆寫），既有圓角維持不動，直到 Task 6 才刻意套用。
 
 - [ ] **Step 2: 在 `styles.css` 現有 `.dark` 內新增對應深色 token**
 
@@ -105,7 +108,8 @@ theme: {
       high: 'var(--c-high)', med: 'var(--c-med)', low: 'var(--c-low)', rest: 'var(--c-rest)',
       good: 'var(--c-good)', danger: 'var(--c-danger)',
     },
-    borderRadius: { sm: 'var(--r-sm)', md: 'var(--r-md)', lg: 'var(--r-lg)', xl: 'var(--r-xl)' },
+    // 角色命名，走 extend 新增（不覆寫 Tailwind 內建 sm/md/lg/xl），既有圓角不受影響
+    borderRadius: { chip: 'var(--r-chip)', control: 'var(--r-control)', card: 'var(--r-card)', panel: 'var(--r-panel)' },
   },
 }
 ```
@@ -122,8 +126,8 @@ Expected: 數字 > 0（class 已被 Tailwind 產出，因對照表中的新 clas
 
 > **JIT 註**：Tailwind v3 只會產出「content 檔案裡實際出現」的 class。因此 Step 5 在遷移前可能為 0。可接受：真正的產出驗證併入 Task 2 起各遷移任務（該任務會實際用到 class）。本任務只需確認編譯**無錯**且 config 語法正確。改用下方指令驗證 config 有效：
 
-Run: `export PATH="/Users/sheal/.nvm/versions/node/v20.20.0/bin:$PATH" && echo '<div class="bg-brand text-ink rounded-lg bg-brand/10"></div>' > /tmp/tw-probe.html && ./tailwindcss -i tailwind.input.css -o /tmp/tw-probe.css --content /tmp/tw-probe.html 2>&1 | tail -1 && grep -c "bg-brand\|text-ink\|rounded-lg" /tmp/tw-probe.css`
-Expected: 產出行數 > 0，代表語意色 + `<alpha-value>` 透明度 + 圓角皆有效。
+Run: `export PATH="/Users/sheal/.nvm/versions/node/v20.20.0/bin:$PATH" && echo '<div class="bg-brand text-ink rounded-card bg-brand/10"></div>' > /tmp/tw-probe.html && ./tailwindcss -i tailwind.input.css -o /tmp/tw-probe.css --content /tmp/tw-probe.html 2>&1 | tail -1 && grep -c "bg-brand\|text-ink\|rounded-card" /tmp/tw-probe.css`
+Expected: 產出行數 > 0，代表語意色 + `<alpha-value>` 透明度 + 角色圓角（`rounded-card`）皆有效。
 
 - [ ] **Step 6: 實機確認未破版（此時仍用舊 class，畫面應與遷移前一致）**
 
@@ -259,12 +263,40 @@ git commit -m "feat: 中性色遷移為 surface/page/ink/muted/line"
 ### Task 4: 碳循環分類色遷移（高碳 amber→emerald，統一 hex map）
 
 **Files:**
-- Modify: `index.html`（約 `:151-152, 220, 238, 271, 273`）、`app.js`（`colorMap`，約 `app.js:1261` 附近；`getPlanLabel` 無涉色）
+- Modify: `styles.css`（category token 改 alpha-capable）、`tailwind.config.js`（high/med/low/rest 註冊為 alpha）、`index.html`（`:151`、hex maps、設定頁計畫卡 `1134-1170`）、`app.js`（colorMap）
 - Regenerate: `tailwind.css`
 
 **Interfaces:**
-- Consumes：`high / med / low / rest` 語意色。
-- 完成後：`index.html:151` 的中碳 `bg-indigo-500`、Task 3 保留的自由日 slate 一併收斂。
+- Consumes：`high / med / low / rest` 語意色（本任務將它們升級為 alpha-capable，使 `bg-high/8`、`border-med/40` 等軟色調可用）。
+- 完成後：`index.html:151` 中碳 `bg-indigo-500` 收斂為 `bg-med`；Task 3 保留的自由日 slate 收斂；**修正 Task 2 的語意外洩**——設定頁 med 計畫卡目前被誤染成 brand 橘（`bg-brand-soft border-brand/20 text-brand`），本任務改回 med 藍。
+
+> **背景**：`high/med/low/rest` 在 Task 1 定義為純 `var()`，不支援 `/NN` 透明度（`bg-high/8` 會是死 class）。而設定頁計畫卡需要軟色調底（原本 `bg-amber-50/60` 等）。故本任務先把這四個 token 改為 RGB 三元組並註冊 `<alpha-value>`，同時保留 `var(--c-high)` 全色字串供 SVG stroke/colorMap 使用。
+
+- [ ] **Step 0: 將 category token 改為 alpha-capable（styles.css + config）**
+
+在 `styles.css` `:root` 把四個 category token 改為「三元組 + 衍生全色」雙定義：
+```css
+:root {
+  --c-high-rgb: 16 185 129;  --c-high: rgb(var(--c-high-rgb));
+  --c-med-rgb: 99 102 241;   --c-med: rgb(var(--c-med-rgb));
+  --c-low-rgb: 244 63 94;    --c-low: rgb(var(--c-low-rgb));
+  --c-rest-rgb: 100 116 139; --c-rest: rgb(var(--c-rest-rgb));
+}
+.dark {
+  --c-high-rgb: 52 211 153;  --c-high: rgb(var(--c-high-rgb));
+  --c-med-rgb: 129 140 248;  --c-med: rgb(var(--c-med-rgb));
+  --c-low-rgb: 251 113 133;  --c-low: rgb(var(--c-low-rgb));
+  --c-rest-rgb: 148 163 184; --c-rest: rgb(var(--c-rest-rgb));
+}
+```
+在 `tailwind.config.js` 把 high/med/low/rest 改為 alpha 形式：
+```js
+high: 'rgb(var(--c-high-rgb) / <alpha-value>)',
+med:  'rgb(var(--c-med-rgb) / <alpha-value>)',
+low:  'rgb(var(--c-low-rgb) / <alpha-value>)',
+rest: 'rgb(var(--c-rest-rgb) / <alpha-value>)',
+```
+> `var(--c-high)`（全色）仍可用於 SVG `:stroke` 與 colorMap；`bg-high` / `bg-high/8` 兩種寫法皆有效。
 
 - [ ] **Step 1: 替換 planType 條件式 class（`index.html:151`）**
 
@@ -282,13 +314,42 @@ git commit -m "feat: 中性色遷移為 surface/page/ink/muted/line"
 {high:'var(--c-high)', med:'var(--c-med)', low:'var(--c-low)', rest:'var(--c-rest)'}
 ```
 `index.html:220` 圖例陣列 `[{c:'#f59e0b',t:'高碳日'},...]` 的 `c` 同步改為 `var(--c-high)` 等。
+同步處理設定頁計畫卡的 inline style 色點（`index.html:1144` 附近）：`background: key === 'high' ? '#f59e0b' : key === 'med' ? '#6366f1' : key === 'low' ? '#f43f5e' : '#64748b'` → 改為 `var(--c-high/med/low/rest)`。
 
 > 註：SVG `:stroke` 綁定接受 CSS 變數字串（`stroke="var(--c-high)"`），瀏覽器可解析。若某處 SVG 在 `<defs>`/漸層無法吃變數，退回實際 hex（高碳 `#10B981`／深色 `#34D399`）並加註。
 
-- [ ] **Step 3: 清理殘餘高碳 amber（設定頁計畫卡等）**
+- [ ] **Step 3: 修正設定頁計畫卡四色（含改回 med 藍、還原 rest 灰識別）**
 
-`grep -n "amber-" index.html` 找出高碳計畫卡（`index.html:1134,1156,1167` 等 `key==='high'` 分支）的 `amber-50/60`、`amber-100/200`、`text-amber-500`、`focus:ring-amber-500/10` → 對應改為 `high` 系（`bg-high/10`、`border-high/30`、`text-high`、`focus:ring-high/10`）。
-> 注意：非高碳語意的 amber（若有純裝飾）保持不變；本步僅動 `key==='high'` 相關。
+現況（Task 2/3 後）計畫卡 class 為：
+```
+'bg-amber-50/60 border-amber-100': key === 'high',      // amber 未遷
+'bg-brand-soft border-brand/20':   key === 'med',        // ← 被 Task 2 誤染成 brand 橘
+'bg-rose-50/60 border-rose-100':   key === 'low',        // rose 未遷
+'bg-page border-line':             key === 'rest'         // ← 失去灰階識別
+```
+改為（用 alpha-capable category token，四色一致）：
+```
+'bg-high/8 border-high/30': key === 'high',
+'bg-med/8 border-med/30':   key === 'med',
+'bg-low/8 border-low/30':   key === 'low',
+'bg-rest/8 border-rest/30': key === 'rest'
+```
+同區塊的輸入框 border/text/ring（`index.html:1156-1159` 與 `1167-1170` 兩組）現況：
+```
+'border-amber-200 text-amber-500 focus:ring-amber-500/10 focus:border-amber-400': key === 'high',
+'border-brand/20 text-brand focus:ring-brand/10 focus:border-brand':               key === 'med',  // ← 誤染
+'border-rose-200 text-rose-500 focus:ring-rose-500/10 focus:border-rose-400':      key === 'low',
+'border-line text-muted focus:ring-muted focus:border-muted':                      key === 'rest'  // ← 失識別
+```
+兩組都改為：
+```
+'border-high/40 text-high focus:ring-high/20 focus:border-high': key === 'high',
+'border-med/40 text-med focus:ring-med/20 focus:border-med':     key === 'med',
+'border-low/40 text-low focus:ring-low/20 focus:border-low':     key === 'low',
+'border-rest/40 text-rest focus:ring-rest/20 focus:border-rest': key === 'rest'
+```
+> 重點：med 卡必須從 brand（橘）改回 med（藍）——這是修正 Task 2 把中碳誤當品牌色的外洩。rest 卡改用 rest（灰）token，恢復與其他三卡並列時的分類識別。
+> 其他殘餘 `amber-`/`rose-` 若屬 high/low 語意（如 grep 到的計畫卡相關）一併改為 high/low 系；非分類語意的 amber/rose（若有純裝飾或「刪除=rose」危險色）保持不變。
 
 - [ ] **Step 4: 重新編譯**
 
@@ -296,13 +357,15 @@ Run: `export PATH="/Users/sheal/.nvm/versions/node/v20.20.0/bin:$PATH" && ./tail
 
 - [ ] **Step 5: 驗收**
 
-- `grep -o "#f59e0b" index.html app.js | wc -l` → `0`
-- `grep -o "indigo-[0-9]*\|slate-[0-9]*" index.html app.js | wc -l` → `0`（品牌與中性已在 Task 2/3 清空，本任務清掉最後的中碳/自由）
-- 高碳 `amber-` 於 `key==='high'` 分支應為 0。
+- `grep -oE "#f59e0b|#6366f1|#f43f5e|#64748b" index.html app.js | wc -l` → `0`（category hex 全數改 var）
+- `grep -oE "indigo-[0-9]+|slate-[0-9]+" index.html app.js | wc -l` → `0`（品牌與中性已在 Task 2/3 清空，本任務清掉最後的中碳 `bg-indigo-500`/自由 `bg-slate-400`）
+- 設定頁 med 卡不再是 brand：計畫卡區塊 `grep -n "brand" index.html`（`1130-1175` 範圍內）應無殘留；med 卡改為 `bg-med/8`、`text-med` 等。
+- alpha 軟色調有效（非死 class）：`export PATH="/Users/sheal/.nvm/versions/node/v20.20.0/bin:$PATH" && grep -oE "bg-(high|med|low|rest)\\\\/[0-9]+\{[^}]*\}" tailwind.css | head` → 應能找到如 `.bg-med\/8{...}` 之類的實際規則。
+- 計畫卡相關 `amber-`/`rose-`（high/low 分支）應已改為 high/low 系。
 
 - [ ] **Step 6: 實機目視**
 
-碳循環選擇器四色：高碳綠、中碳藍、低碳玫瑰、自由灰；日曆進度環、圖例、設定頁高碳計畫卡皆為綠。深淺色皆檢查。
+碳循環選擇器四色：高碳綠、中碳藍、低碳玫瑰、自由灰；日曆進度環、圖例一致。設定頁四張計畫卡分別為：高碳綠、**中碳藍（不可是橘）**、低碳玫瑰、自由灰，各自軟色調底 + 對應邊框/文字。深淺色皆檢查。
 
 - [ ] **Step 7: Commit**
 
@@ -357,22 +420,27 @@ git commit -m "refactor: 移除 60 條深色模式 !important 覆寫（token 上
 - Regenerate: `tailwind.css`
 
 **Interfaces:**
-- Consumes：`--r-sm/md/lg/xl` 與 `rounded-sm/md/lg/xl`。
+- Consumes：角色圓角 token `--r-chip/control/card/panel` 與 class `rounded-chip/control/card/panel`（Task 1 以 `extend` 新增，不與 Tailwind 內建 sm/md/lg/xl 撞名）。
+- 對照：chip=12px（標籤）、control=16px（按鈕/輸入/圖示框）、card=20px（次卡片/餐點卡/分段控制）、panel=24px（主卡片/Modal）。
 
 - [ ] **Step 1: styles.css 元件圓角改用變數**
 
-- `input,select,textarea` `border-radius: 1.5rem` → `var(--r-md)`（`styles.css:78`）
-- `.modal-input` `1rem` → `var(--r-md)`（`styles.css:361`）
-- `.btn-circular .icon-wrapper` `1.25rem` → `var(--r-md)`（`styles.css:198`）
-- `.segment-indicator` `1.15rem` / `.segmented-control` `1.5rem` → `var(--r-lg)`（`styles.css:240,270`）
-- `--card-radius-main: 1.5rem` → `var(--r-xl)`；`--card-radius-sub: 1rem` → `var(--r-lg)`（`styles.css:11-12`）
+- `input,select,textarea` `border-radius: 1.5rem` → `var(--r-control)`（`styles.css:78`）
+- `.modal-input` `1rem` → `var(--r-control)`（`styles.css:361`）
+- `.btn-circular .icon-wrapper` `1.25rem` → `var(--r-control)`（`styles.css:198`）
+- `.segment-indicator` `1.15rem` / `.segmented-control` `1.5rem` → `var(--r-card)`（`styles.css:240,270`）
+- `--card-radius-main: 1.5rem` → `var(--r-panel)`；`--card-radius-sub: 1rem` → `var(--r-card)`（`styles.css:11-12`）
 
-- [ ] **Step 2: HTML/JS utility 圓角歸階**
+- [ ] **Step 2: HTML/JS utility 圓角歸階（含既有 Tailwind 內建圓角，依語意重新指派角色）**
 
-- `rounded-[2.5rem]` / `rounded-[2rem]` → `rounded-xl`
-- `rounded-2xl`（按鈕/輸入）→ `rounded-md`；（次卡片/區塊）→ `rounded-lg`（依語意）
-- `rounded-3xl` → `rounded-xl`
-- 保留 `rounded-full`（藥丸/圓形/日期圈）
+先列出所有圓角用途：`grep -o "rounded-[a-z0-9\[\].rem-]*" index.html app.js | sort | uniq -c`
+再依「元素角色」對應（非機械換名）：
+- 藥丸/圓形/頭像/日期圈 → 保留 `rounded-full`
+- 標籤/chip/小徽章 → `rounded-chip`
+- 按鈕/輸入框/圖示方框 → `rounded-control`（含既有 `rounded-2xl`、`rounded-xl`、`rounded-lg` 屬此角色者）
+- 次卡片/餐點卡/區塊/分段控制 → `rounded-card`
+- 主卡片/Modal 容器/大 hero 框（含 `rounded-[2.5rem]`、`rounded-[2rem]`、`rounded-3xl`）→ `rounded-panel`
+> 重點：Task 1 未覆寫 Tailwind 內建圓角，故此步必須**檢視每一處既有 `rounded-sm/md/lg/xl/2xl/3xl`** 並依角色重新指派為 chip/control/card/panel，不可略過既有用法。
 
 - [ ] **Step 3: 重新編譯**
 
@@ -389,7 +457,7 @@ Expected: `0`（無殘留 arbitrary 圓角）。
 
 ```bash
 git add styles.css index.html app.js tailwind.css
-git commit -m "refactor: 圓角統一為 sm/md/lg/xl 階梯"
+git commit -m "refactor: 圓角統一為 chip/control/card/panel 角色階梯"
 ```
 
 ---
@@ -422,10 +490,63 @@ git commit -m "refactor: 建立字級/字重階層，內文降重"
 
 ---
 
-### Task 8: 版本升級與最終驗證
+### Task 8: PDF 匯出模板對齊新色板
 
 **Files:**
-- Modify: `app.js`、`service-worker.js`、`index.html`
+- Modify: `index.html`（PDF 匯出報表模板，約 `1490-1628`）
+- Regenerate: `tailwind.css`（若模板改用 utility；若仍為 inline hex 則免）
+
+**Interfaces:**
+- PDF 匯出是**永遠淺色**的獨立列印文件，故用**固定 hex**（不可用會隨深色切換的 `var(--c-*)`），但 hex 值要對齊新色板的「淺色版」。
+
+- [ ] **Step 1: 對齊品牌強調色**
+
+模板內舊品牌 `#4f46e5`（如 `index.html:1534,1598` 的 `border-left: 4px solid #4f46e5`、`:1501` 文字色 `#6366f1`）→ 改為新品牌橘 `#F97316`。
+
+- [ ] **Step 2: 對齊碳循環分類色地圖（`index.html:1526`）**
+
+模板的分類色地圖現為舊配色：
+```
+背景 {high:'#eef2ff', med:'#f5f3ff', low:'#fdf2f8', rest:'#f8fafc'}
+文字 {high:'#4338ca', med:'#6d28d9', low:'#be185d', rest:'#64748b'}
+```
+改為對齊新色板（淺色文件用「淡底 + 深字」，各自取新分類色的明暗兩階）：
+```
+背景 {high:'#E6F7F0', med:'#EEF0FE', low:'#FEECEF', rest:'#F1F5F9'}
+文字 {high:'#0A9C6D', med:'#4F46E5', low:'#BE123C', rest:'#475569'}
+```
+> high=emerald 系、med=indigo 系、low=rose 系、rest=slate 系，與 App live 分類色一致（高碳綠、中碳藍、低碳玫瑰、自由灰）。
+
+- [ ] **Step 3: 掃描模板其餘舊色**
+
+`sed -n '1490,1628p' index.html | grep -oE "#[0-9a-fA-F]{6}"` 列出模板所有 hex；確認除了刻意的中性灰（`#64748b`→可改 `#475569`）與上面已對齊者外，無殘留舊品牌紫（`#4f46e5`/`#6366f1`/`#6d73c9`）。
+
+- [ ] **Step 4: 驗收**
+
+`grep -oE "#4f46e5|#6d73c9" index.html | wc -l` → `0`（舊品牌紫在 PDF 模板也清除）。
+`sed -n '1490,1628p' index.html | grep -c "var(--c-"` → `0`（模板仍為固定 hex，未誤用會變色的 token）。
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add index.html
+git commit -m "refactor: PDF 匯出模板對齊新品牌橘與碳循環分類色"
+```
+
+---
+
+### Task 9: 修正殘留舊紫、版本升級與最終驗證
+
+**Files:**
+- Modify: `styles.css`（--accent-primary）、`app.js`、`service-worker.js`、`index.html`
+
+- [ ] **Step 0: 修正 `--accent-primary` 仍為舊品牌紫（重要遺漏）**
+
+`--accent-primary` 是先於 token 系統存在的「第二品牌色變數」，目前仍是舊紫（`styles.css:10` `#6d73c9`、`.dark` `styles.css:42` `#6c69eb`），被多個元件樣式與 2 處 inline style 使用（`.btn-circular` 圓形按鈕、`.selected-day-ring` 日曆選中圈、`.segment-*`、`.meal-card` hover、`.settings-range` 滑桿、`index.html:149` 日期數字、`index.html:169` today pill）。這些元素現在仍是紫色，未跟上品牌橘。
+修正（讓它成為 brand 的別名，單一來源、自動深淺切換）：
+- `styles.css:10` `:root` 的 `--accent-primary: #6d73c9;` → `--accent-primary: rgb(var(--c-brand-rgb));`
+- `styles.css:42` `.dark` 的 `--accent-primary: #6c69eb;` → **刪除該行**（`--c-brand-rgb` 已在 `.dark` 翻轉，別名自動跟隨）。
+> 不需改任何 `var(--accent-primary)` 使用點；它們會自動變成品牌橘。
 
 - [ ] **Step 1: 更新四處版本號至 `0.2.0`**
 
@@ -453,8 +574,8 @@ Expected: 大幅下降（僅保留必要的少數，如非顏色的 floating bar
 - [ ] **Step 5: Commit**
 
 ```bash
-git add app.js service-worker.js index.html
-git commit -m "chore: 版本升級至 0.2.0（設計 token 系統）"
+git add styles.css app.js service-worker.js index.html
+git commit -m "chore: 修正 accent-primary 為品牌橘、版本升級至 0.2.0（設計 token 系統）"
 ```
 
 ---
@@ -468,7 +589,8 @@ git commit -m "chore: 版本升級至 0.2.0（設計 token 系統）"
 - ✅ RGB `<alpha-value>` 支援 → Task 1 Step 5 驗證
 - ✅ 刪 60 條 `!important` → Task 5
 - ✅ standalone binary 重編譯 → 各任務 Step「重新編譯」
-- ✅ 版本四處 + 回歸測試 → Task 8
+- ✅ PDF 匯出模板對齊新色板（Task 4 審查發現的一致性缺口）→ Task 8
+- ✅ 版本四處 + 回歸測試 → Task 9
 - ✅ indigo 雙重語意（品牌 vs 中碳）風險 → Task 2 Step 1 排除、Task 4 收斂
 - ✅ slate 雙重語意（中性 vs 自由日）風險 → Task 3 Step 1 排除、Task 4 收斂
 
