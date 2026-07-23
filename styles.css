@@ -203,6 +203,14 @@ input:focus, select:focus, textarea:focus {
     background-color: var(--ring-color);
 }
 
+/* 日曆選中日：實心 pill 取代描邊 ring */
+.calendar-day-cell.day-selected {
+    background: var(--accent-primary);
+    color: #fff !important;
+    font-weight: 800;
+}
+.calendar-day-cell.day-selected .day-progress-svg { opacity: .35; }
+
 /* 營養素標籤 */
 .nutrient-label {
     font-size: 0.875rem;

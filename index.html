@@ -195,7 +195,7 @@
                                     <div v-for="day in calendarDays" :key="day.date"
                                         @click="selectedDate = day.date"
                                         class="calendar-day-cell rounded-control cursor-pointer transition-all"
-                                        :class="[day.currentMonth ? 'text-ink' : 'opacity-20', selectedDate === day.date ? 'selected-day-ring font-black' : 'hover:bg-brand-soft']">
+                                        :class="[day.currentMonth ? 'text-ink' : 'opacity-20', selectedDate === day.date ? 'day-selected' : 'hover:bg-brand-soft']">
                                         <svg v-if="getDayStats(day.date)" class="day-progress-svg p-1.5"
                                             viewBox="0 0 100 100">
                                             <circle cx="50" cy="50" r="38" fill="none"
@@ -208,17 +208,16 @@
                                         </svg>
                                         <div :class="day.date === new Date().toLocaleDateString('sv-SE') ? 'today-number-circle' : ''"
                                             class="relative z-10 flex items-center justify-center">
-                                            <span class="text-xs sm:text-sm"
-                                                :class="selectedDate === day.date && day.date !== new Date().toLocaleDateString('sv-SE') ? 'text-teal-600' : ''">{{
+                                            <span class="text-xs sm:text-sm">{{
                                                 day.dayNum }}</span>
                                         </div>
                                     </div>
                                 </div>
                                 <!-- 顏色對照說明 -->
-                                <div class="flex flex-wrap justify-center gap-x-4 gap-y-1 pt-4 mt-2 border-t border-line">
+                                <div class="flex flex-wrap justify-center gap-x-4 gap-y-1 pt-4 mt-2 border-t border-line opacity-70">
                                     <div v-for="l in [{c:'var(--c-high)',t:'高碳日'},{c:'var(--c-med)',t:'中碳日'},{c:'var(--c-low)',t:'低碳日'},{c:'var(--c-rest)',t:'自由日'}]" :key="l.t"
                                         class="flex items-center gap-1.5">
-                                        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" :style="{background: l.c}"></span>
+                                        <span class="w-2 h-2 rounded-full flex-shrink-0" :style="{background: l.c}"></span>
                                         <span class="text-[10px] font-bold text-muted">{{ l.t }}</span>
                                     </div>
                                 </div>
