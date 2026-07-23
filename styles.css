@@ -219,44 +219,21 @@ input:focus, select:focus, textarea:focus {
     letter-spacing: 0.02em;
 }
 
-/* === Segmented Control === */
-.segmented-control {
-    background: var(--bg-main);
-    padding: 6px;
-    border-radius: var(--r-card);
-    display: flex;
-    position: relative;
-    border: 1px solid var(--border-color);
+/* 計劃色卡：精簡，比範本小 */
+.plan-card {
+    display: flex; flex-direction: column; align-items: center; gap: .375rem;
+    padding: .75rem .5rem; border-radius: var(--r-card);
+    border: 1.5px solid var(--border-color); cursor: pointer;
+    background: var(--bg-card); color: var(--text-muted);
+    transition: all .2s ease;
 }
-
-.segment-item {
-    flex: 1;
-    text-align: center;
-    padding: 10px 4px;
-    font-size: 0.75rem;
-    font-weight: 800;
-    color: var(--text-muted);
-    cursor: pointer;
-    position: relative;
-    z-index: 1;
-    transition: color 0.3s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+.plan-card:hover { border-color: color-mix(in srgb, currentColor 40%, transparent); }
+.plan-card.active {
+    color: var(--plan-c);
+    border-color: var(--plan-c);
+    background: color-mix(in srgb, var(--plan-c) 12%, transparent);
 }
-
-.segment-item.active { color: #fff; }
-
-.segment-indicator {
-    position: absolute;
-    top: 6px;
-    bottom: 6px;
-    left: 6px;
-    border-radius: var(--r-card);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 0;
-}
+.plan-card .label { font-size: .75rem; font-weight: 800; }
 
 /* === 日曆格子 === */
 .calendar-day-cell {
