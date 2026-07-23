@@ -92,13 +92,6 @@ body {
 }
 
 /* === Typography & Colors === */
-.text-main { color: var(--text-main); }
-.text-muted { color: var(--text-muted); }
-
-.plan-high { background: #f59e0b; }
-.plan-med  { background: #6366f1; }
-.plan-low  { background: #f43f5e; }
-.plan-rest { background: #71717a; }
 
 input, select, textarea {
     background-color: var(--bg-card);
@@ -296,43 +289,6 @@ input:focus, select:focus, textarea:focus {
 .no-spin::-webkit-inner-spin-button,
 .no-spin::-webkit-outer-spin-button { -webkit-appearance: none; appearance: none; margin: 0; }
 .no-spin { -moz-appearance: textfield; appearance: textfield; }
-
-/* === 設定介面 range slider === */
-.settings-range {
-    -webkit-appearance: none;
-    appearance: none;
-    height: 6px;
-    border-radius: 9999px;
-    background: #e2e8f0;
-    outline: none;
-}
-.settings-range::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 9999px;
-    border: 2.5px solid white;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.18);
-    cursor: pointer;
-    transition: transform 0.15s;
-}
-.settings-range::-webkit-slider-thumb:active { transform: scale(1.2); }
-.settings-range::-moz-range-thumb {
-    width: 20px; height: 20px;
-    border-radius: 9999px;
-    border: 2.5px solid white;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.18);
-    cursor: pointer;
-}
-.range-amber::-webkit-slider-thumb  { background: #f59e0b; }
-.range-amber::-moz-range-thumb      { background: #f59e0b; }
-.range-indigo::-webkit-slider-thumb { background: #6366f1; }
-.range-indigo::-moz-range-thumb     { background: #6366f1; }
-.range-rose::-webkit-slider-thumb   { background: #f43f5e; }
-.range-rose::-moz-range-thumb       { background: #f43f5e; }
-.range-slate::-webkit-slider-thumb  { background: #64748b; }
-.range-slate::-moz-range-thumb      { background: #64748b; }
 
 /* === Modal 輸入框 === */
 .modal-input {

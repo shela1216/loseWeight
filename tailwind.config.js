@@ -24,8 +24,6 @@ module.exports = {
                 control: 'var(--r-control)',
                 card: 'var(--r-card)',
                 panel: 'var(--r-panel)',
-                '4xl': '2rem',
-                '5xl': '2.5rem',
             },
             opacity: {
                 // 8：預設 opacity scale 無此值，供 bg-high/8 等分類卡軟色調底使用
