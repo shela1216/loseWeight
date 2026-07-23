@@ -306,3 +306,32 @@ input:focus, select:focus, textarea:focus {
     border-color: var(--accent-primary);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
+
+/* === Nutrigo 視覺語言 (v0.3.0) === */
+/* tinted 圓角方塊 icon chip：底色由 currentColor 自動淡化，色設在元素上即可 */
+.icon-chip {
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: var(--r-control);
+    background: color-mix(in srgb, currentColor 12%, transparent);
+    border: none;
+}
+.dark .icon-chip { background: color-mix(in srgb, currentColor 20%, transparent); }
+
+/* 統一卡片 header：左標題、右控制 */
+.card-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: .5rem; margin-bottom: 1rem;
+}
+.card-head .title {
+    font-size: .75rem; font-weight: 800; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--text-muted);
+}
+
+/* 餐別 chip（⑥ 用） */
+.meal-cat-chip {
+    display: inline-flex; align-items: center; gap: .375rem;
+    padding: .25rem .625rem; border-radius: var(--r-chip);
+    font-size: .75rem; font-weight: 800;
+    background: color-mix(in srgb, currentColor 14%, transparent);
+    color: currentColor;
+}
