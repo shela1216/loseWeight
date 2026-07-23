@@ -3,6 +3,7 @@
         import { initializeFirestore, persistentLocalCache, doc, setDoc, updateDoc, onSnapshot, collection, query, where, getDocs, writeBatch, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         import { pickPriorityNutrient } from './recommend.js';
+        import { weightGaugeData } from './weightGauge.js';
 
         const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
 
@@ -1173,7 +1174,7 @@
                 });
 
                 return {
-                    appVersion, skipHistorySave,
+                    appVersion, skipHistorySave, weightGaugeData,
                     isDark, toggleTheme,
                     initialized, user, saving, showSettings, showHistory, showMonthPicker, historySearch, historySortBy, historySortOrder, historyTab, selectedDate, pickerMonth, loginEmail, loginPassword,
                     openHistory, closeHistory, historyPickMode, priorityNutrient, priorityNutrientLabel,
