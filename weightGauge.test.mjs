@@ -21,4 +21,8 @@ assert.ok(r2.fill > 0.7 && r2.fill < 0.85, `fill=${r2.fill}`);
 const r3 = weightGaugeData(100, 65);
 assert.strictEqual(r3.fill, 0);
 
+// 體重無效（0 / null / 空）→ hasTarget:false，不誤報已達標
+assert.strictEqual(weightGaugeData(0, 65).hasTarget, false);
+assert.strictEqual(weightGaugeData(null, 65).hasTarget, false);
+
 console.log('weightGauge tests passed');

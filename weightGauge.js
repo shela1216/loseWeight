@@ -3,7 +3,7 @@
 // ponytail: capPct=0.35 為校準旋鈕——超出目標 35% 時弧歸零；覺得起始太空/太滿就調它。
 export function weightGaugeData(weight, target, capPct = 0.35) {
     const t = Number(target), w = Number(weight);
-    if (!target || isNaN(t) || t <= 0 || isNaN(w)) return { hasTarget: false };
+    if (!target || isNaN(t) || t <= 0 || !weight || isNaN(w) || w <= 0) return { hasTarget: false };
     const reached = w <= t;
     const over = (w - t) / t;
     const fill = reached ? 1 : Math.max(0, Math.min(1, 1 - over / capPct));
