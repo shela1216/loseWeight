@@ -422,7 +422,7 @@
                 const nutrientKeys = [{ key: 'carbs', label: '淨碳水' }, { key: 'protein', label: '蛋白質' }, { key: 'fat', label: '脂肪' }];
 
                 const profile = reactive({
-                    gender: 'male', weight: 70, height: 175, age: 30, activity: 1.2, goal: 'lose'
+                    gender: 'male', weight: 70, targetWeight: 60, height: 175, age: 30, activity: 1.2, goal: 'lose'
                 });
 
                 const plans = reactive({

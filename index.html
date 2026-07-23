@@ -1065,6 +1065,16 @@
                             </div>
                         </div>
 
+                        <!-- 目標體重 -->
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold text-muted uppercase tracking-widest pl-1">目標體重</label>
+                            <div class="relative">
+                                <input type="number" v-model.number="profile.targetWeight"
+                                    class="w-full bg-page px-3 py-3.5 rounded-control text-sm border border-line font-black outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand transition-all pr-8">
+                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted opacity-60 font-bold pointer-events-none">kg</span>
+                            </div>
+                        </div>
+
                         <!-- 目標 -->
                         <div class="space-y-2">
                             <label class="text-xs font-bold text-muted uppercase tracking-widest pl-1">目標</label>
