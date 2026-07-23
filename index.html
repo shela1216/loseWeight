@@ -195,7 +195,7 @@
                                     <div v-for="day in calendarDays" :key="day.date"
                                         @click="selectedDate = day.date"
                                         class="calendar-day-cell rounded-control cursor-pointer transition-all"
-                                        :class="[day.currentMonth ? 'text-ink' : 'opacity-20', selectedDate === day.date ? 'day-selected' : 'hover:bg-brand-soft']">
+                                        :class="[day.currentMonth ? 'text-ink' : 'opacity-20', selectedDate === day.date ? 'selected-day-ring font-black' : 'hover:bg-brand-soft']">
                                         <svg v-if="getDayStats(day.date)" class="day-progress-svg p-1.5"
                                             viewBox="0 0 100 100">
                                             <circle cx="50" cy="50" r="38" fill="none"
@@ -208,16 +208,17 @@
                                         </svg>
                                         <div :class="day.date === new Date().toLocaleDateString('sv-SE') ? 'today-number-circle' : ''"
                                             class="relative z-10 flex items-center justify-center">
-                                            <span class="text-xs sm:text-sm">{{
+                                            <span class="text-xs sm:text-sm"
+                                                :class="selectedDate === day.date && day.date !== new Date().toLocaleDateString('sv-SE') ? 'text-teal-600' : ''">{{
                                                 day.dayNum }}</span>
                                         </div>
                                     </div>
                                 </div>
                                 <!-- 顏色對照說明 -->
-                                <div class="flex flex-wrap justify-center gap-x-4 gap-y-1 pt-4 mt-2 border-t border-line opacity-70">
+                                <div class="flex flex-wrap justify-center gap-x-4 gap-y-1 pt-4 mt-2 border-t border-line">
                                     <div v-for="l in [{c:'var(--c-high)',t:'高碳日'},{c:'var(--c-med)',t:'中碳日'},{c:'var(--c-low)',t:'低碳日'},{c:'var(--c-rest)',t:'自由日'}]" :key="l.t"
                                         class="flex items-center gap-1.5">
-                                        <span class="w-2 h-2 rounded-full flex-shrink-0" :style="{background: l.c}"></span>
+                                        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" :style="{background: l.c}"></span>
                                         <span class="text-[10px] font-bold text-muted">{{ l.t }}</span>
                                     </div>
                                 </div>
@@ -231,18 +232,25 @@
                             <div class="w-1.5 h-4 bg-brand rounded-full"></div>
                             <h3 class="text-xs font-bold text-muted uppercase tracking-widest">今日計劃切換</h3>
                         </div>
-                        <div class="grid grid-cols-4 gap-2">
-                            <div v-for="key in ['high', 'med', 'low', 'rest']" :key="key"
-                                @click="setPlanType(key)"
-                                class="plan-card" :class="{ active: currentDayRecord.planType === key }"
-                                :style="{ '--plan-c': {high:'var(--c-high)', med:'var(--c-med)', low:'var(--c-low)', rest:'var(--c-rest)'}[key] }">
-                                <span class="icon-chip w-8 h-8 p-1.5">
-                                    <svg v-if="key === 'high'" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18M5 6v12M19 6v12M9 10v4M15 10v4"/></svg>
-                                    <svg v-if="key === 'med'" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18m0-18A9 9 0 003 12h9V3zm0 18A9 9 0 0021 12h-9v9z"/></svg>
-                                    <svg v-if="key === 'low'" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"/></svg>
-                                    <svg v-if="key === 'rest'" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                        <div class="segmented-control relative">
+                            <div class="segment-indicator shadow-xl shadow-brand/30"
+                                :style="{ width: 'calc((100% - 12px) / 4 - 8px)', transform: `translateX(calc(${Object.keys(plans).indexOf(currentDayRecord.planType)} * (100% + 8px) + 4px))`, backgroundColor: {high:'var(--c-high)', med:'var(--c-med)', low:'var(--c-low)', rest:'var(--c-rest)'}[currentDayRecord.planType] }">
+                            </div>
+                            <div v-for="key in ['high', 'med', 'low', 'rest']"
+                                :key="key" @click="setPlanType(key)" class="segment-item"
+                                :class="{ active: currentDayRecord.planType === key }">
+                                <span class="w-5 h-5 mb-1 transition-transform flex items-center justify-center"
+                                    :class="currentDayRecord.planType === key ? 'scale-110' : ''">
+                                    <!-- 高碳: 啞鈴/力量 -->
+                                    <svg v-if="key === 'high'" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18M5 6v12M19 6v12M9 10v4M15 10v4" /></svg>
+                                    <!-- 中碳: 葉子 -->
+                                    <svg v-if="key === 'med'" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18m0-18A9 9 0 003 12h9V3zm0 18A9 9 0 0021 12h-9v9z" /></svg>
+                                    <!-- 低碳: 火焰 -->
+                                    <svg v-if="key === 'low'" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" /><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" /></svg>
+                                    <!-- 自由: 休息/愛心 -->
+                                    <svg v-if="key === 'rest'" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
                                 </span>
-                                <span class="label">{{ {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[key] }}</span>
+                                <span class="text-[10px] uppercase">{{ {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[key] }}</span>
                             </div>
                         </div>
                     </div>
@@ -252,10 +260,7 @@
                 <div class="lg:col-span-8 space-y-8 mt-10 lg:mt-0">
 
                     <!-- 核心數據卡片 -->
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Calories 卡：占 2 欄 -->
-                    <section class="premium-card-main p-4 sm:p-8 lg:col-span-2">
-                        <div class="card-head"><span class="title">熱量與營養素</span></div>
+                    <section class="premium-card-main p-4 sm:p-10">
                         <!-- 熱量主區塊 -->
                         <div class="flex flex-row items-center justify-center gap-4 sm:gap-20 mb-6 sm:mb-14">
                             <!-- 進度圈 -->
@@ -286,7 +291,7 @@
                                 <div class="flex flex-col items-center md:items-start min-w-0">
                                     <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-4">
                                         <div
-                                            class="icon-chip w-7 h-7 sm:w-10 sm:h-10 text-brand p-1.5 sm:p-2.5">
+                                            class="w-7 h-7 sm:w-10 sm:h-10 rounded-control flex items-center justify-center bg-brand/10 text-brand border border-brand/20 p-1.5 sm:p-2.5">
                                             <svg class="w-full h-full" fill="none" stroke="currentColor"
                                                 stroke-width="2.5" viewBox="0 0 24 24">
                                                 <path
@@ -306,7 +311,7 @@
                                 <div class="flex flex-col items-center md:items-start min-w-0">
                                     <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-4">
                                         <div
-                                            class="icon-chip w-7 h-7 sm:w-10 sm:h-10 text-muted p-1.5 sm:p-2.5">
+                                            class="w-7 h-7 sm:w-10 sm:h-10 rounded-control flex items-center justify-center bg-theme border border-theme text-muted p-1.5 sm:p-2.5">
                                             <svg class="w-full h-full" fill="none" stroke="currentColor"
                                                 stroke-width="2.5" viewBox="0 0 24 24">
                                                 <path
@@ -379,47 +384,6 @@
                         </div>
                     </section>
 
-                    <!-- Weight 卡：占 1 欄 -->
-                    <section class="premium-card-main p-4 sm:p-8 flex flex-col">
-                        <div class="card-head"><span class="title">體重</span></div>
-                        <template v-if="weightGaugeData(profile.weight, profile.targetWeight).hasTarget">
-                            <div class="relative w-full max-w-[220px] mx-auto mt-2" style="aspect-ratio:2/1;">
-                                <!-- ⚠️ SVG stroke 顏色必須走 :style（var() 在 presentation attribute 不解析，比照 index.html 既有卡路里環寫法） -->
-                                <svg viewBox="0 0 100 55" class="w-full">
-                                    <!-- 半圓底 -->
-                                    <path d="M8 50 A42 42 0 0 1 92 50" fill="none" stroke-width="8" stroke-linecap="round"
-                                        :style="{ stroke: 'var(--c-line)' }"/>
-                                    <!-- 半圓填色：dasharray 半圓長 ≈ π*42 ≈ 131.9 -->
-                                    <path d="M8 50 A42 42 0 0 1 92 50" fill="none" stroke-width="8" stroke-linecap="round"
-                                        :style="{
-                                            stroke: weightGaugeData(profile.weight, profile.targetWeight).reached ? 'var(--c-high)' : 'var(--accent-primary)',
-                                            strokeDasharray: 131.9,
-                                            strokeDashoffset: 131.9 * (1 - weightGaugeData(profile.weight, profile.targetWeight).fill),
-                                            transition: 'stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1)'
-                                        }"/>
-                                </svg>
-                                <div class="absolute inset-x-0 bottom-0 text-center">
-                                    <div class="text-3xl font-black leading-none">{{ profile.weight }}<span class="text-xs text-muted ml-1">kg</span></div>
-                                    <div class="text-[11px] font-bold mt-1"
-                                        :class="weightGaugeData(profile.weight, profile.targetWeight).reached ? 'text-teal-500' : 'text-muted'">
-                                        {{ weightGaugeData(profile.weight, profile.targetWeight).reached ? '已達標' : '還差 ' + weightGaugeData(profile.weight, profile.targetWeight).remaining + ' kg' }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex justify-between text-[10px] font-bold text-muted mt-2 px-2">
-                                <span>目標 {{ profile.targetWeight }}</span>
-                                <span>目前 {{ profile.weight }}</span>
-                            </div>
-                        </template>
-                        <!-- 未設目標：提示按鈕 -->
-                        <button v-else @click="showSettings = true"
-                            class="flex-1 flex flex-col items-center justify-center gap-2 text-muted py-8 rounded-card border border-dashed border-line hover:text-brand hover:border-brand/40 transition-all">
-                            <span class="icon-chip w-10 h-10 p-2 text-brand"><svg class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg></span>
-                            <span class="text-xs font-bold">設定目標體重</span>
-                        </button>
-                    </section>
-                    </div>
-
                     <!-- 餐點紀錄區塊 -->
                     <section class="relative">
                         <div class="flex justify-between items-center mb-6 sm:mb-8 px-4 py-4 sticky top-0 z-[90] backdrop-blur-xl bg-[#f4f4f5]/90 dark:bg-[#1f1d2b]/90 -mx-4 sm:-mx-2 sm:px-6 shadow-sm border-b border-line transition-all" :style="showSettings ? 'visibility:hidden' : ''">
@@ -454,13 +418,15 @@
                             <div v-for="typeObj in mealTypes" :key="typeObj.key">
                                 <div v-if="getMealsByType(typeObj.key).length > 0"
                                     class="premium-card-sub p-6 sm:p-10">
-                                    <div class="card-head mb-6 sm:mb-8">
-                                        <span class="meal-cat-chip"
-                                            :style="{ color: {breakfast:'var(--c-med)', lunch:'var(--accent-primary)', dinner:'var(--c-high)', snack:'var(--c-low)'}[typeObj.key] }">
-                                            {{ typeObj.label }}
-                                            <span class="opacity-90">· {{ formatFloat(getMealsByType(typeObj.key).reduce((s,m)=>s+(m.calories||0),0)) }} kcal</span>
-                                        </span>
-                                        <span class="text-[11px] font-bold text-muted">{{ getMealsByType(typeObj.key).length }} 項</span>
+                                    <div class="flex items-center gap-4 mb-6 sm:mb-10 px-1">
+                                        <span class="w-2 h-7 rounded-full"
+                                            :style="{ backgroundColor: {breakfast:'#6366f1', lunch:'#8b5cf6', dinner:'#3b82f6', snack:'#ec4899'}[typeObj.key] }"></span>
+                                        <h4
+                                            class="text-base sm:text-lg font-black tracking-wider uppercase">
+                                            {{ typeObj.label }}</h4>
+                                        <span
+                                            class="text-[11px] font-bold text-muted ml-auto uppercase tracking-widest">{{
+                                            getMealsByType(typeObj.key).length }} items</span>
                                     </div>
                                     <div class="space-y-4 sm:space-y-6">
                                         <div v-for="meal in getMealsByType(typeObj.key)" :key="meal.originalIndex"
@@ -486,10 +452,19 @@
                                                     <span class="">{{ formatFloat(meal.calories) }} <span
                                                             class="text-[10px] text-muted uppercase ml-0.5">kcal</span></span>
                                                 </div>
-                                                <div class="flex flex-wrap items-center gap-2">
-                                                    <span class="meal-cat-chip" style="color:var(--accent-primary)">碳水 {{ formatFloat(meal.carbs) }}g</span>
-                                                    <span class="meal-cat-chip" style="color:var(--c-med)">蛋白質 {{ formatFloat(meal.protein) }}g</span>
-                                                    <span class="meal-cat-chip" style="color:var(--c-low)">脂肪 {{ formatFloat(meal.fat) }}g</span>
+                                                <div class="flex items-center gap-5">
+                                                    <span
+                                                        class="text-[10px] font-bold text-muted uppercase tracking-widest">C:<span
+                                                            class="text-ink font-semibold ml-1">{{
+                                                            formatFloat(meal.carbs) }}g</span></span>
+                                                    <span
+                                                        class="text-[10px] font-bold text-muted uppercase tracking-widest">P:<span
+                                                            class="text-ink font-semibold ml-1">{{
+                                                            formatFloat(meal.protein) }}g</span></span>
+                                                    <span
+                                                        class="text-[10px] font-bold text-muted uppercase tracking-widest">F:<span
+                                                            class="text-ink font-semibold ml-1">{{
+                                                            formatFloat(meal.fat) }}g</span></span>
                                                 </div>
                                             </div>
                                             <div v-if="editingIndex !== meal.originalIndex"
@@ -1090,16 +1065,6 @@
                             </div>
                         </div>
 
-                        <!-- 目標體重 -->
-                        <div class="space-y-2">
-                            <label class="text-xs font-bold text-muted uppercase tracking-widest pl-1">目標體重</label>
-                            <div class="relative">
-                                <input type="number" v-model.number="profile.targetWeight"
-                                    class="w-full bg-page px-3 py-3.5 rounded-control text-sm border border-line font-black outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand transition-all pr-8">
-                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted opacity-60 font-bold pointer-events-none">kg</span>
-                            </div>
-                        </div>
-
                         <!-- 目標 -->
                         <div class="space-y-2">
                             <label class="text-xs font-bold text-muted uppercase tracking-widest pl-1">目標</label>
@@ -1681,7 +1646,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.3.0"></script>
+    <script type="module" src="app.js?v=0.2.0"></script>
 </body>
 
 </html>
