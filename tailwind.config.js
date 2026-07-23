@@ -5,14 +5,29 @@ module.exports = {
     theme: {
         extend: {
             colors: {
-                indigo: {
-                    500: '#6366f1',
-                    600: '#4f46e5',
-                }
+                brand: 'rgb(var(--c-brand-rgb) / <alpha-value>)',
+                'brand-soft': 'var(--c-brand-soft)',
+                surface: 'var(--c-surface)',
+                page: 'var(--c-page)',
+                ink: 'rgb(var(--c-ink-rgb) / <alpha-value>)',
+                muted: 'var(--c-muted)',
+                line: 'var(--c-line)',
+                high: 'rgb(var(--c-high-rgb) / <alpha-value>)',
+                med: 'rgb(var(--c-med-rgb) / <alpha-value>)',
+                low: 'rgb(var(--c-low-rgb) / <alpha-value>)',
+                rest: 'rgb(var(--c-rest-rgb) / <alpha-value>)',
+                good: 'var(--c-good)',
+                danger: 'var(--c-danger)',
             },
             borderRadius: {
-                '4xl': '2rem',
-                '5xl': '2.5rem',
+                chip: 'var(--r-chip)',
+                control: 'var(--r-control)',
+                card: 'var(--r-card)',
+                panel: 'var(--r-panel)',
+            },
+            opacity: {
+                // 8：預設 opacity scale 無此值，供 bg-high/8 等分類卡軟色調底使用
+                '8': '0.08',
             }
         }
     },
