@@ -3,6 +3,7 @@
         import { initializeFirestore, persistentLocalCache, doc, setDoc, updateDoc, onSnapshot, collection, query, where, getDocs, writeBatch, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         import { pickPriorityNutrient } from './recommend.js';
+        import { weightGaugeData } from './weightGauge.js';
 
         const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
 
@@ -50,7 +51,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.2.0');
+                console.log('App initialization starting... v0.3.0');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -335,7 +336,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.2.0');
+                const appVersion = ref('0.3.0');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -422,7 +423,7 @@
                 const nutrientKeys = [{ key: 'carbs', label: '淨碳水' }, { key: 'protein', label: '蛋白質' }, { key: 'fat', label: '脂肪' }];
 
                 const profile = reactive({
-                    gender: 'male', weight: 70, height: 175, age: 30, activity: 1.2, goal: 'lose'
+                    gender: 'male', weight: 70, targetWeight: 60, height: 175, age: 30, activity: 1.2, goal: 'lose'
                 });
 
                 const plans = reactive({
@@ -1173,7 +1174,7 @@
                 });
 
                 return {
-                    appVersion, skipHistorySave,
+                    appVersion, skipHistorySave, weightGaugeData,
                     isDark, toggleTheme,
                     initialized, user, saving, showSettings, showHistory, showMonthPicker, historySearch, historySortBy, historySortOrder, historyTab, selectedDate, pickerMonth, loginEmail, loginPassword,
                     openHistory, closeHistory, historyPickMode, priorityNutrient, priorityNutrientLabel,

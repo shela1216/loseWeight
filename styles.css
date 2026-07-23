@@ -203,6 +203,14 @@ input:focus, select:focus, textarea:focus {
     background-color: var(--ring-color);
 }
 
+/* 日曆選中日：實心 pill 取代描邊 ring */
+.calendar-day-cell.day-selected {
+    background: var(--accent-primary);
+    color: #fff !important;
+    font-weight: 800;
+}
+.calendar-day-cell.day-selected .day-progress-svg { opacity: .35; }
+
 /* 營養素標籤 */
 .nutrient-label {
     font-size: 0.875rem;
@@ -211,44 +219,21 @@ input:focus, select:focus, textarea:focus {
     letter-spacing: 0.02em;
 }
 
-/* === Segmented Control === */
-.segmented-control {
-    background: var(--bg-main);
-    padding: 6px;
-    border-radius: var(--r-card);
-    display: flex;
-    position: relative;
-    border: 1px solid var(--border-color);
+/* 計劃色卡：精簡，比範本小 */
+.plan-card {
+    display: flex; flex-direction: column; align-items: center; gap: .375rem;
+    padding: .75rem .5rem; border-radius: var(--r-card);
+    border: 1.5px solid var(--border-color); cursor: pointer;
+    background: var(--bg-card); color: var(--text-muted);
+    transition: all .2s ease;
 }
-
-.segment-item {
-    flex: 1;
-    text-align: center;
-    padding: 10px 4px;
-    font-size: 0.75rem;
-    font-weight: 800;
-    color: var(--text-muted);
-    cursor: pointer;
-    position: relative;
-    z-index: 1;
-    transition: color 0.3s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+.plan-card:hover { border-color: color-mix(in srgb, currentColor 40%, transparent); }
+.plan-card.active {
+    color: var(--plan-c);
+    border-color: var(--plan-c);
+    background: color-mix(in srgb, var(--plan-c) 12%, transparent);
 }
-
-.segment-item.active { color: #fff; }
-
-.segment-indicator {
-    position: absolute;
-    top: 6px;
-    bottom: 6px;
-    left: 6px;
-    border-radius: var(--r-card);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 0;
-}
+.plan-card .label { font-size: .75rem; font-weight: 800; }
 
 /* === 日曆格子 === */
 .calendar-day-cell {
@@ -305,4 +290,33 @@ input:focus, select:focus, textarea:focus {
 .modal-input:focus {
     border-color: var(--accent-primary);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+/* === Nutrigo 視覺語言 (v0.3.0) === */
+/* tinted 圓角方塊 icon chip：底色由 currentColor 自動淡化，色設在元素上即可 */
+.icon-chip {
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: var(--r-control);
+    background: color-mix(in srgb, currentColor 12%, transparent);
+    border: none;
+}
+.dark .icon-chip { background: color-mix(in srgb, currentColor 20%, transparent); }
+
+/* 統一卡片 header：左標題、右控制 */
+.card-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: .5rem; margin-bottom: 1rem;
+}
+.card-head .title {
+    font-size: .75rem; font-weight: 800; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--text-muted);
+}
+
+/* 餐別 chip（⑥ 用） */
+.meal-cat-chip {
+    display: inline-flex; align-items: center; gap: .375rem;
+    padding: .25rem .625rem; border-radius: var(--r-chip);
+    font-size: .75rem; font-weight: 800;
+    background: color-mix(in srgb, currentColor 14%, transparent);
+    color: currentColor;
 }
