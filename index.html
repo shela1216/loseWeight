@@ -919,7 +919,7 @@
 
                 <div class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden custom-scroll grid grid-cols-1 lg:grid-cols-2 gap-3 content-start px-2 pb-4" @scroll="handleHistoryScroll">
                     <div v-for="item in visibleMealHistory" :key="item.name"
-                        class="p-4 sm:p-5 bg-surface border border-line rounded-card hover:bg-brand-soft hover:border-brand/20 cursor-pointer flex justify-between items-center transition-all group active:scale-[0.98] overflow-hidden">
+                        class="p-4 sm:p-5 bg-surface border border-line rounded-card hover:bg-brand-soft hover:border-brand/20 cursor-pointer flex justify-between items-center transition-all group active:scale-[0.98]">
                         <div class="flex-1 mr-3 min-w-0" @click="chooseHistoryMeal(item)">
                             <div class="flex items-center gap-3 mb-2 min-w-0">
                                 <span class="font-semibold text-ink text-base break-words">{{ item.name }}</span>
@@ -1769,7 +1769,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.3.1"></script>
+    <script type="module" src="app.js?v=0.3.2"></script>
 </body>
 
 </html>
