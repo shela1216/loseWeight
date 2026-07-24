@@ -50,7 +50,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.2.1');
+                console.log('App initialization starting... v0.2.2');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -335,7 +335,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.2.1');
+                const appVersion = ref('0.2.2');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -591,8 +591,10 @@
                 };
 
                 const historyPickMode = ref(null); // null=加到當日;數字=填回組合品項 index
+                const historyMealType = ref('lunch'); // 從資料庫加到當日時要放入的餐別
                 const openHistory = (pickIdx = null) => {
                     historyPickMode.value = pickIdx;
+                    historyMealType.value = 'lunch';
                     historySortBy.value = 'recommend';
                     historySortOrder.value = 'desc'; // 推薦排序需由高到低,避免沿用上次的 asc
                     if (pickIdx !== null) historyTab.value = 'general'; // 挑入組合品項時只列一般餐點
@@ -629,7 +631,7 @@
                         isNameAuto.value = false;
                         prepareScale();
                     } else {
-                        newMeal.type = 'lunch';
+                        newMeal.type = historyMealType.value;
                         if (!allData[selectedDate.value]) {
                             allData[selectedDate.value] = { planType: 'med', meals: [] };
                         }
@@ -1176,7 +1178,7 @@
                     appVersion, skipHistorySave,
                     isDark, toggleTheme,
                     initialized, user, saving, showSettings, showHistory, showMonthPicker, historySearch, historySortBy, historySortOrder, historyTab, selectedDate, pickerMonth, loginEmail, loginPassword,
-                    openHistory, closeHistory, historyPickMode, priorityNutrient, priorityNutrientLabel,
+                    openHistory, closeHistory, historyPickMode, historyMealType, priorityNutrient, priorityNutrientLabel,
                     editingIndex, isAddingMeal, mealToDelete, historyToDelete, nutrientKeys, profile, plans, tempPlans, allData, mealHistory, visibleMealHistory, handleHistoryScroll, editingMeal, showSyncModal, templates,
                     currentMonthYearDisplay, calculatedTDEE, formatNum, formatFloat, scaleNutrients, lastAmount, prepareScale, onlyNumber,
                     settingsStep, setCalorieCenter, setNutrientCenter,
