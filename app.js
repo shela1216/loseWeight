@@ -50,7 +50,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.2.0');
+                console.log('App initialization starting... v0.2.1');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -335,7 +335,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.2.0');
+                const appVersion = ref('0.2.1');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -1031,11 +1031,11 @@
                     tempMealBackup.value = JSON.parse(JSON.stringify(copiedMeal));
                 };
 
-                const addMeal = () => {
+                const addMeal = (type = 'lunch') => {
                     if (!allData[selectedDate.value]) {
                         allData[selectedDate.value] = { planType: 'med', meals: [] };
                     }
-                    const newMeal = { type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] };
+                    const newMeal = { type, name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] };
                     Object.assign(editingMeal, newMeal);
                     isNameAuto.value = true;
                     const newIndex = allData[selectedDate.value].meals.push(newMeal) - 1;
@@ -1222,6 +1222,9 @@
                         await loadMonthData(pickerMonth.value);
                     },
                     mealTypes, getMealsByType,
+                    getTypeCalories: (type) => (allData[selectedDate.value]?.meals || [])
+                        .filter(m => m.type === type)
+                        .reduce((s, m) => s + (Number(m.calories) || 0), 0),
                     addMeal, startEdit, cancelEdit, saveMeal, addFromHistory, saveToHistoryOnly,
                     confirmDeleteHistory: (item) => { historyToDelete.value = item; }, executeDeleteHistory,
                     confirmDelete: (i) => { mealToDelete.value = i; },
