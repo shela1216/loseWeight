@@ -50,7 +50,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.3.2');
+                console.log('App initialization starting... v0.3.3');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -335,7 +335,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.3.2');
+                const appVersion = ref('0.3.3');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -1011,11 +1011,51 @@
                 const manageSortOrder = ref('asc');   // asc, desc
                 const manageSelected = ref(new Set());
                 const manageConfirmDelete = ref(false);
+                // 進階篩選
+                const manageShowFilters = ref(false);
+                const manageType = ref('all');       // all, general(一般), combo(組合)
+                const manageDateMode = ref('off');   // off, range(區間內), before(早於門檻)
+                const manageDateStart = ref('');
+                const manageDateEnd = ref('');
+                const manageBeforeDate = ref('');     // before 模式的門檻日(最近使用日早於此)
+                const manageCountMin = ref('');
+                const manageCountMax = ref('');
+
+                const daysAgo = (n) => { const d = new Date(); d.setDate(d.getDate() - n); return formatDate(d); };
+                const setManageRangePreset = (type) => {
+                    manageDateMode.value = 'range';
+                    const now = new Date();
+                    if (type === 'week') { manageDateStart.value = daysAgo(6); manageDateEnd.value = formatDate(now); }
+                    else if (type === 'month') { manageDateStart.value = daysAgo(29); manageDateEnd.value = formatDate(now); }
+                    else if (type === 'halfYear') { manageDateStart.value = daysAgo(182); manageDateEnd.value = formatDate(now); }
+                    else if (type === 'thisMonth') { manageDateStart.value = formatDate(new Date(now.getFullYear(), now.getMonth(), 1)); manageDateEnd.value = formatDate(now); }
+                    else if (type === 'lastMonth') { manageDateStart.value = formatDate(new Date(now.getFullYear(), now.getMonth() - 1, 1)); manageDateEnd.value = formatDate(new Date(now.getFullYear(), now.getMonth(), 0)); }
+                };
+                const setManageBeforePreset = (days) => {
+                    manageDateMode.value = 'before';
+                    manageBeforeDate.value = daysAgo(days);
+                };
+                const clearManageFilters = () => {
+                    manageType.value = 'all';
+                    manageDateMode.value = 'off';
+                    manageDateStart.value = ''; manageDateEnd.value = ''; manageBeforeDate.value = '';
+                    manageCountMin.value = ''; manageCountMax.value = '';
+                };
+                const manageFilterCount = computed(() => {
+                    let n = 0;
+                    if (manageType.value !== 'all') n++;
+                    if (manageDateMode.value === 'range' && (manageDateStart.value || manageDateEnd.value)) n++;
+                    if (manageDateMode.value === 'before' && manageBeforeDate.value) n++;
+                    if (manageCountMin.value !== '' || manageCountMax.value !== '') n++;
+                    return n;
+                });
 
                 const openManage = async () => {
                     manageSelected.value = new Set();
                     manageSearch.value = '';
                     manageConfirmDelete.value = false;
+                    manageShowFilters.value = false;
+                    clearManageFilters();
                     showManage.value = true;
                     await recalcCounts(); // 開面板時掃一次,補齊 first/last 使用日
                 };
@@ -1038,6 +1078,25 @@
                         const term = manageSearch.value.toLowerCase().trim();
                         list = list.filter(m => m.name.toLowerCase().includes(term));
                     }
+
+                    // 類型：一般(無品項) / 組合(有品項)
+                    if (manageType.value === 'general') list = list.filter(m => !m.items || m.items.length === 0);
+                    else if (manageType.value === 'combo') list = list.filter(m => m.items && m.items.length > 0);
+
+                    // 日期(最近使用日)
+                    if (manageDateMode.value === 'range' && (manageDateStart.value || manageDateEnd.value)) {
+                        list = list.filter(m => m.lastUsed
+                            && (!manageDateStart.value || m.lastUsed >= manageDateStart.value)
+                            && (!manageDateEnd.value || m.lastUsed <= manageDateEnd.value));
+                    } else if (manageDateMode.value === 'before' && manageBeforeDate.value) {
+                        // 最近使用日早於門檻(含從未使用者)
+                        list = list.filter(m => !m.lastUsed || m.lastUsed < manageBeforeDate.value);
+                    }
+
+                    // 次數範圍
+                    const cmin = manageCountMin.value, cmax = manageCountMax.value;
+                    if (cmin !== '' && !isNaN(cmin)) list = list.filter(m => m.count >= Number(cmin));
+                    if (cmax !== '' && !isNaN(cmax)) list = list.filter(m => m.count <= Number(cmax));
 
                     const by = manageSortBy.value;
                     const dir = manageSortOrder.value === 'asc' ? 1 : -1;
@@ -1393,6 +1452,9 @@
                     showManage, openManage, closeManage, manageSearch, manageSortBy, manageSortOrder,
                     manageSelected, manageConfirmDelete, manageList, manageAllSelected,
                     toggleManageSelect, toggleManageSelectAll, executeManageDelete,
+                    manageShowFilters, manageType, manageDateMode, manageDateStart, manageDateEnd,
+                    manageBeforeDate, manageCountMin, manageCountMax, manageFilterCount,
+                    setManageRangePreset, setManageBeforePreset, clearManageFilters,
                     openSettings, saveSettings,
                     addItem, removeItem, updateTotalsFromItems,
                     activeSuggestItem, itemSuggestions, applyItemSuggestion, itemSuggestPage, suggestPageCount, pagedSuggestions,

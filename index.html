@@ -1016,6 +1016,13 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                     </div>
+                    <!-- 類型切換 -->
+                    <div class="flex gap-1.5 p-1 bg-page rounded-card border border-line">
+                        <button v-for="t in [{k:'all',l:'全部'},{k:'general',l:'一般餐點'},{k:'combo',l:'組合餐點'}]" :key="t.k"
+                            @click="manageType = t.k"
+                            :class="manageType === t.k ? 'bg-surface text-brand shadow-sm' : 'text-muted hover:text-ink'"
+                            class="flex-1 py-2 rounded-control text-xs font-black tracking-wide transition-all">{{ t.l }}</button>
+                    </div>
                     <div class="flex items-center gap-2">
                         <select v-model="manageSortBy"
                             class="flex-1 pl-3 pr-8 py-2.5 bg-page border border-line rounded-control text-xs font-black text-muted outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand transition-all cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%2364748b%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1rem_1rem] bg-[right_0.5rem_center] bg-no-repeat">
@@ -1037,7 +1044,66 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 8l4 4m0 0l4-4m-4 4V8" />
                             </svg>
                         </button>
+                        <button @click="manageShowFilters = !manageShowFilters"
+                            class="h-10 px-3 flex items-center gap-1.5 border rounded-control text-xs font-black transition-all active:scale-95 shrink-0"
+                            :class="manageShowFilters || manageFilterCount > 0 ? 'bg-brand-soft border-brand/30 text-brand' : 'bg-page border-line text-muted hover:text-brand'">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h18M6 8h12M9 12h6m-4 4h2" /></svg>
+                            篩選<span v-if="manageFilterCount > 0" class="ml-0.5">({{ manageFilterCount }})</span>
+                        </button>
                     </div>
+
+                    <!-- 進階篩選面板 -->
+                    <div v-if="manageShowFilters" class="bg-page border border-line rounded-card p-3 space-y-3">
+                        <!-- 日期(最近使用) -->
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[10px] font-black text-muted uppercase tracking-widest">最近使用日</span>
+                                <div class="flex gap-1">
+                                    <button v-for="m in [{k:'off',l:'不限'},{k:'range',l:'區間內'},{k:'before',l:'早於'}]" :key="m.k"
+                                        @click="manageDateMode = m.k"
+                                        :class="manageDateMode === m.k ? 'bg-brand text-white' : 'bg-surface text-muted border border-line'"
+                                        class="px-2.5 py-1 rounded-chip text-[11px] font-black transition-all">{{ m.l }}</button>
+                                </div>
+                            </div>
+                            <!-- 區間內 -->
+                            <div v-if="manageDateMode === 'range'" class="space-y-2">
+                                <div class="flex flex-wrap gap-1.5">
+                                    <button v-for="p in [{k:'week',l:'近一週'},{k:'month',l:'近一月'},{k:'halfYear',l:'近半年'},{k:'thisMonth',l:'本月'},{k:'lastMonth',l:'上月'}]" :key="p.k"
+                                        @click="setManageRangePreset(p.k)"
+                                        class="px-2.5 py-1 rounded-chip text-[11px] font-black bg-surface border border-line text-muted hover:text-brand hover:border-brand/30 transition-all">{{ p.l }}</button>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <input type="date" v-model="manageDateStart" class="flex-1 min-w-0 px-2 py-2 bg-surface border border-line rounded-control text-xs font-bold text-ink outline-none focus:border-brand">
+                                    <span class="text-muted text-xs font-bold">~</span>
+                                    <input type="date" v-model="manageDateEnd" class="flex-1 min-w-0 px-2 py-2 bg-surface border border-line rounded-control text-xs font-bold text-ink outline-none focus:border-brand">
+                                </div>
+                            </div>
+                            <!-- 早於門檻 -->
+                            <div v-else-if="manageDateMode === 'before'" class="space-y-2">
+                                <div class="flex flex-wrap gap-1.5">
+                                    <button v-for="p in [{d:7,l:'超過一週沒用'},{d:30,l:'超過一月'},{d:183,l:'超過半年'},{d:365,l:'超過一年'}]" :key="p.d"
+                                        @click="setManageBeforePreset(p.d)"
+                                        class="px-2.5 py-1 rounded-chip text-[11px] font-black bg-surface border border-line text-muted hover:text-brand hover:border-brand/30 transition-all">{{ p.l }}</button>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[11px] font-bold text-muted shrink-0">最近使用早於</span>
+                                    <input type="date" v-model="manageBeforeDate" class="flex-1 min-w-0 px-2 py-2 bg-surface border border-line rounded-control text-xs font-bold text-ink outline-none focus:border-brand">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 次數範圍 -->
+                        <div>
+                            <span class="text-[10px] font-black text-muted uppercase tracking-widest">使用次數範圍</span>
+                            <div class="flex items-center gap-2 mt-2">
+                                <input type="number" min="0" v-model="manageCountMin" @keydown="onlyNumber" placeholder="最少" class="flex-1 min-w-0 px-3 py-2 bg-surface border border-line rounded-control text-xs font-bold text-ink outline-none focus:border-brand">
+                                <span class="text-muted text-xs font-bold">~</span>
+                                <input type="number" min="0" v-model="manageCountMax" @keydown="onlyNumber" placeholder="最多" class="flex-1 min-w-0 px-3 py-2 bg-surface border border-line rounded-control text-xs font-bold text-ink outline-none focus:border-brand">
+                            </div>
+                        </div>
+                        <button v-if="manageFilterCount > 0" @click="clearManageFilters()"
+                            class="w-full py-2 rounded-control text-[11px] font-black text-muted bg-surface border border-line hover:text-rose-500 transition-all uppercase tracking-widest">清除所有篩選</button>
+                    </div>
+
                     <!-- 全選列 -->
                     <div class="flex items-center justify-between px-1">
                         <button @click="toggleManageSelectAll()" class="flex items-center gap-2 text-xs font-black text-muted hover:text-brand transition-colors">
@@ -1769,7 +1835,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.3.2"></script>
+    <script type="module" src="app.js?v=0.3.3"></script>
 </body>
 
 </html>
