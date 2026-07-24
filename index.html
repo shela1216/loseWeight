@@ -411,11 +411,11 @@
                                 class="premium-card-sub p-5 sm:p-8">
                                 <!-- 分類卡頭：餐別 + 熱量小計 + 新增 -->
                                 <div class="flex items-center gap-3 mb-5 px-1">
-                                    <span class="w-2 h-7 rounded-full"
-                                        :style="{ backgroundColor: {breakfast:'#6366f1', lunch:'#8b5cf6', dinner:'#3b82f6', snack:'#ec4899'}[typeObj.key] }"></span>
+                                    <div class="w-11 h-11 rounded-full flex items-center justify-center text-xl shrink-0"
+                                        :style="{ backgroundColor: {breakfast:'#6366f1', lunch:'#8b5cf6', dinner:'#3b82f6', snack:'#ec4899'}[typeObj.key] + '22' }">{{ typeObj.icon }}</div>
                                     <div class="min-w-0">
                                         <h4 class="text-base sm:text-lg font-black tracking-wider uppercase leading-none">
-                                            {{ typeObj.label }}</h4>
+                                            {{ typeObj.name }}</h4>
                                         <p class="text-[11px] font-bold text-muted mt-1">{{
                                             formatFloat(getTypeCalories(typeObj.key)) }} <span class="uppercase tracking-widest">cal</span></p>
                                     </div>
@@ -1639,7 +1639,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.2.2"></script>
+    <script type="module" src="app.js?v=0.2.3"></script>
 </body>
 
 </html>

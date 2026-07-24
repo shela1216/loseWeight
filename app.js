@@ -50,7 +50,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.2.2');
+                console.log('App initialization starting... v0.2.3');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -335,7 +335,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.2.2');
+                const appVersion = ref('0.2.3');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -804,10 +804,10 @@
                 };
 
                 const mealTypes = [
-                    { key: 'breakfast', label: '🌅 早餐' },
-                    { key: 'lunch', label: '☀️ 午餐' },
-                    { key: 'dinner', label: '🌙 晚餐' },
-                    { key: 'snack', label: '🍰 點心' }
+                    { key: 'breakfast', icon: '🌅', name: '早餐', label: '🌅 早餐' },
+                    { key: 'lunch', icon: '☀️', name: '午餐', label: '☀️ 午餐' },
+                    { key: 'dinner', icon: '🌙', name: '晚餐', label: '🌙 晚餐' },
+                    { key: 'snack', icon: '🍰', name: '點心', label: '🍰 點心' }
                 ];
 
                 const getMealsByType = (type) => {
