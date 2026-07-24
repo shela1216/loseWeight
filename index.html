@@ -851,6 +851,9 @@
                             快速選取餐點並管理</p>
                     </div>
                     <div class="flex items-center gap-2">
+                        <button @click="openManage()"
+                            class="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-control bg-page text-muted hover:bg-brand-soft hover:text-brand transition-colors"
+                            title="管理與批次刪除餐點">管理</button>
                         <button @click="recalcCounts" :disabled="isRecalculating"
                             class="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-control bg-page text-muted hover:bg-brand-soft hover:text-brand transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             title="從所有歷史紀錄重新計算使用次數">
@@ -985,6 +988,123 @@
                 </div>
             </div>
         </div>
+
+        <!-- 餐點資料庫管理面板 (批次刪除 + 篩選排序) -->
+        <div v-if="showManage" class="fixed inset-0 z-[120] flex items-center justify-center p-4">
+            <div class="modal-overlay absolute inset-0" @click="closeManage()"></div>
+            <div class="bg-surface w-full max-w-lg rounded-panel p-6 sm:p-8 relative z-10 shadow-2xl flex flex-col max-h-[88vh] border border-line">
+                <!-- Header -->
+                <div class="flex justify-between items-center mb-5 px-1 shrink-0">
+                    <div>
+                        <h3 class="text-2xl font-black text-ink tracking-tight">資料庫管理</h3>
+                        <p class="text-[10px] sm:text-xs text-muted font-bold uppercase tracking-widest mt-1">篩選、排序與批次刪除</p>
+                    </div>
+                    <button @click="closeManage()"
+                        class="w-10 h-10 flex items-center justify-center bg-page rounded-control text-muted hover:text-ink transition-colors"><svg
+                            class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path d="M6 18L18 6M6 6l12 12"></path>
+                        </svg></button>
+                </div>
+
+                <!-- 工具列：搜尋 + 排序 -->
+                <div class="flex flex-col gap-3 mb-3 shrink-0">
+                    <div class="relative">
+                        <input type="text" v-model="manageSearch"
+                            class="w-full pl-11 pr-4 py-3 bg-page border border-line rounded-control text-sm font-bold outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand focus:bg-surface transition-all"
+                            placeholder="搜尋餐點名稱...">
+                        <svg class="w-5 h-5 text-muted opacity-60 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <select v-model="manageSortBy"
+                            class="flex-1 pl-3 pr-8 py-2.5 bg-page border border-line rounded-control text-xs font-black text-muted outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand transition-all cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%2364748b%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1rem_1rem] bg-[right_0.5rem_center] bg-no-repeat">
+                            <option value="lastUsed">最近使用</option>
+                            <option value="firstUsed">最早使用</option>
+                            <option value="count">使用次數</option>
+                            <option value="calories">熱量</option>
+                            <option value="carbs">碳水</option>
+                            <option value="protein">蛋白</option>
+                            <option value="fat">脂肪</option>
+                        </select>
+                        <button @click="manageSortOrder = manageSortOrder === 'desc' ? 'asc' : 'desc'"
+                            class="w-10 h-10 flex items-center justify-center bg-page border border-line rounded-control text-muted hover:text-brand hover:bg-brand-soft transition-all active:scale-90 shrink-0"
+                            :title="manageSortOrder === 'desc' ? '由高到低 / 由新到舊' : '由低到高 / 由舊到新'">
+                            <svg v-if="manageSortOrder === 'desc'" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                            </svg>
+                            <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 8l4 4m0 0l4-4m-4 4V8" />
+                            </svg>
+                        </button>
+                    </div>
+                    <!-- 全選列 -->
+                    <div class="flex items-center justify-between px-1">
+                        <button @click="toggleManageSelectAll()" class="flex items-center gap-2 text-xs font-black text-muted hover:text-brand transition-colors">
+                            <span class="w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all"
+                                :class="manageAllSelected ? 'bg-brand border-brand text-white' : 'border-line'">
+                                <svg v-if="manageAllSelected" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            </span>
+                            {{ manageAllSelected ? '取消全選' : '全選' }}
+                        </button>
+                        <span class="text-[11px] font-bold text-muted">共 {{ manageList.length }} 項</span>
+                    </div>
+                </div>
+
+                <!-- 清單 -->
+                <div class="flex-1 overflow-y-auto overflow-x-hidden custom-scroll space-y-2 pb-2">
+                    <div v-for="m in manageList" :key="m.key" @click="toggleManageSelect(m.key)"
+                        class="p-3 sm:p-4 border rounded-card cursor-pointer flex items-center gap-3 transition-all active:scale-[0.99]"
+                        :class="manageSelected.has(m.key) ? 'bg-brand-soft border-brand/40' : 'bg-surface border-line hover:border-brand/20'">
+                        <span class="w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all"
+                            :class="manageSelected.has(m.key) ? 'bg-brand border-brand text-white' : 'border-line'">
+                            <svg v-if="manageSelected.has(m.key)" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                        </span>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="font-semibold text-ink text-sm break-words min-w-0">{{ m.name }}</span>
+                                <span class="text-[9px] font-bold bg-line text-muted px-1.5 py-0.5 rounded-chip shrink-0 whitespace-nowrap">{{ m.count }} 次</span>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[10px] font-bold text-muted">
+                                <span>{{ formatFloat(m.calories) }} kcal</span>
+                                <span v-if="m.lastUsed">最近 {{ m.lastUsed }}</span>
+                                <span v-if="m.firstUsed">最早 {{ m.firstUsed }}</span>
+                                <span v-if="!m.lastUsed && !m.firstUsed" class="opacity-50">尚無使用紀錄</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="isRecalculating" class="py-10 text-center text-xs font-bold text-muted uppercase tracking-widest">掃描使用紀錄中...</div>
+                    <div v-else-if="manageList.length === 0" class="py-10 text-center text-xs font-bold text-muted uppercase tracking-widest">
+                        {{ manageSearch ? '找不到相符餐點' : '尚無紀錄' }}
+                    </div>
+                </div>
+
+                <!-- 底部：批次刪除 -->
+                <div class="shrink-0 pt-3 border-t border-line mt-1">
+                    <button @click="manageConfirmDelete = true" :disabled="manageSelected.size === 0"
+                        class="w-full py-3 rounded-control font-black text-sm bg-rose-500 text-white hover:bg-rose-600 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100">
+                        刪除選取 ({{ manageSelected.size }})
+                    </button>
+                </div>
+
+                <!-- 確認刪除 overlay -->
+                <div v-if="manageConfirmDelete" class="absolute inset-0 z-20 flex items-center justify-center p-4">
+                    <div class="modal-overlay absolute inset-0 rounded-panel" @click="manageConfirmDelete = false"></div>
+                    <div class="bg-surface w-full max-w-xs rounded-panel p-6 relative z-10 shadow-2xl border border-line text-center">
+                        <div class="w-14 h-14 bg-rose-50 rounded-panel flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-7 h-7 text-rose-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </div>
+                        <h4 class="text-lg font-black text-ink mb-2">刪除 {{ manageSelected.size }} 筆餐點?</h4>
+                        <p class="text-xs text-muted mb-6 leading-relaxed">此動作無法復原，僅刪除資料庫中的紀錄，不影響已記錄的餐點。</p>
+                        <div class="flex gap-3">
+                            <button @click="manageConfirmDelete = false" class="flex-1 py-2.5 rounded-control text-xs font-black text-muted bg-page hover:bg-line transition-all uppercase tracking-widest">取消</button>
+                            <button @click="executeManageDelete()" class="flex-1 py-2.5 rounded-control text-xs font-black text-white bg-rose-500 hover:bg-rose-600 active:scale-95 transition-all uppercase tracking-widest">刪除</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- 彈出視窗：設定與目標計算 (方案B：步驟式介面) -->
         <Teleport to="body">
         <div v-if="showSettings" class="fixed inset-0 z-[150] flex items-center justify-center p-4">
@@ -1649,7 +1769,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.2.4"></script>
+    <script type="module" src="app.js?v=0.3.0"></script>
 </body>
 
 </html>

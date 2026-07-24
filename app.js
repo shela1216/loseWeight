@@ -50,7 +50,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.2.4');
+                console.log('App initialization starting... v0.3.0');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -335,7 +335,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.2.4');
+                const appVersion = ref('0.3.0');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -658,6 +658,8 @@
                         const k = newMeal.name.toLowerCase().trim();
                         if (templates[k]) {
                             templates[k].count = (templates[k].count || 0) + 1;
+                            templates[k].lastUsed = selectedDate.value;
+                            if (!templates[k].firstUsed) templates[k].firstUsed = selectedDate.value;
                         }
                         saveData();
                     }
@@ -971,13 +973,20 @@
                         const allRecordsRef = collection(db, 'artifacts', appId, 'users', user.value.uid, 'dailyRecords');
                         const snap = await getDocs(allRecordsRef);
                         const counts = new Map();
+                        const first = new Map(); // 最早使用日
+                        const last = new Map();  // 最近使用日
                         snap.forEach(docSnap => {
                             const day = docSnap.data();
+                            const date = day.date || docSnap.id;
                             if (day.meals) {
                                 day.meals.forEach(m => {
                                     if (m.name) {
                                         const k = m.name.toLowerCase().trim();
                                         counts.set(k, (counts.get(k) || 0) + 1);
+                                        if (date) {
+                                            if (!first.has(k) || date < first.get(k)) first.set(k, date);
+                                            if (!last.has(k) || date > last.get(k)) last.set(k, date);
+                                        }
                                     }
                                 });
                             }
@@ -985,12 +994,84 @@
                         Object.keys(templates).forEach(k => {
                             if (templates[k]) {
                                 templates[k].count = counts.get(k) || 0;
+                                templates[k].firstUsed = first.get(k) || null;
+                                templates[k].lastUsed = last.get(k) || null;
                             }
                         });
                         saveData();
                     } finally {
                         isRecalculating.value = false;
                     }
+                };
+
+                // ===== 餐點資料庫管理面板 =====
+                const showManage = ref(false);
+                const manageSearch = ref('');
+                const manageSortBy = ref('lastUsed'); // count, firstUsed, lastUsed, calories, carbs, protein, fat
+                const manageSortOrder = ref('asc');   // asc, desc
+                const manageSelected = ref(new Set());
+                const manageConfirmDelete = ref(false);
+
+                const openManage = async () => {
+                    manageSelected.value = new Set();
+                    manageSearch.value = '';
+                    manageConfirmDelete.value = false;
+                    showManage.value = true;
+                    await recalcCounts(); // 開面板時掃一次,補齊 first/last 使用日
+                };
+                const closeManage = () => {
+                    showManage.value = false;
+                    manageConfirmDelete.value = false;
+                };
+                const toggleManageSelect = (key) => {
+                    const s = new Set(manageSelected.value);
+                    if (s.has(key)) s.delete(key); else s.add(key);
+                    manageSelected.value = s;
+                };
+
+                const manageList = computed(() => {
+                    let list = Object.entries(templates)
+                        .filter(([, t]) => t && t.name)
+                        .map(([key, t]) => ({ key, ...t, count: Number(t.count) || 0 }));
+
+                    if (manageSearch.value) {
+                        const term = manageSearch.value.toLowerCase().trim();
+                        list = list.filter(m => m.name.toLowerCase().includes(term));
+                    }
+
+                    const by = manageSortBy.value;
+                    const dir = manageSortOrder.value === 'asc' ? 1 : -1;
+                    const dateKeys = { firstUsed: 1, lastUsed: 1 };
+                    list.sort((a, b) => {
+                        if (dateKeys[by]) {
+                            // 無日期者一律排最後(不論升降)
+                            const av = a[by], bv = b[by];
+                            if (!av && !bv) return 0;
+                            if (!av) return 1;
+                            if (!bv) return -1;
+                            return av < bv ? -dir : av > bv ? dir : 0;
+                        }
+                        return ((Number(a[by]) || 0) - (Number(b[by]) || 0)) * dir;
+                    });
+                    return list;
+                });
+
+                const manageAllSelected = computed(() =>
+                    manageList.value.length > 0 && manageList.value.every(m => manageSelected.value.has(m.key)));
+
+                const toggleManageSelectAll = () => {
+                    if (manageAllSelected.value) {
+                        manageSelected.value = new Set();
+                    } else {
+                        manageSelected.value = new Set(manageList.value.map(m => m.key));
+                    }
+                };
+
+                const executeManageDelete = () => {
+                    manageSelected.value.forEach(key => { delete templates[key]; });
+                    manageSelected.value = new Set();
+                    manageConfirmDelete.value = false;
+                    saveData();
                 };
 
                 const saveData = () => {
@@ -1119,6 +1200,8 @@
                         // 只有在「新增」餐點時，才增加使用次數
                         if (isAddingMeal.value && templates[k]) {
                             templates[k].count = (templates[k].count || 0) + 1;
+                            templates[k].lastUsed = selectedDate.value;
+                            if (!templates[k].firstUsed) templates[k].firstUsed = selectedDate.value;
                         }
                     }
                     if (editingIndex.value !== null) {
@@ -1307,6 +1390,9 @@
                         }
                     },
                     setPlanType, autoCalculatePlans, exportCSV, saveData, recalcCounts, isRecalculating,
+                    showManage, openManage, closeManage, manageSearch, manageSortBy, manageSortOrder,
+                    manageSelected, manageConfirmDelete, manageList, manageAllSelected,
+                    toggleManageSelect, toggleManageSelectAll, executeManageDelete,
                     openSettings, saveSettings,
                     addItem, removeItem, updateTotalsFromItems,
                     activeSuggestItem, itemSuggestions, applyItemSuggestion, itemSuggestPage, suggestPageCount, pagedSuggestions,
