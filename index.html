@@ -908,15 +908,6 @@
                         </button>
                     </div>
 
-                    <!-- 加入到哪一餐 (僅加到當日時顯示) -->
-                    <div v-if="historyPickMode === null" class="flex items-center gap-2">
-                        <span class="text-[10px] font-black text-muted uppercase tracking-widest shrink-0">加到</span>
-                        <div class="flex gap-1.5 p-1 bg-page rounded-card border border-line flex-1">
-                            <button v-for="t in mealTypes" :key="t.key" @click="historyMealType = t.key"
-                                :class="historyMealType === t.key ? 'bg-surface text-brand shadow-sm' : 'text-muted hover:text-ink'"
-                                class="flex-1 py-2 rounded-control text-xs font-black tracking-wide transition-all">{{ t.label }}</button>
-                        </div>
-                    </div>
                 </div>
 
                 <div v-if="historySortBy === 'recommend'" class="px-2 mb-3 shrink-0">
@@ -926,7 +917,7 @@
                 <div class="flex-1 overflow-y-auto overflow-x-hidden custom-scroll space-y-4 px-2 pb-4" @scroll="handleHistoryScroll">
                     <div v-for="item in visibleMealHistory" :key="item.name"
                         class="p-4 sm:p-5 bg-surface border border-line rounded-card hover:bg-brand-soft hover:border-brand/20 cursor-pointer flex justify-between items-center transition-all group active:scale-[0.98] overflow-hidden">
-                        <div class="flex-1 mr-3 min-w-0" @click="addFromHistory(item)">
+                        <div class="flex-1 mr-3 min-w-0" @click="chooseHistoryMeal(item)">
                             <div class="flex items-center gap-3 mb-2 min-w-0">
                                 <span class="font-semibold text-ink text-base break-words">{{ item.name }}</span>
                                 <span
@@ -971,6 +962,25 @@
                         <p class="text-muted text-sm font-bold uppercase tracking-widest">
                             {{ historySearch ? '找不到相符餐點' : '尚無紀錄' }}
                         </p>
+                    </div>
+                </div>
+
+                <!-- 選擇餐別面板：點餐點後跳出確認 -->
+                <div v-if="pendingHistoryMeal" class="absolute inset-0 z-20 flex items-end sm:items-center justify-center p-4">
+                    <div class="modal-overlay absolute inset-0 rounded-panel" @click="pendingHistoryMeal = null"></div>
+                    <div class="bg-surface w-full max-w-sm rounded-panel p-6 relative z-10 shadow-2xl border border-line">
+                        <p class="text-[10px] font-black text-muted uppercase tracking-widest mb-1">加入到哪一餐</p>
+                        <h4 class="text-lg font-black text-ink mb-5 break-words leading-snug">{{ pendingHistoryMeal.name }}</h4>
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <button v-for="t in mealTypes" :key="t.key" @click="confirmHistoryMealType(t.key)"
+                                class="flex items-center gap-3 p-3 rounded-card border border-line bg-page hover:border-brand hover:bg-brand-soft active:scale-95 transition-all">
+                                <span class="w-9 h-9 rounded-full flex items-center justify-center text-lg shrink-0"
+                                    :style="{ backgroundColor: {breakfast:'#6366f1', lunch:'#8b5cf6', dinner:'#3b82f6', snack:'#ec4899'}[t.key] + '22' }">{{ t.icon }}</span>
+                                <span class="text-sm font-black text-ink">{{ t.name }}</span>
+                            </button>
+                        </div>
+                        <button @click="pendingHistoryMeal = null"
+                            class="w-full py-2.5 rounded-control text-xs font-black text-muted hover:text-ink bg-page hover:bg-line transition-all uppercase tracking-widest">取消</button>
                     </div>
                 </div>
             </div>
@@ -1639,7 +1649,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.2.3"></script>
+    <script type="module" src="app.js?v=0.2.4"></script>
 </body>
 
 </html>

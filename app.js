@@ -50,7 +50,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.2.3');
+                console.log('App initialization starting... v0.2.4');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -335,7 +335,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.2.3');
+                const appVersion = ref('0.2.4');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -592,9 +592,11 @@
 
                 const historyPickMode = ref(null); // null=加到當日;數字=填回組合品項 index
                 const historyMealType = ref('lunch'); // 從資料庫加到當日時要放入的餐別
+                const pendingHistoryMeal = ref(null); // 待選餐別的資料庫餐點(點擊後跳出選擇面板)
                 const openHistory = (pickIdx = null) => {
                     historyPickMode.value = pickIdx;
                     historyMealType.value = 'lunch';
+                    pendingHistoryMeal.value = null;
                     historySortBy.value = 'recommend';
                     historySortOrder.value = 'desc'; // 推薦排序需由高到低,避免沿用上次的 asc
                     if (pickIdx !== null) historyTab.value = 'general'; // 挑入組合品項時只列一般餐點
@@ -602,7 +604,23 @@
                 };
                 const closeHistory = () => {
                     historyPickMode.value = null;
+                    pendingHistoryMeal.value = null;
                     showHistory.value = false;
+                };
+
+                // 點擊資料庫餐點:挑入組合品項/編輯替換維持立即行為;加到當日則先跳出選餐別面板
+                const chooseHistoryMeal = (meal) => {
+                    if (historyPickMode.value !== null || editingIndex.value !== null) {
+                        addFromHistory(meal);
+                        return;
+                    }
+                    pendingHistoryMeal.value = meal;
+                };
+                const confirmHistoryMealType = (type) => {
+                    if (!pendingHistoryMeal.value) return;
+                    historyMealType.value = type;
+                    addFromHistory(pendingHistoryMeal.value);
+                    pendingHistoryMeal.value = null;
                 };
                 const addFromHistory = (meal) => {
                     if (historyPickMode.value !== null) {
@@ -1178,7 +1196,7 @@
                     appVersion, skipHistorySave,
                     isDark, toggleTheme,
                     initialized, user, saving, showSettings, showHistory, showMonthPicker, historySearch, historySortBy, historySortOrder, historyTab, selectedDate, pickerMonth, loginEmail, loginPassword,
-                    openHistory, closeHistory, historyPickMode, historyMealType, priorityNutrient, priorityNutrientLabel,
+                    openHistory, closeHistory, historyPickMode, pendingHistoryMeal, chooseHistoryMeal, confirmHistoryMealType, priorityNutrient, priorityNutrientLabel,
                     editingIndex, isAddingMeal, mealToDelete, historyToDelete, nutrientKeys, profile, plans, tempPlans, allData, mealHistory, visibleMealHistory, handleHistoryScroll, editingMeal, showSyncModal, templates,
                     currentMonthYearDisplay, calculatedTDEE, formatNum, formatFloat, scaleNutrients, lastAmount, prepareScale, onlyNumber,
                     settingsStep, setCalorieCenter, setNutrientCenter,
