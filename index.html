@@ -843,7 +843,7 @@
         <div v-if="showHistory" class="fixed inset-0 z-[110] flex items-center justify-center p-4">
             <div class="modal-overlay absolute inset-0" @click="closeHistory()"></div>
             <div
-                class="bg-surface w-full max-w-lg rounded-panel p-8 relative z-10 shadow-2xl flex flex-col max-h-[85vh] border border-line">
+                class="bg-surface w-full max-w-lg lg:max-w-4xl rounded-panel p-8 relative z-10 shadow-2xl flex flex-col max-h-[85vh] border border-line overflow-hidden">
                 <div class="flex justify-between items-center mb-8 px-2 shrink-0">
                     <div>
                         <h3 class="text-2xl font-black text-ink tracking-tight">食物資料庫</h3>
@@ -917,7 +917,7 @@
                     <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-chip inline-block">{{ priorityNutrientLabel }}</span>
                 </div>
 
-                <div class="flex-1 overflow-y-auto overflow-x-hidden custom-scroll space-y-4 px-2 pb-4" @scroll="handleHistoryScroll">
+                <div class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden custom-scroll grid grid-cols-1 lg:grid-cols-2 gap-3 content-start px-2 pb-4" @scroll="handleHistoryScroll">
                     <div v-for="item in visibleMealHistory" :key="item.name"
                         class="p-4 sm:p-5 bg-surface border border-line rounded-card hover:bg-brand-soft hover:border-brand/20 cursor-pointer flex justify-between items-center transition-all group active:scale-[0.98] overflow-hidden">
                         <div class="flex-1 mr-3 min-w-0" @click="chooseHistoryMeal(item)">
@@ -992,7 +992,7 @@
         <!-- 餐點資料庫管理面板 (批次刪除 + 篩選排序) -->
         <div v-if="showManage" class="fixed inset-0 z-[120] flex items-center justify-center p-4">
             <div class="modal-overlay absolute inset-0" @click="closeManage()"></div>
-            <div class="bg-surface w-full max-w-lg rounded-panel p-6 sm:p-8 relative z-10 shadow-2xl flex flex-col max-h-[88vh] border border-line">
+            <div class="bg-surface w-full max-w-lg lg:max-w-4xl rounded-panel p-6 sm:p-8 relative z-10 shadow-2xl flex flex-col max-h-[88vh] border border-line overflow-hidden">
                 <!-- Header -->
                 <div class="flex justify-between items-center mb-5 px-1 shrink-0">
                     <div>
@@ -1052,7 +1052,7 @@
                 </div>
 
                 <!-- 清單 -->
-                <div class="flex-1 overflow-y-auto overflow-x-hidden custom-scroll space-y-2 pb-2">
+                <div class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden custom-scroll grid grid-cols-1 lg:grid-cols-2 gap-2 content-start pb-2">
                     <div v-for="m in manageList" :key="m.key" @click="toggleManageSelect(m.key)"
                         class="p-3 sm:p-4 border rounded-card cursor-pointer flex items-center gap-3 transition-all active:scale-[0.99]"
                         :class="manageSelected.has(m.key) ? 'bg-brand-soft border-brand/40' : 'bg-surface border-line hover:border-brand/20'">
@@ -1769,7 +1769,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.3.0"></script>
+    <script type="module" src="app.js?v=0.3.1"></script>
 </body>
 
 </html>
