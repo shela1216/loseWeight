@@ -50,7 +50,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.3.3');
+                console.log('App initialization starting... v0.3.4');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -335,7 +335,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.3.3');
+                const appVersion = ref('0.3.4');
                 const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -593,6 +593,7 @@
                 const historyPickMode = ref(null); // null=加到當日;數字=填回組合品項 index
                 const historyMealType = ref('lunch'); // 從資料庫加到當日時要放入的餐別
                 const pendingHistoryMeal = ref(null); // 待選餐別的資料庫餐點(點擊後跳出選擇面板)
+                const pendingAmount = ref(1); // 選餐別面板中可調整的份量,加入時按比例縮放營養素
                 const openHistory = (pickIdx = null) => {
                     historyPickMode.value = pickIdx;
                     historyMealType.value = 'lunch';
@@ -615,11 +616,34 @@
                         return;
                     }
                     pendingHistoryMeal.value = meal;
+                    pendingAmount.value = Number(meal.amount) > 0 ? Number(meal.amount) : 1;
                 };
+
+                // 面板中調整份量:以資料庫原始份量為基準等比縮放營養素
+                const pendingAmountValid = computed(() => {
+                    const a = Number(pendingAmount.value);
+                    return Number.isFinite(a) && a > 0;
+                });
+                const pendingScaled = computed(() => {
+                    const m = pendingHistoryMeal.value;
+                    if (!m) return null;
+                    const base = Number(m.amount) > 0 ? Number(m.amount) : 1;
+                    const ratio = pendingAmountValid.value ? Number(pendingAmount.value) / base : 0;
+                    return {
+                        calories: formatFloat((Number(m.calories) || 0) * ratio),
+                        carbs: formatFloat((Number(m.carbs) || 0) * ratio),
+                        protein: formatFloat((Number(m.protein) || 0) * ratio),
+                        fat: formatFloat((Number(m.fat) || 0) * ratio)
+                    };
+                });
                 const confirmHistoryMealType = (type) => {
-                    if (!pendingHistoryMeal.value) return;
+                    if (!pendingHistoryMeal.value || !pendingAmountValid.value) return;
                     historyMealType.value = type;
-                    addFromHistory(pendingHistoryMeal.value);
+                    addFromHistory(Object.assign(
+                        JSON.parse(JSON.stringify(pendingHistoryMeal.value)),
+                        { amount: Number(pendingAmount.value) },
+                        pendingScaled.value
+                    ));
                     pendingHistoryMeal.value = null;
                 };
                 const addFromHistory = (meal) => {
@@ -1339,6 +1363,7 @@
                     isDark, toggleTheme,
                     initialized, user, saving, showSettings, showHistory, showMonthPicker, historySearch, historySortBy, historySortOrder, historyTab, selectedDate, pickerMonth, loginEmail, loginPassword,
                     openHistory, closeHistory, historyPickMode, pendingHistoryMeal, chooseHistoryMeal, confirmHistoryMealType, priorityNutrient, priorityNutrientLabel,
+                    pendingAmount, pendingAmountValid, pendingScaled,
                     editingIndex, isAddingMeal, mealToDelete, historyToDelete, nutrientKeys, profile, plans, tempPlans, allData, mealHistory, visibleMealHistory, handleHistoryScroll, editingMeal, showSyncModal, templates,
                     currentMonthYearDisplay, calculatedTDEE, formatNum, formatFloat, scaleNutrients, lastAmount, prepareScale, onlyNumber,
                     settingsStep, setCalorieCenter, setNutrientCenter,

@@ -973,10 +973,30 @@
                     <div class="modal-overlay absolute inset-0 rounded-panel" @click="pendingHistoryMeal = null"></div>
                     <div class="bg-surface w-full max-w-sm rounded-panel p-6 relative z-10 shadow-2xl border border-line">
                         <p class="text-[10px] font-black text-muted uppercase tracking-widest mb-1">加入到哪一餐</p>
-                        <h4 class="text-lg font-black text-ink mb-5 break-words leading-snug">{{ pendingHistoryMeal.name }}</h4>
+                        <h4 class="text-lg font-black text-ink mb-4 break-words leading-snug">{{ pendingHistoryMeal.name }}</h4>
+
+                        <!-- 份量調整：改數值會等比縮放營養素，單位沿用資料庫紀錄 -->
+                        <div class="bg-page rounded-control px-4 py-3 mb-4 border"
+                            :class="pendingAmountValid ? 'border-transparent focus-within:border-brand' : 'border-danger'">
+                            <div class="flex items-center gap-2">
+                                <label class="text-[10px] font-black text-muted uppercase tracking-widest shrink-0">份量</label>
+                                <input type="number" inputmode="decimal" v-model.number="pendingAmount" step="any" min="0"
+                                    @keypress="onlyNumber"
+                                    class="flex-1 bg-transparent text-xl font-black text-ink outline-none w-full min-w-0 text-right">
+                                <span class="text-sm font-black text-muted shrink-0">{{ pendingHistoryMeal.unit || '份' }}</span>
+                            </div>
+                            <p v-if="pendingAmountValid" class="text-[11px] font-bold text-muted mt-1.5 text-right">
+                                <span class="text-brand">{{ pendingScaled.calories }} kcal</span>
+                                · 碳 {{ pendingScaled.carbs }} · 蛋 {{ pendingScaled.protein }} · 脂 {{ pendingScaled.fat }}
+                            </p>
+                            <p v-else class="text-[11px] font-bold text-danger mt-1.5 text-right">請輸入大於 0 的份量</p>
+                        </div>
+
                         <div class="grid grid-cols-2 gap-3 mb-4">
                             <button v-for="t in mealTypes" :key="t.key" @click="confirmHistoryMealType(t.key)"
-                                class="flex items-center gap-3 p-3 rounded-card border border-line bg-page hover:border-brand hover:bg-brand-soft active:scale-95 transition-all">
+                                :disabled="!pendingAmountValid"
+                                :class="pendingAmountValid ? 'hover:border-brand hover:bg-brand-soft active:scale-95' : 'opacity-40 cursor-not-allowed'"
+                                class="flex items-center gap-3 p-3 rounded-card border border-line bg-page transition-all">
                                 <span class="w-9 h-9 rounded-full flex items-center justify-center text-lg shrink-0"
                                     :style="{ backgroundColor: {breakfast:'#6366f1', lunch:'#8b5cf6', dinner:'#3b82f6', snack:'#ec4899'}[t.key] + '22' }">{{ t.icon }}</span>
                                 <span class="text-sm font-black text-ink">{{ t.name }}</span>
@@ -1835,7 +1855,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.3.3"></script>
+    <script type="module" src="app.js?v=0.3.4"></script>
 </body>
 
 </html>
