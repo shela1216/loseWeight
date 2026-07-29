@@ -408,7 +408,9 @@
 
                         <div class="space-y-6 sm:space-y-8">
                             <div v-for="typeObj in mealTypes" :key="typeObj.key"
-                                class="premium-card-sub p-5 sm:p-8">
+                                :data-meal-type="typeObj.key"
+                                class="premium-card-sub p-5 sm:p-8 transition-all"
+                                :class="dragMeal && dragOverType === typeObj.key && dragMeal.type !== typeObj.key ? 'ring-2 ring-brand ring-offset-2 ring-offset-transparent' : ''">
                                 <!-- 分類卡頭：餐別 + 熱量小計 + 新增 -->
                                 <div class="flex items-center gap-3 mb-5 px-1">
                                     <div class="w-11 h-11 rounded-full flex items-center justify-center text-xl shrink-0"
@@ -439,7 +441,14 @@
                                 <div v-else class="space-y-3 sm:space-y-4">
                                     <div v-for="meal in getMealsByType(typeObj.key)" :key="meal.originalIndex"
                                         v-show="editingIndex !== meal.originalIndex"
-                                        class="meal-card rounded-card relative overflow-hidden group p-4 sm:p-5">
+                                        @pointerdown="onMealPointerDown($event, meal)"
+                                        @pointermove="onMealPointerMove"
+                                        @pointerup="onMealPointerUp"
+                                        @pointercancel="cancelMealDrag"
+                                        @touchmove="onMealTouchMove"
+                                        @contextmenu.prevent
+                                        class="meal-card rounded-card relative overflow-hidden group p-4 sm:p-5 select-none"
+                                        :class="dragMeal && dragMeal.index === meal.originalIndex ? 'opacity-40 scale-[0.98]' : ''">
                                         <!-- 第一行：名稱 + 編輯/刪除 -->
                                         <div class="flex items-start gap-2 mb-2">
                                             <span class="flex-1 text-base sm:text-lg font-semibold break-words min-w-0 leading-snug">{{
@@ -1452,6 +1461,38 @@
         </div>
         </Teleport>
 
+        <!-- 拖曳中的浮動標籤 -->
+        <Teleport to="body">
+            <div v-if="dragMeal" class="fixed z-[300] pointer-events-none -translate-x-1/2 -translate-y-1/2"
+                :style="{ left: dragPos.x + 'px', top: dragPos.y + 'px' }">
+                <div class="bg-brand text-white px-4 py-2 rounded-control text-sm font-black shadow-2xl whitespace-nowrap">
+                    {{ dragMeal.name }}
+                </div>
+            </div>
+        </Teleport>
+
+        <!-- 確認搬移餐別 Modal -->
+        <div v-if="pendingMove" class="fixed inset-0 z-[130] flex items-center justify-center p-4">
+            <div class="modal-overlay absolute inset-0"></div>
+            <div class="bg-surface rounded-panel p-10 relative z-10 w-full max-w-xs text-center shadow-2xl border border-line">
+                <div class="w-20 h-20 bg-brand/10 text-brand rounded-panel flex items-center justify-center mx-auto mb-6 shadow-inner">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    </svg>
+                </div>
+                <h4 class="text-xl font-black text-ink mb-2 tracking-tight">移動餐點？</h4>
+                <p class="text-sm text-muted mb-8 leading-relaxed">
+                    將「{{ pendingMove.name }}」從 {{ getMealLabel(pendingMove.type) }} 移到 {{ getMealLabel(pendingMove.to) }}
+                </p>
+                <div class="flex gap-3">
+                    <button @click="pendingMove = null"
+                        class="flex-1 py-4 bg-page text-muted rounded-control font-black text-sm hover:bg-line active:scale-95 transition-all">取消</button>
+                    <button @click="executeMealMove"
+                        class="flex-1 py-4 bg-brand text-white rounded-control font-black text-sm shadow-xl hover:opacity-90 active:scale-95 transition-all">確定</button>
+                </div>
+            </div>
+        </div>
+
         <!-- 確認刪除 Modal (餐點紀錄) -->
         <div v-if="mealToDelete !== null && mealToDelete !== undefined" class="fixed inset-0 z-[130] flex items-center justify-center p-4">
             <div class="modal-overlay absolute inset-0"></div>
@@ -1855,7 +1896,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.3.4"></script>
+    <script type="module" src="app.js?v=0.3.5"></script>
 </body>
 
 </html>

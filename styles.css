@@ -272,6 +272,8 @@ input:focus, select:focus, textarea:focus {
     background: var(--btn-bg);
     border: 1px solid var(--border-color);
     transition: all 0.2s ease;
+    /* 長按拖曳切換餐別：關掉 iOS 長按選單 */
+    -webkit-touch-callout: none;
 }
 
 .meal-card:hover {
