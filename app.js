@@ -652,11 +652,11 @@
                 const pendingType = ref('lunch'); // 面板中選中的餐別
                 const pendingTime = ref('12:00'); // 面板中的時間,預設隨餐別變動
 
-                // 面板選餐別:時間仍是上一個餐別的預設值時一起更新
+                const pendingTimeIsSuggestion = ref(true); // 同 mealTimeIsSuggestion:手動調過就不再被餐別覆蓋
+
                 const pickPendingType = (key) => {
-                    const wasDefault = pendingTime.value === DEFAULT_MEAL_TIME[pendingType.value];
                     pendingType.value = key;
-                    if (wasDefault) pendingTime.value = DEFAULT_MEAL_TIME[key];
+                    if (pendingTimeIsSuggestion.value) pendingTime.value = DEFAULT_MEAL_TIME[key];
                 };
                 const openHistory = (pickIdx = null) => {
                     historyPickMode.value = pickIdx;
@@ -684,6 +684,7 @@
                     // 預設依當下時間推導餐別,使用者可再改
                     pendingTime.value = nowHHMM();
                     pendingType.value = mealTypeForTime(pendingTime.value);
+                    pendingTimeIsSuggestion.value = true;
                 };
 
                 // 面板中調整份量:以資料庫原始份量為基準等比縮放營養素
@@ -1359,16 +1360,19 @@
 
                     editingIndex.value = index;
                     isAddingMeal.value = false;
+                    mealTimeIsSuggestion.value = false; // 既有紀錄的時間是真資料
                     skipHistorySave.value = false;
                     lastAmount.value = editingMeal.amount;
                     tempMealBackup.value = JSON.parse(JSON.stringify(copiedMeal));
                 };
 
-                // 切換餐別:若目前時間還是上一個餐別的預設值(使用者沒手動調過),就一起更新
+                // 新增餐點時的時間只是建議值(帶入當下時間),切餐別可覆蓋;
+                // 但編輯既有餐點或使用者手動調過時間後就是真資料,切餐別不能蓋掉
+                const mealTimeIsSuggestion = ref(false);
+
                 const pickMealType = (key) => {
-                    const wasDefault = editingMeal.time === DEFAULT_MEAL_TIME[editingMeal.type];
                     editingMeal.type = key;
-                    if (wasDefault || !editingMeal.time) editingMeal.time = DEFAULT_MEAL_TIME[key];
+                    if (mealTimeIsSuggestion.value || !editingMeal.time) editingMeal.time = DEFAULT_MEAL_TIME[key];
                 };
 
                 // type 傳 null 時依當下時間推導餐別與時間;傳餐別時用該餐別的預設時間
@@ -1384,6 +1388,7 @@
                     const newIndex = allData[selectedDate.value].meals.push(newMeal) - 1;
                     editingIndex.value = newIndex;
                     isAddingMeal.value = true;
+                    mealTimeIsSuggestion.value = true; // 新增時的時間只是建議值,切餐別可覆蓋
                     skipHistorySave.value = false;
                     lastAmount.value = 1;
                     tempMealBackup.value = null;
@@ -1524,7 +1529,7 @@
                     isDark, toggleTheme,
                     initialized, user, saving, showSettings, showHistory, showMonthPicker, historySearch, historySortBy, historySortOrder, historyTab, selectedDate, pickerMonth, loginEmail, loginPassword,
                     openHistory, closeHistory, historyPickMode, pendingHistoryMeal, chooseHistoryMeal, confirmHistoryAdd, priorityNutrient, priorityNutrientLabel,
-                    pendingAmount, pendingAmountValid, pendingScaled, pendingType, pendingTime, pickPendingType,
+                    pendingAmount, pendingAmountValid, pendingScaled, pendingType, pendingTime, pickPendingType, pendingTimeIsSuggestion,
                     editingIndex, isAddingMeal, mealToDelete, historyToDelete, nutrientKeys, profile, plans, tempPlans, allData, mealHistory, visibleMealHistory, handleHistoryScroll, editingMeal, showSyncModal, templates,
                     currentMonthYearDisplay, calculatedTDEE, formatNum, formatFloat, scaleNutrients, lastAmount, prepareScale, onlyNumber,
                     settingsStep, setCalorieCenter, setNutrientCenter,
@@ -1570,7 +1575,7 @@
                         await loadMonthData(pickerMonth.value);
                     },
                     mealTypes, nowHHMM, DEFAULT_MEAL_TIME,
-                    timeline, WORKOUT_TYPES, getWorkoutMeta, getMealMeta, pickMealType,
+                    timeline, WORKOUT_TYPES, getWorkoutMeta, getMealMeta, pickMealType, mealTimeIsSuggestion,
                     editingWorkout, editingWorkoutIndex, isAddingWorkout, addWorkout, startEditWorkout,
                     saveWorkout, cancelEditWorkout, workoutToDelete, confirmDeleteWorkout, executeDeleteWorkout,
                     dragRow, dragPos,

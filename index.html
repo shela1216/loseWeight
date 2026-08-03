@@ -670,7 +670,7 @@
                     <!-- 第3排: 進食時間 -->
                     <div class="bg-page rounded-control px-4 py-3 flex items-center gap-3">
                         <label class="text-[10px] font-black text-muted uppercase tracking-widest shrink-0">時間</label>
-                        <input type="time" v-model="editingMeal.time"
+                        <input type="time" v-model="editingMeal.time" @input="mealTimeIsSuggestion = false"
                             class="flex-1 bg-transparent text-xl font-black text-ink outline-none w-full min-w-0 text-right">
                     </div>
 
@@ -1127,7 +1127,7 @@
                         <!-- 時間：預設隨餐別變動,可手動微調 -->
                         <div class="bg-page rounded-control px-4 py-3 mb-4 flex items-center gap-3">
                             <label class="text-[10px] font-black text-muted uppercase tracking-widest shrink-0">時間</label>
-                            <input type="time" v-model="pendingTime"
+                            <input type="time" v-model="pendingTime" @input="pendingTimeIsSuggestion = false"
                                 class="flex-1 bg-transparent text-xl font-black text-ink outline-none w-full min-w-0 text-right">
                         </div>
 
