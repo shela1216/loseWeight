@@ -3,6 +3,7 @@
         import { initializeFirestore, persistentLocalCache, doc, setDoc, updateDoc, onSnapshot, collection, query, where, getDocs, writeBatch, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         import { pickPriorityNutrient } from './recommend.js';
+        import { mealTime, mealTypeForTime, snapTime, buildTimeline, DEFAULT_MEAL_TIME } from './timeline.js';
 
         const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
 
@@ -1241,12 +1242,17 @@
                     }, 800);
                 };
 
+                // 當下時間 'HH:MM',新增餐點/運動時帶預設值
+                const nowHHMM = () => {
+                    const d = new Date();
+                    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+                };
+
+                // 依時間升冪排序;舊資料無 time 時 mealTime() 會用餐別預設值
                 const sortMeals = () => {
-                    const order = { breakfast: 1, lunch: 2, dinner: 3, snack: 4 };
-                    if (allData[selectedDate.value]?.meals) {
-                        allData[selectedDate.value].meals.sort((a, b) => {
-                            return (order[a.type] || 99) - (order[b.type] || 99);
-                        });
+                    const meals = allData[selectedDate.value]?.meals;
+                    if (meals) {
+                        meals.sort((a, b) => mealTime(a).localeCompare(mealTime(b)));
                     }
                 };
 
@@ -1267,11 +1273,14 @@
                     tempMealBackup.value = JSON.parse(JSON.stringify(copiedMeal));
                 };
 
-                const addMeal = (type = 'lunch') => {
+                // type 傳 null 時依當下時間推導餐別與時間;傳餐別時用該餐別的預設時間
+                const addMeal = (type = null) => {
                     if (!allData[selectedDate.value]) {
                         allData[selectedDate.value] = { planType: 'med', meals: [] };
                     }
-                    const newMeal = { type, name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] };
+                    const time = type ? DEFAULT_MEAL_TIME[type] : nowHHMM();
+                    const mealType = type || mealTypeForTime(time);
+                    const newMeal = { type: mealType, time, name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] };
                     Object.assign(editingMeal, newMeal);
                     isNameAuto.value = true;
                     const newIndex = allData[selectedDate.value].meals.push(newMeal) - 1;
@@ -1299,6 +1308,7 @@
                     const currentNormalized = {
                         ...editingMeal,
                         amount: 1,
+                        time: undefined, // 時間屬於「當天那一筆」,不該被資料庫記住
                         calories: formatFloat(editingMeal.calories / (editingMeal.amount || 1)),
                         carbs: formatFloat(editingMeal.carbs / (editingMeal.amount || 1)),
                         protein: formatFloat(editingMeal.protein / (editingMeal.amount || 1)),
@@ -1359,6 +1369,7 @@
                         carbs: formatFloat(editingMeal.carbs / (editingMeal.amount || 1)),
                         protein: formatFloat(editingMeal.protein / (editingMeal.amount || 1)),
                         fat: formatFloat(editingMeal.fat / (editingMeal.amount || 1)),
+                        time: undefined, // 時間屬於「當天那一筆」,不該被資料庫記住
                         count: templates[k]?.count || 0
                     };
                     templates[k] = currentNormalized;
@@ -1460,7 +1471,7 @@
                         pickerMonth.value = new Date(d.getFullYear(), d.getMonth(), 1);
                         await loadMonthData(pickerMonth.value);
                     },
-                    mealTypes, getMealsByType,
+                    mealTypes, getMealsByType, nowHHMM, DEFAULT_MEAL_TIME,
                     dragMeal, dragPos, dragOverType, pendingMove,
                     onMealPointerDown, onMealPointerMove, onMealTouchMove, onMealPointerUp, cancelMealDrag, executeMealMove,
                     getTypeCalories: (type) => (allData[selectedDate.value]?.meals || [])
