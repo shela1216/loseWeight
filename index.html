@@ -1113,16 +1113,27 @@
                             <p v-else class="text-[11px] font-bold text-danger mt-1.5 text-right">請輸入大於 0 的份量</p>
                         </div>
 
+                        <!-- 餐別選擇：只選中,不立即加入 -->
                         <div class="grid grid-cols-2 gap-3 mb-4">
-                            <button v-for="t in mealTypes" :key="t.key" @click="confirmHistoryMealType(t.key)"
-                                :disabled="!pendingAmountValid"
-                                :class="pendingAmountValid ? 'hover:border-brand hover:bg-brand-soft active:scale-95' : 'opacity-40 cursor-not-allowed'"
-                                class="flex items-center gap-3 p-3 rounded-card border border-line bg-page transition-all">
+                            <button v-for="t in mealTypes" :key="t.key" @click="pickPendingType(t.key)"
+                                class="flex items-center gap-3 p-3 rounded-card border bg-page transition-all active:scale-95"
+                                :class="pendingType === t.key ? 'border-brand bg-brand-soft' : 'border-line hover:border-brand'">
                                 <span class="w-9 h-9 rounded-full flex items-center justify-center text-lg shrink-0"
                                     :style="{ backgroundColor: {breakfast:'#6366f1', lunch:'#8b5cf6', dinner:'#3b82f6', snack:'#ec4899'}[t.key] + '22' }">{{ t.icon }}</span>
                                 <span class="text-sm font-black text-ink">{{ t.name }}</span>
                             </button>
                         </div>
+
+                        <!-- 時間：預設隨餐別變動,可手動微調 -->
+                        <div class="bg-page rounded-control px-4 py-3 mb-4 flex items-center gap-3">
+                            <label class="text-[10px] font-black text-muted uppercase tracking-widest shrink-0">時間</label>
+                            <input type="time" v-model="pendingTime"
+                                class="flex-1 bg-transparent text-xl font-black text-ink outline-none w-full min-w-0 text-right">
+                        </div>
+
+                        <button @click="confirmHistoryAdd" :disabled="!pendingAmountValid || !pendingTime"
+                            :class="pendingAmountValid && pendingTime ? 'hover:opacity-90 active:scale-95' : 'opacity-40 cursor-not-allowed'"
+                            class="w-full py-4 mb-3 bg-brand text-white rounded-control font-black text-sm shadow-xl transition-all">加入</button>
                         <button @click="pendingHistoryMeal = null"
                             class="w-full py-2.5 rounded-control text-xs font-black text-muted hover:text-ink bg-page hover:bg-line transition-all uppercase tracking-widest">取消</button>
                     </div>

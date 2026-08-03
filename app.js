@@ -649,6 +649,15 @@
                 const historyMealType = ref('lunch'); // 從資料庫加到當日時要放入的餐別
                 const pendingHistoryMeal = ref(null); // 待選餐別的資料庫餐點(點擊後跳出選擇面板)
                 const pendingAmount = ref(1); // 選餐別面板中可調整的份量,加入時按比例縮放營養素
+                const pendingType = ref('lunch'); // 面板中選中的餐別
+                const pendingTime = ref('12:00'); // 面板中的時間,預設隨餐別變動
+
+                // 面板選餐別:時間仍是上一個餐別的預設值時一起更新
+                const pickPendingType = (key) => {
+                    const wasDefault = pendingTime.value === DEFAULT_MEAL_TIME[pendingType.value];
+                    pendingType.value = key;
+                    if (wasDefault) pendingTime.value = DEFAULT_MEAL_TIME[key];
+                };
                 const openHistory = (pickIdx = null) => {
                     historyPickMode.value = pickIdx;
                     historyMealType.value = 'lunch';
@@ -672,6 +681,9 @@
                     }
                     pendingHistoryMeal.value = meal;
                     pendingAmount.value = Number(meal.amount) > 0 ? Number(meal.amount) : 1;
+                    // 預設依當下時間推導餐別,使用者可再改
+                    pendingTime.value = nowHHMM();
+                    pendingType.value = mealTypeForTime(pendingTime.value);
                 };
 
                 // 面板中調整份量:以資料庫原始份量為基準等比縮放營養素
@@ -691,12 +703,12 @@
                         fat: formatFloat((Number(m.fat) || 0) * ratio)
                     };
                 });
-                const confirmHistoryMealType = (type) => {
-                    if (!pendingHistoryMeal.value || !pendingAmountValid.value) return;
-                    historyMealType.value = type;
+                const confirmHistoryAdd = () => {
+                    if (!pendingHistoryMeal.value || !pendingAmountValid.value || !pendingTime.value) return;
+                    historyMealType.value = pendingType.value;
                     addFromHistory(Object.assign(
                         JSON.parse(JSON.stringify(pendingHistoryMeal.value)),
-                        { amount: Number(pendingAmount.value) },
+                        { amount: Number(pendingAmount.value), time: pendingTime.value },
                         pendingScaled.value
                     ));
                     pendingHistoryMeal.value = null;
@@ -722,6 +734,7 @@
                     const newMeal = JSON.parse(JSON.stringify(meal));
                     if (newMeal.amount === undefined) newMeal.amount = 1;
                     if (newMeal.unit === undefined) newMeal.unit = '份';
+                    if (!newMeal.time) newMeal.time = DEFAULT_MEAL_TIME[historyMealType.value];
 
                     if (editingIndex.value !== null) {
                         Object.assign(editingMeal, newMeal);
@@ -1510,8 +1523,8 @@
                     appVersion, skipHistorySave,
                     isDark, toggleTheme,
                     initialized, user, saving, showSettings, showHistory, showMonthPicker, historySearch, historySortBy, historySortOrder, historyTab, selectedDate, pickerMonth, loginEmail, loginPassword,
-                    openHistory, closeHistory, historyPickMode, pendingHistoryMeal, chooseHistoryMeal, confirmHistoryMealType, priorityNutrient, priorityNutrientLabel,
-                    pendingAmount, pendingAmountValid, pendingScaled,
+                    openHistory, closeHistory, historyPickMode, pendingHistoryMeal, chooseHistoryMeal, confirmHistoryAdd, priorityNutrient, priorityNutrientLabel,
+                    pendingAmount, pendingAmountValid, pendingScaled, pendingType, pendingTime, pickPendingType,
                     editingIndex, isAddingMeal, mealToDelete, historyToDelete, nutrientKeys, profile, plans, tempPlans, allData, mealHistory, visibleMealHistory, handleHistoryScroll, editingMeal, showSyncModal, templates,
                     currentMonthYearDisplay, calculatedTDEE, formatNum, formatFloat, scaleNutrients, lastAmount, prepareScale, onlyNumber,
                     settingsStep, setCalorieCenter, setNutrientCenter,
