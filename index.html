@@ -19,8 +19,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
     <!-- CSS 也要帶版號：tailwind.css 是 purge 產物，沒有 cache buster 時新 class 會被舊快取吃掉 -->
-    <link rel="stylesheet" href="tailwind.css?v=0.4.7">
-    <link rel="stylesheet" href="styles.css?v=0.4.7">
+    <link rel="stylesheet" href="tailwind.css?v=0.4.8">
+    <link rel="stylesheet" href="styles.css?v=0.4.8">
     <script src="https://unpkg.com/vue@3.5.35/dist/vue.global.prod.js"></script>
 
     <link rel="manifest" href='manifest.json'>
@@ -430,22 +430,24 @@
                         </div>
                         <div v-else>
                             <div class="space-y-3 sm:space-y-4">
+                                <!-- 手機：換行成「標籤+時間」一列、卡片全寬一列（去掉左側時間軸欄位，內容才有寬度）
+                                     sm 以上：維持左側時間軸欄 + 節點 + 卡片的三欄版面 -->
                                 <div v-for="(row, idx) in timeline" :key="row.kind + '-' + row.originalIndex"
                                     v-show="!(row.kind === 'meal' && editingIndex === row.originalIndex)"
-                                    class="flex items-start gap-3">
+                                    class="flex flex-wrap sm:flex-nowrap items-start gap-x-3 gap-y-1">
 
-                                    <!-- 時間刻度：類別標籤在時間上方，加淡底＋同色框，深色模式才看得清 -->
-                                    <div class="w-[56px] shrink-0 text-right">
-                                        <p class="h-5 flex justify-end items-center">
+                                    <!-- 時間與類別：手機橫排在卡片上方，sm 以上為右對齊的左側欄 -->
+                                    <div class="order-1 shrink-0 flex items-center gap-2 sm:block sm:w-[56px] sm:text-right">
+                                        <p class="h-5 flex items-center sm:justify-end">
                                             <span class="px-1.5 rounded-chip border text-[10px] leading-4 font-black whitespace-nowrap"
                                                 :style="{ backgroundColor: rowColor(row) + '26', borderColor: rowColor(row) + '59', color: rowColor(row) }">{{ rowLabel(row) }}</span>
                                         </p>
                                         <span class="text-[11px] font-black text-muted tabular-nums">{{ row.time }}</span>
                                     </div>
 
-                                    <!-- 節點：對齊上方的類別標籤（標籤列 h-5 中心 10px，圓點 12px 故 pt-1）
+                                    <!-- 節點：手機不顯示（沒有左側欄可對位）；sm 以上對齊標籤列中心（h-5 中心 10px、圓點 12px 故 pt-1）
                                          連接線畫在每列內、由圓點下緣延伸到下一列圓點，末列不畫 -->
-                                    <div class="relative self-stretch w-[20px] shrink-0 flex justify-center items-start pt-1">
+                                    <div class="order-2 relative self-stretch w-[20px] shrink-0 hidden sm:flex justify-center items-start pt-1">
                                         <span v-if="idx < timeline.length - 1"
                                             class="absolute left-1/2 -translate-x-1/2 top-4 -bottom-3 sm:-bottom-4 w-px bg-line"></span>
                                         <span v-if="row.kind === 'workout'"
@@ -463,7 +465,7 @@
                                         @pointercancel="cancelRowDrag"
                                         @touchmove="onRowTouchMove"
                                         @contextmenu.prevent
-                                        class="meal-card rounded-card relative overflow-hidden flex-1 min-w-0 p-3.5 sm:p-4 select-none"
+                                        class="meal-card rounded-card relative overflow-hidden order-3 w-full sm:w-auto sm:flex-1 min-w-0 p-3.5 sm:p-4 select-none"
                                         :class="dragRow && dragRow.kind === 'workout' && dragRow.originalIndex === row.originalIndex ? 'opacity-40 scale-[0.98]' : ''">
                                         <div class="flex items-center gap-3">
                                             <span class="w-9 h-9 rounded-full bg-emerald-500/10 flex items-center justify-center text-lg shrink-0">{{ getWorkoutMeta(row.data.type).icon }}</span>
@@ -498,7 +500,7 @@
                                         @pointercancel="cancelRowDrag"
                                         @touchmove="onRowTouchMove"
                                         @contextmenu.prevent
-                                        class="meal-card rounded-card relative overflow-hidden group flex-1 min-w-0 p-4 sm:p-5 select-none"
+                                        class="meal-card rounded-card relative overflow-hidden group order-3 w-full sm:w-auto sm:flex-1 min-w-0 p-4 sm:p-5 select-none"
                                         :class="dragRow && dragRow.kind === 'meal' && dragRow.originalIndex === row.originalIndex ? 'opacity-40 scale-[0.98]' : ''">
                                         <!-- 第一行：名稱 + 編輯/刪除（餐別已移到左側時間欄上方） -->
                                         <div class="flex items-start gap-2 mb-2">
@@ -2055,7 +2057,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.4.7"></script>
+    <script type="module" src="app.js?v=0.4.8"></script>
 </body>
 
 </html>
