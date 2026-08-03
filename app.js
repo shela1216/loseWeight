@@ -919,6 +919,66 @@
                 ];
                 const getWorkoutMeta = (key) => WORKOUT_TYPES.find(w => w.key === key) || WORKOUT_TYPES[WORKOUT_TYPES.length - 1];
 
+                // === 運動紀錄 ===
+                const editingWorkout = reactive({ time: '07:00', type: 'run', duration: 30 });
+                const editingWorkoutIndex = ref(null); // null = sheet 關閉
+                const isAddingWorkout = ref(false);
+                const workoutToDelete = ref(null);
+
+                // 舊資料的 day object 沒有 workouts 欄位,寫入前補上
+                const ensureWorkouts = () => {
+                    if (!allData[selectedDate.value]) {
+                        allData[selectedDate.value] = { planType: 'med', meals: [] };
+                    }
+                    if (!allData[selectedDate.value].workouts) {
+                        allData[selectedDate.value].workouts = [];
+                    }
+                    return allData[selectedDate.value].workouts;
+                };
+
+                const addWorkout = () => {
+                    Object.assign(editingWorkout, { time: nowHHMM(), type: 'run', duration: 30 });
+                    editingWorkoutIndex.value = -1; // -1 = 新增中,存檔才進陣列
+                    isAddingWorkout.value = true;
+                };
+
+                const startEditWorkout = (index) => {
+                    const w = allData[selectedDate.value]?.workouts?.[index];
+                    if (!w) return;
+                    Object.assign(editingWorkout, JSON.parse(JSON.stringify(w)));
+                    editingWorkoutIndex.value = index;
+                    isAddingWorkout.value = false;
+                };
+
+                const cancelEditWorkout = () => {
+                    editingWorkoutIndex.value = null;
+                    isAddingWorkout.value = false;
+                };
+
+                const saveWorkout = () => {
+                    const duration = Number(editingWorkout.duration);
+                    if (!editingWorkout.time || !(duration > 0)) return;
+                    const record = { time: editingWorkout.time, type: editingWorkout.type, duration };
+                    const list = ensureWorkouts();
+                    if (isAddingWorkout.value) {
+                        list.push(record);
+                    } else if (editingWorkoutIndex.value !== null && list[editingWorkoutIndex.value]) {
+                        list[editingWorkoutIndex.value] = record;
+                    }
+                    editingWorkoutIndex.value = null;
+                    isAddingWorkout.value = false;
+                    saveData();
+                };
+
+                const confirmDeleteWorkout = (index) => { workoutToDelete.value = index; };
+
+                const executeDeleteWorkout = () => {
+                    const list = allData[selectedDate.value]?.workouts;
+                    if (list && workoutToDelete.value !== null) list.splice(workoutToDelete.value, 1);
+                    workoutToDelete.value = null;
+                    saveData();
+                };
+
                 // 餐點與運動合併成一條時間軸
                 const timeline = computed(() => {
                     const day = allData[selectedDate.value];
@@ -1496,6 +1556,8 @@
                     },
                     mealTypes, nowHHMM, DEFAULT_MEAL_TIME,
                     timeline, WORKOUT_TYPES, getWorkoutMeta, getMealMeta, pickMealType,
+                    editingWorkout, editingWorkoutIndex, isAddingWorkout, addWorkout, startEditWorkout,
+                    saveWorkout, cancelEditWorkout, workoutToDelete, confirmDeleteWorkout, executeDeleteWorkout,
                     dragMeal, dragPos, dragOverType, pendingMove,
                     onMealPointerDown, onMealPointerMove, onMealTouchMove, onMealPointerUp, cancelMealDrag, executeMealMove,
                     addMeal, startEdit, cancelEdit, saveMeal, addFromHistory, saveToHistoryOnly,

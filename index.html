@@ -402,6 +402,14 @@
                                     </svg>
                                     <span>餐點</span>
                                 </button>
+                                <button @click="addWorkout()"
+                                    class="flex items-center gap-1.5 px-3 py-2 rounded-control bg-page text-ink border border-line text-xs font-black hover:border-emerald-500 hover:text-emerald-500 active:scale-95 transition-all"
+                                    title="新增運動">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    <span>運動</span>
+                                </button>
                                 <button @click="openHistory()" class="btn-circular" title="食物資料庫">
                                     <div class="icon-wrapper">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
@@ -839,6 +847,75 @@
                     </button>
                     <button @click="cancelEdit"
                         class="w-full mt-1 text-muted opacity-60 text-xs font-black uppercase tracking-[0.2em] hover:text-ink transition-colors text-center">捨棄變更</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 運動編輯 sheet -->
+        <div v-if="editingWorkoutIndex !== null" class="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
+            <div class="modal-overlay absolute inset-0" @click="cancelEditWorkout"></div>
+            <div class="bg-surface w-full max-w-lg rounded-t-panel sm:rounded-panel relative z-10 shadow-2xl flex flex-col max-h-[92vh] border-t border-x border-line sm:border overflow-hidden animate-in fade-in slide-in-from-bottom-10 duration-300">
+
+                <div class="sm:hidden w-12 h-1.5 bg-line rounded-full mx-auto mt-4 mb-2"></div>
+
+                <div class="px-5 sm:px-6 pt-5 sm:pt-6 pb-4 flex justify-between items-center">
+                    <div>
+                        <h3 class="text-3xl font-black text-ink tracking-tight">{{ isAddingWorkout ? '新增運動' : '編輯運動' }}</h3>
+                        <p class="text-xs font-bold text-muted mt-1 uppercase tracking-widest">Activity Log</p>
+                    </div>
+                    <button @click="cancelEditWorkout"
+                        class="w-10 h-10 flex items-center justify-center bg-page rounded-full text-muted hover:text-muted transition-all hover:rotate-90">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                            <path d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto custom-scroll px-4 py-4 space-y-5">
+                    <!-- 運動類型 -->
+                    <div class="grid grid-cols-4 gap-3">
+                        <button v-for="w in WORKOUT_TYPES" :key="w.key" @click="editingWorkout.type = w.key"
+                            class="flex flex-col items-center gap-2 py-2 transition-all">
+                            <div class="w-14 h-14 rounded-full flex items-center justify-center text-xl transition-all duration-300"
+                                :class="editingWorkout.type === w.key ? 'bg-emerald-500 text-white shadow-xl scale-110' : 'bg-page text-muted grayscale opacity-50 hover:opacity-100 hover:grayscale-0'">
+                                {{ w.icon }}
+                            </div>
+                            <span class="text-[11px] font-black transition-colors"
+                                :class="editingWorkout.type === w.key ? 'text-ink' : 'text-muted'">{{ w.name }}</span>
+                        </button>
+                    </div>
+
+                    <!-- 時間 -->
+                    <div class="bg-page rounded-control px-4 py-3 flex items-center gap-3">
+                        <label class="text-[10px] font-black text-muted uppercase tracking-widest shrink-0">時間</label>
+                        <input type="time" v-model="editingWorkout.time"
+                            class="flex-1 bg-transparent text-xl font-black text-ink outline-none w-full min-w-0 text-right">
+                    </div>
+
+                    <!-- 時長 -->
+                    <div class="bg-page rounded-control px-4 py-3">
+                        <div class="flex items-center gap-2">
+                            <label class="text-[10px] font-black text-muted uppercase tracking-widest shrink-0">時長</label>
+                            <input type="number" inputmode="numeric" v-model.number="editingWorkout.duration" step="5" min="1"
+                                @keypress="onlyNumber"
+                                class="flex-1 bg-transparent text-xl font-black text-ink outline-none w-full min-w-0 text-right">
+                            <span class="text-sm font-black text-muted shrink-0">分鐘</span>
+                        </div>
+                        <p v-if="!(Number(editingWorkout.duration) > 0)" class="text-[11px] font-bold text-danger mt-1.5 text-right">請輸入大於 0 的分鐘數</p>
+                        <div class="flex gap-2 mt-3">
+                            <button v-for="d in [15, 30, 45, 60, 90]" :key="d" @click="editingWorkout.duration = d"
+                                class="flex-1 py-1.5 rounded-control text-[11px] font-black transition-all"
+                                :class="Number(editingWorkout.duration) === d ? 'bg-emerald-500 text-white' : 'bg-surface text-muted border border-line hover:border-emerald-500'">{{ d }}</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="px-4 py-4 border-t border-line flex gap-3">
+                    <button @click="cancelEditWorkout"
+                        class="flex-1 py-4 bg-page text-muted rounded-control font-black text-sm hover:bg-line active:scale-95 transition-all">取消</button>
+                    <button @click="saveWorkout" :disabled="!(Number(editingWorkout.duration) > 0)"
+                        :class="Number(editingWorkout.duration) > 0 ? 'hover:opacity-90 active:scale-95' : 'opacity-40 cursor-not-allowed'"
+                        class="flex-1 py-4 bg-emerald-500 text-white rounded-control font-black text-sm shadow-xl transition-all">儲存</button>
                 </div>
             </div>
         </div>
@@ -1534,6 +1611,26 @@
                         class="flex-1 py-4 bg-page text-muted rounded-control font-black text-sm hover:bg-line active:scale-95 transition-all">取消</button>
                     <button @click="executeDelete"
                         class="flex-1 py-4 bg-rose-500 text-white rounded-control font-black text-sm shadow-xl shadow-rose-100 hover:bg-rose-600 active:scale-95 transition-all">刪除</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 確認刪除 Modal (運動紀錄) -->
+        <div v-if="workoutToDelete !== null" class="fixed inset-0 z-[130] flex items-center justify-center p-4">
+            <div class="modal-overlay absolute inset-0"></div>
+            <div class="bg-surface rounded-panel p-10 relative z-10 w-full max-w-xs text-center shadow-2xl border border-line">
+                <div class="w-20 h-20 bg-rose-500/10 text-rose-500 rounded-panel flex items-center justify-center mx-auto mb-6 shadow-inner">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </div>
+                <h4 class="text-xl font-black text-ink mb-2 tracking-tight">刪除運動紀錄？</h4>
+                <p class="text-sm text-muted mb-8 leading-relaxed">此動作無法復原</p>
+                <div class="flex gap-3">
+                    <button @click="workoutToDelete = null"
+                        class="flex-1 py-4 bg-page text-muted rounded-control font-black text-sm hover:bg-line active:scale-95 transition-all">取消</button>
+                    <button @click="executeDeleteWorkout"
+                        class="flex-1 py-4 bg-rose-500 text-white rounded-control font-black text-sm shadow-xl hover:opacity-90 active:scale-95 transition-all">刪除</button>
                 </div>
             </div>
         </div>
