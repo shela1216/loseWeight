@@ -51,7 +51,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.4.5');
+                console.log('App initialization starting... v0.4.6');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -336,7 +336,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.4.5');
+                const appVersion = ref('0.4.6');
                 const editingMeal = reactive({ type: 'lunch', time: '12:00', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -930,7 +930,7 @@
                     { key: 'bike', icon: '🚴', name: '單車' },
                     { key: 'swim', icon: '🏊', name: '游泳' },
                     { key: 'gym', icon: '🏋️', name: '重訓' },
-                    { key: 'yoga', icon: '🧘', name: '瑜珈' },
+                    { key: 'hike', icon: '🥾', name: '登山' },
                     { key: 'ball', icon: '⚽', name: '球類' },
                     { key: 'other', icon: '✨', name: '其他' }
                 ];
@@ -938,7 +938,7 @@
                 const WORKOUT_COLOR = '#10b981'; // 運動代表色(emerald-500),節點與標籤共用
 
                 // === 運動紀錄 ===
-                const editingWorkout = reactive({ time: '07:00', type: 'run', duration: 30 });
+                const editingWorkout = reactive({ time: '07:00', type: 'run', duration: 30, name: '' });
                 const editingWorkoutIndex = ref(null); // null = sheet 關閉
                 const isAddingWorkout = ref(false);
                 const workoutToDelete = ref(null);
@@ -955,7 +955,7 @@
                 };
 
                 const addWorkout = () => {
-                    Object.assign(editingWorkout, { time: nowHHMM(), type: 'run', duration: 30 });
+                    Object.assign(editingWorkout, { time: nowHHMM(), type: 'run', duration: 30, name: '' });
                     editingWorkoutIndex.value = -1; // -1 = 新增中,存檔才進陣列
                     isAddingWorkout.value = true;
                 };
@@ -963,7 +963,8 @@
                 const startEditWorkout = (index) => {
                     const w = allData[selectedDate.value]?.workouts?.[index];
                     if (!w) return;
-                    Object.assign(editingWorkout, JSON.parse(JSON.stringify(w)));
+                    // 沒有 name 的記錄要顯式清空,否則 Object.assign 會留著上一筆編輯的自訂名稱
+                    Object.assign(editingWorkout, { name: '' }, JSON.parse(JSON.stringify(w)));
                     editingWorkoutIndex.value = index;
                     isAddingWorkout.value = false;
                 };
@@ -977,6 +978,9 @@
                     const duration = Number(editingWorkout.duration);
                     if (!editingWorkout.time || !(duration > 0)) return;
                     const record = { time: editingWorkout.time, type: editingWorkout.type, duration };
+                    // 自訂名稱只在「其他」有意義,換成其他類型時不留殘值
+                    const name = editingWorkout.type === 'other' ? String(editingWorkout.name || '').trim() : '';
+                    if (name) record.name = name;
                     const list = ensureWorkouts();
                     if (isAddingWorkout.value) {
                         list.push(record);

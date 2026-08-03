@@ -19,8 +19,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
     <!-- CSS 也要帶版號：tailwind.css 是 purge 產物，沒有 cache buster 時新 class 會被舊快取吃掉 -->
-    <link rel="stylesheet" href="tailwind.css?v=0.4.5">
-    <link rel="stylesheet" href="styles.css?v=0.4.5">
+    <link rel="stylesheet" href="tailwind.css?v=0.4.6">
+    <link rel="stylesheet" href="styles.css?v=0.4.6">
     <script src="https://unpkg.com/vue@3.5.35/dist/vue.global.prod.js"></script>
 
     <link rel="manifest" href='manifest.json'>
@@ -467,10 +467,13 @@
                                         :class="dragRow && dragRow.kind === 'workout' && dragRow.originalIndex === row.originalIndex ? 'opacity-40 scale-[0.98]' : ''">
                                         <div class="flex items-center gap-3">
                                             <span class="w-9 h-9 rounded-full bg-emerald-500/10 flex items-center justify-center text-lg shrink-0">{{ getWorkoutMeta(row.data.type).icon }}</span>
-                                            <!-- 類型已在左側標籤，卡片以時長為主（比照餐點卡的 kcal 排法） -->
-                                            <div class="min-w-0 flex-1 flex items-baseline gap-1.5">
-                                                <span class="text-lg font-black tracking-tight">{{ row.data.duration }}</span>
-                                                <span class="text-[10px] text-muted uppercase font-bold">min</span>
+                                            <!-- 「其他」的自訂內容在左側 56px 標籤放不下，完整名稱顯示在卡片 -->
+                                            <div class="min-w-0 flex-1">
+                                                <p v-if="row.data.name" class="text-sm font-black text-ink truncate">{{ row.data.name }}</p>
+                                                <div class="flex items-baseline gap-1.5">
+                                                    <span class="text-lg font-black tracking-tight">{{ row.data.duration }}</span>
+                                                    <span class="text-[10px] text-muted uppercase font-bold">min</span>
+                                                </div>
                                             </div>
                                             <div class="flex gap-1 shrink-0">
                                                 <button @click="startEditWorkout(row.originalIndex)"
@@ -905,6 +908,13 @@
                             <span class="text-[11px] font-black transition-colors"
                                 :class="editingWorkout.type === w.key ? 'text-ink' : 'text-muted'">{{ w.name }}</span>
                         </button>
+                    </div>
+
+                    <!-- 自訂運動內容：只有「其他」需要 -->
+                    <div v-if="editingWorkout.type === 'other'" class="bg-page rounded-control px-4 py-3 flex items-center gap-3">
+                        <label class="text-[10px] font-black text-muted uppercase tracking-widest shrink-0">內容</label>
+                        <input type="text" v-model="editingWorkout.name" maxlength="20" placeholder="例如：跳繩"
+                            class="flex-1 bg-transparent text-xl font-black text-ink placeholder:text-muted placeholder:opacity-50 outline-none w-full min-w-0 text-right">
                     </div>
 
                     <!-- 時間 -->
@@ -2025,7 +2035,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.4.5"></script>
+    <script type="module" src="app.js?v=0.4.6"></script>
 </body>
 
 </html>
