@@ -51,7 +51,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.4.0');
+                console.log('App initialization starting... v0.4.1');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -336,7 +336,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.4.0');
+                const appVersion = ref('0.4.1');
                 const editingMeal = reactive({ type: 'lunch', time: '12:00', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -916,11 +916,12 @@
                     return map[key];
                 };
 
+                // color 是餐別代表色,時間軸節點與資料庫面板共用同一份(原本兩處各自內嵌同樣的 hex)
                 const mealTypes = [
-                    { key: 'breakfast', icon: '🌅', name: '早餐', label: '🌅 早餐' },
-                    { key: 'lunch', icon: '☀️', name: '午餐', label: '☀️ 午餐' },
-                    { key: 'dinner', icon: '🌙', name: '晚餐', label: '🌙 晚餐' },
-                    { key: 'snack', icon: '🍰', name: '點心', label: '🍰 點心' }
+                    { key: 'breakfast', icon: '🌅', name: '早餐', label: '🌅 早餐', color: '#6366f1' },
+                    { key: 'lunch', icon: '☀️', name: '午餐', label: '☀️ 午餐', color: '#8b5cf6' },
+                    { key: 'dinner', icon: '🌙', name: '晚餐', label: '🌙 晚餐', color: '#3b82f6' },
+                    { key: 'snack', icon: '🍰', name: '點心', label: '🍰 點心', color: '#ec4899' }
                 ];
 
                 const WORKOUT_TYPES = [
