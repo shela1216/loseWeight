@@ -19,8 +19,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
     <!-- CSS 也要帶版號：tailwind.css 是 purge 產物，沒有 cache buster 時新 class 會被舊快取吃掉 -->
-    <link rel="stylesheet" href="tailwind.css?v=0.4.4">
-    <link rel="stylesheet" href="styles.css?v=0.4.4">
+    <link rel="stylesheet" href="tailwind.css?v=0.4.5">
+    <link rel="stylesheet" href="styles.css?v=0.4.5">
     <script src="https://unpkg.com/vue@3.5.35/dist/vue.global.prod.js"></script>
 
     <link rel="manifest" href='manifest.json'>
@@ -434,26 +434,25 @@
                                     v-show="!(row.kind === 'meal' && editingIndex === row.originalIndex)"
                                     class="flex items-start gap-3">
 
-                                    <!-- 時間刻度：類別標在時間上方（餐點用餐別代表色，運動用綠色） -->
-                                    <div class="w-[52px] shrink-0 text-right">
-                                        <p class="h-4 leading-4 text-[10px] font-black whitespace-nowrap overflow-hidden"
-                                            :class="row.kind === 'workout' ? 'text-emerald-500' : ''"
-                                            :style="row.kind === 'meal' ? { color: getMealMeta(row.data.type).color } : null">{{
-                                            row.kind === 'workout'
-                                                ? getWorkoutMeta(row.data.type).icon + getWorkoutMeta(row.data.type).name
-                                                : getMealMeta(row.data.type).icon + getMealMeta(row.data.type).name }}</p>
+                                    <!-- 時間刻度：類別標籤在時間上方，加淡底＋同色框，深色模式才看得清 -->
+                                    <div class="w-[56px] shrink-0 text-right">
+                                        <p class="h-5 flex justify-end items-center">
+                                            <span class="px-1.5 rounded-chip border text-[10px] leading-4 font-black whitespace-nowrap"
+                                                :style="{ backgroundColor: rowColor(row) + '26', borderColor: rowColor(row) + '59', color: rowColor(row) }">{{ rowLabel(row) }}</span>
+                                        </p>
                                         <span class="text-[11px] font-black text-muted tabular-nums">{{ row.time }}</span>
                                     </div>
 
-                                    <!-- 節點：對齊上方的類別標籤（h-4 標籤中心 8px，圓點 12px 故 pt-0.5）
+                                    <!-- 節點：對齊上方的類別標籤（標籤列 h-5 中心 10px，圓點 12px 故 pt-1）
                                          連接線畫在每列內、由圓點下緣延伸到下一列圓點，末列不畫 -->
-                                    <div class="relative self-stretch w-[20px] shrink-0 flex justify-center items-start pt-0.5">
+                                    <div class="relative self-stretch w-[20px] shrink-0 flex justify-center items-start pt-1">
                                         <span v-if="idx < timeline.length - 1"
-                                            class="absolute left-1/2 -translate-x-1/2 top-3.5 -bottom-3 sm:-bottom-4 w-px bg-line"></span>
+                                            class="absolute left-1/2 -translate-x-1/2 top-4 -bottom-3 sm:-bottom-4 w-px bg-line"></span>
                                         <span v-if="row.kind === 'workout'"
-                                            class="w-3 h-3 rounded-full border-2 border-emerald-500 bg-page ring-4 ring-page z-10"></span>
+                                            class="w-3 h-3 rounded-full border-2 bg-page ring-4 ring-page z-10"
+                                            :style="{ borderColor: rowColor(row) }"></span>
                                         <span v-else class="w-3 h-3 rounded-full ring-4 ring-page z-10"
-                                            :style="{ backgroundColor: getMealMeta(row.data.type).color }"></span>
+                                            :style="{ backgroundColor: rowColor(row) }"></span>
                                     </div>
 
                                     <!-- 運動卡 -->
@@ -2026,7 +2025,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.4.4"></script>
+    <script type="module" src="app.js?v=0.4.5"></script>
 </body>
 
 </html>

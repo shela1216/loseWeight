@@ -51,7 +51,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.4.4');
+                console.log('App initialization starting... v0.4.5');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -336,7 +336,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.4.4');
+                const appVersion = ref('0.4.5');
                 const editingMeal = reactive({ type: 'lunch', time: '12:00', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -935,6 +935,7 @@
                     { key: 'other', icon: '✨', name: '其他' }
                 ];
                 const getWorkoutMeta = (key) => WORKOUT_TYPES.find(w => w.key === key) || WORKOUT_TYPES[WORKOUT_TYPES.length - 1];
+                const WORKOUT_COLOR = '#10b981'; // 運動代表色(emerald-500),節點與標籤共用
 
                 // === 運動紀錄 ===
                 const editingWorkout = reactive({ time: '07:00', type: 'run', duration: 30 });
@@ -1003,6 +1004,13 @@
                 });
 
                 const getMealMeta = (key) => mealTypes.find(t => t.key === key) || mealTypes[1];
+
+                // 時間軸一列的代表色:餐點用餐別色,運動用運動色。節點與標籤都走這個,避免兩處各寫一份
+                const rowColor = (row) => row.kind === 'workout' ? WORKOUT_COLOR : getMealMeta(row.data.type).color;
+                const rowLabel = (row) => {
+                    const meta = row.kind === 'workout' ? getWorkoutMeta(row.data.type) : getMealMeta(row.data.type);
+                    return meta.icon + meta.name;
+                };
 
                 const calendarDays = computed(() => {
                     const year = pickerMonth.value.getFullYear();
@@ -1576,7 +1584,7 @@
                         await loadMonthData(pickerMonth.value);
                     },
                     mealTypes, nowHHMM, DEFAULT_MEAL_TIME,
-                    timeline, WORKOUT_TYPES, getWorkoutMeta, getMealMeta, pickMealType, mealTimeIsSuggestion,
+                    timeline, WORKOUT_TYPES, getWorkoutMeta, getMealMeta, rowColor, rowLabel, pickMealType, mealTimeIsSuggestion,
                     editingWorkout, editingWorkoutIndex, isAddingWorkout, addWorkout, startEditWorkout,
                     saveWorkout, cancelEditWorkout, workoutToDelete, confirmDeleteWorkout, executeDeleteWorkout,
                     dragRow, dragPos,
