@@ -19,8 +19,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
     <!-- CSS 也要帶版號：tailwind.css 是 purge 產物，沒有 cache buster 時新 class 會被舊快取吃掉 -->
-    <link rel="stylesheet" href="tailwind.css?v=0.4.3">
-    <link rel="stylesheet" href="styles.css?v=0.4.3">
+    <link rel="stylesheet" href="tailwind.css?v=0.4.4">
+    <link rel="stylesheet" href="styles.css?v=0.4.4">
     <script src="https://unpkg.com/vue@3.5.35/dist/vue.global.prod.js"></script>
 
     <link rel="manifest" href='manifest.json'>
@@ -428,12 +428,9 @@
                             class="border border-dashed border-line rounded-card py-10 text-center text-xs font-bold text-muted/70">
                             今天還沒有紀錄
                         </div>
-                        <div v-else class="relative">
-                            <!-- 縱向連接線：時間欄 52px + gap-3 12px + 節點欄 20px 的一半 = 圓點中心 74px -->
-                            <div class="absolute left-[74px] top-6 bottom-6 w-px bg-line"></div>
-
+                        <div v-else>
                             <div class="space-y-3 sm:space-y-4">
-                                <div v-for="row in timeline" :key="row.kind + '-' + row.originalIndex"
+                                <div v-for="(row, idx) in timeline" :key="row.kind + '-' + row.originalIndex"
                                     v-show="!(row.kind === 'meal' && editingIndex === row.originalIndex)"
                                     class="flex items-start gap-3">
 
@@ -448,8 +445,11 @@
                                         <span class="text-[11px] font-black text-muted tabular-nums">{{ row.time }}</span>
                                     </div>
 
-                                    <!-- 節點：餐點用餐別代表色實心圓，運動用綠色空心圓以便一眼區分 -->
-                                    <div class="relative w-[20px] shrink-0 flex justify-center pt-5">
+                                    <!-- 節點：對齊上方的類別標籤（h-4 標籤中心 8px，圓點 12px 故 pt-0.5）
+                                         連接線畫在每列內、由圓點下緣延伸到下一列圓點，末列不畫 -->
+                                    <div class="relative self-stretch w-[20px] shrink-0 flex justify-center items-start pt-0.5">
+                                        <span v-if="idx < timeline.length - 1"
+                                            class="absolute left-1/2 -translate-x-1/2 top-3.5 -bottom-3 sm:-bottom-4 w-px bg-line"></span>
                                         <span v-if="row.kind === 'workout'"
                                             class="w-3 h-3 rounded-full border-2 border-emerald-500 bg-page ring-4 ring-page z-10"></span>
                                         <span v-else class="w-3 h-3 rounded-full ring-4 ring-page z-10"
@@ -2026,7 +2026,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.4.3"></script>
+    <script type="module" src="app.js?v=0.4.4"></script>
 </body>
 
 </html>
