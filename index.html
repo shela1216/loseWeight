@@ -393,7 +393,15 @@
                                     v-if="currentDayRecord.meals.length > 0">Daily log ({{
                                     currentDayRecord.meals.length }})</p>
                             </div>
-                            <div class="flex gap-4 sm:gap-6 items-center">
+                            <div class="flex gap-2 sm:gap-3 items-center">
+                                <button @click="addMeal()"
+                                    class="flex items-center gap-1.5 px-3 py-2 rounded-control bg-brand text-white text-xs font-black shadow-lg shadow-brand-soft hover:opacity-90 active:scale-95 transition-all"
+                                    title="新增餐點">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    <span>餐點</span>
+                                </button>
                                 <button @click="openHistory()" class="btn-circular" title="食物資料庫">
                                     <div class="icon-wrapper">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
@@ -406,73 +414,79 @@
                             </div>
                         </div>
 
-                        <div class="space-y-6 sm:space-y-8">
-                            <div v-for="typeObj in mealTypes" :key="typeObj.key"
-                                :data-meal-type="typeObj.key"
-                                class="premium-card-sub p-5 sm:p-8 transition-all"
-                                :class="dragMeal && dragOverType === typeObj.key && dragMeal.type !== typeObj.key ? 'ring-2 ring-brand ring-offset-2 ring-offset-transparent' : ''">
-                                <!-- 分類卡頭：餐別 + 熱量小計 + 新增 -->
-                                <div class="flex items-center gap-3 mb-5 px-1">
-                                    <div class="w-11 h-11 rounded-full flex items-center justify-center text-xl shrink-0"
-                                        :style="{ backgroundColor: {breakfast:'#6366f1', lunch:'#8b5cf6', dinner:'#3b82f6', snack:'#ec4899'}[typeObj.key] + '22' }">{{ typeObj.icon }}</div>
-                                    <div class="min-w-0">
-                                        <h4 class="text-base sm:text-lg font-black tracking-wider uppercase leading-none">
-                                            {{ typeObj.name }}</h4>
-                                        <p class="text-[11px] font-bold text-muted mt-1">{{
-                                            formatFloat(getTypeCalories(typeObj.key)) }} <span class="uppercase tracking-widest">cal</span></p>
+                        <!-- 時間軸：餐點與運動依時間升冪排列 -->
+                        <div v-if="timeline.length === 0"
+                            class="border border-dashed border-line rounded-card py-10 text-center text-xs font-bold text-muted/70">
+                            今天還沒有紀錄
+                        </div>
+                        <div v-else class="relative">
+                            <!-- 縱向連接線 -->
+                            <div class="absolute left-[52px] top-3 bottom-3 w-px bg-line"></div>
+
+                            <div class="space-y-3 sm:space-y-4">
+                                <div v-for="row in timeline" :key="row.kind + '-' + row.originalIndex"
+                                    v-show="!(row.kind === 'meal' && editingIndex === row.originalIndex)"
+                                    class="flex items-start gap-3">
+
+                                    <!-- 時間刻度 -->
+                                    <div class="w-[42px] shrink-0 pt-4 text-right">
+                                        <span class="text-[11px] font-black text-muted tabular-nums">{{ row.time }}</span>
                                     </div>
-                                    <button @click="addMeal(typeObj.key)"
-                                        class="ml-auto w-11 h-11 flex-shrink-0 flex items-center justify-center rounded-control bg-brand/10 text-brand hover:bg-brand hover:text-white active:scale-95 transition-all"
-                                        :title="'新增' + typeObj.label">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                                        </svg>
-                                    </button>
-                                </div>
 
-                                <!-- 空分類提示 -->
-                                <div v-if="getMealsByType(typeObj.key).length === 0"
-                                    class="border border-dashed border-line rounded-card py-6 text-center text-xs font-bold text-muted/70">
-                                    尚無紀錄
-                                </div>
+                                    <!-- 節點 -->
+                                    <div class="relative w-[20px] shrink-0 flex justify-center pt-5">
+                                        <span class="w-2.5 h-2.5 rounded-full ring-4 ring-page z-10"
+                                            :class="row.kind === 'workout' ? 'bg-emerald-500' : 'bg-brand'"></span>
+                                    </div>
 
-                                <!-- 餐點列表 -->
-                                <div v-else class="space-y-3 sm:space-y-4">
-                                    <div v-for="meal in getMealsByType(typeObj.key)" :key="meal.originalIndex"
-                                        v-show="editingIndex !== meal.originalIndex"
-                                        @pointerdown="onMealPointerDown($event, meal)"
-                                        @pointermove="onMealPointerMove"
-                                        @pointerup="onMealPointerUp"
-                                        @pointercancel="cancelMealDrag"
-                                        @touchmove="onMealTouchMove"
-                                        @contextmenu.prevent
-                                        class="meal-card rounded-card relative overflow-hidden group p-4 sm:p-5 select-none"
-                                        :class="dragMeal && dragMeal.index === meal.originalIndex ? 'opacity-40 scale-[0.98]' : ''">
-                                        <!-- 第一行：名稱 + 編輯/刪除 -->
+                                    <!-- 運動卡 -->
+                                    <div v-if="row.kind === 'workout'"
+                                        class="meal-card rounded-card relative overflow-hidden flex-1 min-w-0 p-3.5 sm:p-4 select-none">
+                                        <div class="flex items-center gap-3">
+                                            <span class="w-9 h-9 rounded-full bg-emerald-500/10 flex items-center justify-center text-lg shrink-0">{{ getWorkoutMeta(row.data.type).icon }}</span>
+                                            <div class="min-w-0 flex-1">
+                                                <p class="text-sm font-black text-ink truncate">{{ getWorkoutMeta(row.data.type).name }}</p>
+                                                <p class="text-[11px] font-bold text-muted mt-0.5">{{ row.data.duration }} <span class="uppercase tracking-widest">min</span></p>
+                                            </div>
+                                            <div class="flex gap-1 shrink-0">
+                                                <button @click="startEditWorkout(row.originalIndex)"
+                                                    class="w-8 h-8 flex items-center justify-center rounded-control bg-theme text-muted hover:text-brand hover:shadow-lg transition-all"><svg
+                                                        class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                                        <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                    </svg></button>
+                                                <button @click="confirmDeleteWorkout(row.originalIndex)"
+                                                    class="w-8 h-8 flex items-center justify-center rounded-control bg-theme text-muted hover:text-rose-500 hover:shadow-lg transition-all"><svg
+                                                        class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                                        <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg></button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 餐點卡 -->
+                                    <div v-else
+                                        class="meal-card rounded-card relative overflow-hidden group flex-1 min-w-0 p-4 sm:p-5 select-none">
+                                        <!-- 第一行：名稱 + 餐別 chip + 編輯/刪除 -->
                                         <div class="flex items-start gap-2 mb-2">
                                             <span class="flex-1 text-base sm:text-lg font-semibold break-words min-w-0 leading-snug">{{
-                                                meal.name || '未命名餐點' }}</span>
+                                                row.data.name || '未命名餐點' }}</span>
+                                            <span class="shrink-0 mt-0.5 text-[10px] font-black px-2 py-1 rounded-chip bg-line text-muted whitespace-nowrap">{{ getMealMeta(row.data.type).icon }} {{ getMealMeta(row.data.type).name }}</span>
                                             <div class="flex gap-1 flex-shrink-0">
-                                                <button @click="startEdit(meal.originalIndex)"
+                                                <button @click="startEdit(row.originalIndex)"
                                                     class="w-8 h-8 flex items-center justify-center rounded-control bg-theme text-muted hover:text-brand hover:shadow-lg transition-all"><svg
-                                                        class="w-4 h-4" fill="none" stroke="currentColor"
-                                                        stroke-width="2.2" viewBox="0 0 24 24">
-                                                        <path
-                                                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                        class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                                        <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                                     </svg></button>
-                                                <button @click="confirmDelete(meal.originalIndex)"
+                                                <button @click="confirmDelete(row.originalIndex)"
                                                     class="w-8 h-8 flex items-center justify-center rounded-control bg-theme text-muted hover:text-rose-500 hover:shadow-lg transition-all"><svg
-                                                        class="w-4 h-4" fill="none" stroke="currentColor"
-                                                        stroke-width="2.2" viewBox="0 0 24 24">
-                                                        <path
-                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                                        <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                     </svg></button>
                                             </div>
                                         </div>
                                         <!-- 組成品項 chip -->
-                                        <div v-if="meal.items && meal.items.length > 0" class="flex flex-wrap gap-1.5 mb-2.5">
-                                            <span v-for="item in meal.items" :key="item.name"
+                                        <div v-if="row.data.items && row.data.items.length > 0" class="flex flex-wrap gap-1.5 mb-2.5">
+                                            <span v-for="item in row.data.items" :key="item.name"
                                                 class="text-[10px] font-bold bg-line text-muted px-2 py-0.5 rounded-chip">
                                                 {{ item.name }} ({{ item.amount }}{{ item.unit }})
                                             </span>
@@ -481,17 +495,17 @@
                                         <div class="flex items-center justify-between gap-3 flex-wrap">
                                             <div class="flex items-baseline gap-1.5">
                                                 <span class="text-brand bg-brand/10 px-2 py-0.5 rounded-chip text-xs font-semibold">{{
-                                                    meal.amount }}{{ meal.unit || '份' }}</span>
-                                                <span class="text-lg font-black tracking-tight ml-1">{{ formatFloat(meal.calories) }}</span>
+                                                    row.data.amount }}{{ row.data.unit || '份' }}</span>
+                                                <span class="text-lg font-black tracking-tight ml-1">{{ formatFloat(row.data.calories) }}</span>
                                                 <span class="text-[10px] text-muted uppercase font-bold">kcal</span>
                                             </div>
                                             <div class="flex items-center gap-3">
                                                 <span class="flex items-center gap-1 text-[11px] font-bold text-muted">
-                                                    <span class="w-2 h-2 rounded-full bg-pink-500"></span>F {{ formatFloat(meal.fat) }}g</span>
+                                                    <span class="w-2 h-2 rounded-full bg-pink-500"></span>F {{ formatFloat(row.data.fat) }}g</span>
                                                 <span class="flex items-center gap-1 text-[11px] font-bold text-muted">
-                                                    <span class="w-2 h-2 rounded-full bg-violet-500"></span>P {{ formatFloat(meal.protein) }}g</span>
+                                                    <span class="w-2 h-2 rounded-full bg-violet-500"></span>P {{ formatFloat(row.data.protein) }}g</span>
                                                 <span class="flex items-center gap-1 text-[11px] font-bold text-muted">
-                                                    <span class="w-2 h-2 rounded-full bg-brand"></span>C {{ formatFloat(meal.carbs) }}g</span>
+                                                    <span class="w-2 h-2 rounded-full bg-brand"></span>C {{ formatFloat(row.data.carbs) }}g</span>
                                             </div>
                                         </div>
                                     </div>

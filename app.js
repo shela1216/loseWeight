@@ -907,11 +907,25 @@
                     { key: 'snack', icon: '🍰', name: '點心', label: '🍰 點心' }
                 ];
 
-                const getMealsByType = (type) => {
-                    return (allData[selectedDate.value]?.meals || [])
-                        .map((meal, index) => ({ ...meal, originalIndex: index }))
-                        .filter(m => m.type === type);
-                };
+                const WORKOUT_TYPES = [
+                    { key: 'run', icon: '🏃', name: '慧跑' },
+                    { key: 'walk', icon: '🚶', name: '快走' },
+                    { key: 'bike', icon: '🚴', name: '單車' },
+                    { key: 'swim', icon: '🏊', name: '游泳' },
+                    { key: 'gym', icon: '🏋️', name: '重訓' },
+                    { key: 'yoga', icon: '🧘', name: '瑜珈' },
+                    { key: 'ball', icon: '⚽', name: '球類' },
+                    { key: 'other', icon: '✨', name: '其他' }
+                ];
+                const getWorkoutMeta = (key) => WORKOUT_TYPES.find(w => w.key === key) || WORKOUT_TYPES[WORKOUT_TYPES.length - 1];
+
+                // 餐點與運動合併成一條時間軸
+                const timeline = computed(() => {
+                    const day = allData[selectedDate.value];
+                    return buildTimeline(day?.meals, day?.workouts);
+                });
+
+                const getMealMeta = (key) => mealTypes.find(t => t.key === key) || mealTypes[1];
 
                 const calendarDays = computed(() => {
                     const year = pickerMonth.value.getFullYear();
@@ -1471,12 +1485,10 @@
                         pickerMonth.value = new Date(d.getFullYear(), d.getMonth(), 1);
                         await loadMonthData(pickerMonth.value);
                     },
-                    mealTypes, getMealsByType, nowHHMM, DEFAULT_MEAL_TIME,
+                    mealTypes, nowHHMM, DEFAULT_MEAL_TIME,
+                    timeline, WORKOUT_TYPES, getWorkoutMeta, getMealMeta,
                     dragMeal, dragPos, dragOverType, pendingMove,
                     onMealPointerDown, onMealPointerMove, onMealTouchMove, onMealPointerUp, cancelMealDrag, executeMealMove,
-                    getTypeCalories: (type) => (allData[selectedDate.value]?.meals || [])
-                        .filter(m => m.type === type)
-                        .reduce((s, m) => s + (Number(m.calories) || 0), 0),
                     addMeal, startEdit, cancelEdit, saveMeal, addFromHistory, saveToHistoryOnly,
                     confirmDeleteHistory: (item) => { historyToDelete.value = item; }, executeDeleteHistory,
                     confirmDelete: (i) => { mealToDelete.value = i; },
