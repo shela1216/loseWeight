@@ -19,8 +19,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
     <!-- CSS 也要帶版號：tailwind.css 是 purge 產物，沒有 cache buster 時新 class 會被舊快取吃掉 -->
-    <link rel="stylesheet" href="tailwind.css?v=0.4.2">
-    <link rel="stylesheet" href="styles.css?v=0.4.2">
+    <link rel="stylesheet" href="tailwind.css?v=0.4.3">
+    <link rel="stylesheet" href="styles.css?v=0.4.3">
     <script src="https://unpkg.com/vue@3.5.35/dist/vue.global.prod.js"></script>
 
     <link rel="manifest" href='manifest.json'>
@@ -437,11 +437,14 @@
                                     v-show="!(row.kind === 'meal' && editingIndex === row.originalIndex)"
                                     class="flex items-start gap-3">
 
-                                    <!-- 時間刻度：餐別標在時間上方，運動列保留同高空白讓時間對齊 -->
+                                    <!-- 時間刻度：類別標在時間上方（餐點用餐別代表色，運動用綠色） -->
                                     <div class="w-[52px] shrink-0 text-right">
                                         <p class="h-4 leading-4 text-[10px] font-black whitespace-nowrap overflow-hidden"
+                                            :class="row.kind === 'workout' ? 'text-emerald-500' : ''"
                                             :style="row.kind === 'meal' ? { color: getMealMeta(row.data.type).color } : null">{{
-                                            row.kind === 'meal' ? getMealMeta(row.data.type).icon + getMealMeta(row.data.type).name : '' }}</p>
+                                            row.kind === 'workout'
+                                                ? getWorkoutMeta(row.data.type).icon + getWorkoutMeta(row.data.type).name
+                                                : getMealMeta(row.data.type).icon + getMealMeta(row.data.type).name }}</p>
                                         <span class="text-[11px] font-black text-muted tabular-nums">{{ row.time }}</span>
                                     </div>
 
@@ -465,9 +468,10 @@
                                         :class="dragRow && dragRow.kind === 'workout' && dragRow.originalIndex === row.originalIndex ? 'opacity-40 scale-[0.98]' : ''">
                                         <div class="flex items-center gap-3">
                                             <span class="w-9 h-9 rounded-full bg-emerald-500/10 flex items-center justify-center text-lg shrink-0">{{ getWorkoutMeta(row.data.type).icon }}</span>
-                                            <div class="min-w-0 flex-1">
-                                                <p class="text-sm font-black text-ink truncate">{{ getWorkoutMeta(row.data.type).name }}</p>
-                                                <p class="text-[11px] font-bold text-muted mt-0.5">{{ row.data.duration }} <span class="uppercase tracking-widest">min</span></p>
+                                            <!-- 類型已在左側標籤，卡片以時長為主（比照餐點卡的 kcal 排法） -->
+                                            <div class="min-w-0 flex-1 flex items-baseline gap-1.5">
+                                                <span class="text-lg font-black tracking-tight">{{ row.data.duration }}</span>
+                                                <span class="text-[10px] text-muted uppercase font-bold">min</span>
                                             </div>
                                             <div class="flex gap-1 shrink-0">
                                                 <button @click="startEditWorkout(row.originalIndex)"
@@ -2022,7 +2026,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.4.2"></script>
+    <script type="module" src="app.js?v=0.4.3"></script>
 </body>
 
 </html>
