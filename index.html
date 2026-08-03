@@ -19,8 +19,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
     <!-- CSS 也要帶版號：tailwind.css 是 purge 產物，沒有 cache buster 時新 class 會被舊快取吃掉 -->
-    <link rel="stylesheet" href="tailwind.css?v=0.4.8">
-    <link rel="stylesheet" href="styles.css?v=0.4.8">
+    <link rel="stylesheet" href="tailwind.css?v=0.4.9">
+    <link rel="stylesheet" href="styles.css?v=0.4.9">
     <script src="https://unpkg.com/vue@3.5.35/dist/vue.global.prod.js"></script>
 
     <link rel="manifest" href='manifest.json'>
@@ -467,6 +467,9 @@
                                         @contextmenu.prevent
                                         class="meal-card rounded-card relative overflow-hidden order-3 w-full sm:w-auto sm:flex-1 min-w-0 p-3.5 sm:p-4 select-none"
                                         :class="dragRow && dragRow.kind === 'workout' && dragRow.originalIndex === row.originalIndex ? 'opacity-40 scale-[0.98]' : ''">
+                                        <!-- 手機版沒有左側節點與連接線，改用卡片左緣彩色邊條標示類別 -->
+                                        <span class="absolute left-0 top-0 bottom-0 w-1 sm:hidden"
+                                            :style="{ backgroundColor: rowColor(row) }"></span>
                                         <div class="flex items-center gap-3">
                                             <span class="w-9 h-9 rounded-full bg-emerald-500/10 flex items-center justify-center text-lg shrink-0">{{ getWorkoutMeta(row.data.type).icon }}</span>
                                             <!-- 「其他」的自訂內容在左側 56px 標籤放不下，完整名稱顯示在卡片 -->
@@ -502,6 +505,9 @@
                                         @contextmenu.prevent
                                         class="meal-card rounded-card relative overflow-hidden group order-3 w-full sm:w-auto sm:flex-1 min-w-0 p-4 sm:p-5 select-none"
                                         :class="dragRow && dragRow.kind === 'meal' && dragRow.originalIndex === row.originalIndex ? 'opacity-40 scale-[0.98]' : ''">
+                                        <!-- 手機版沒有左側節點與連接線，改用卡片左緣彩色邊條標示餐別 -->
+                                        <span class="absolute left-0 top-0 bottom-0 w-1 sm:hidden"
+                                            :style="{ backgroundColor: rowColor(row) }"></span>
                                         <!-- 第一行：名稱 + 編輯/刪除（餐別已移到左側時間欄上方） -->
                                         <div class="flex items-start gap-2 mb-2">
                                             <span class="flex-1 text-base sm:text-lg font-semibold break-words min-w-0 leading-snug">{{
@@ -2057,7 +2063,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.4.8"></script>
+    <script type="module" src="app.js?v=0.4.9"></script>
 </body>
 
 </html>
