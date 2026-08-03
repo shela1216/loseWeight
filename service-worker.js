@@ -1,5 +1,5 @@
 // 快取版本號
-const CACHE_NAME = 'diet-tracker-v0.4.6';
+const CACHE_NAME = 'diet-tracker-v0.4.7';
 
 // 需要快取的靜態資源列表
 const urlsToCache = [

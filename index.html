@@ -19,8 +19,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
     <!-- CSS 也要帶版號：tailwind.css 是 purge 產物，沒有 cache buster 時新 class 會被舊快取吃掉 -->
-    <link rel="stylesheet" href="tailwind.css?v=0.4.6">
-    <link rel="stylesheet" href="styles.css?v=0.4.6">
+    <link rel="stylesheet" href="tailwind.css?v=0.4.7">
+    <link rel="stylesheet" href="styles.css?v=0.4.7">
     <script src="https://unpkg.com/vue@3.5.35/dist/vue.global.prod.js"></script>
 
     <link rel="manifest" href='manifest.json'>
@@ -1849,8 +1849,11 @@
         </div>
 
         <!-- 隱藏的截圖報表模板 -->
-        <div id="export-report"
-            style="display: none; width: 800px; padding: 40px; background-color: #f8f9fb; font-family: sans-serif;">
+        <!-- 匯出報告：只在匯出時建立（原本常駐 DOM，害 getRangeStats() 每次資料變動都重算 11 次）
+             字體必須明確指定含中文字符的字型：主字體 Inter 沒有中文，html2canvas 的 clone
+             逐字 fallback 不可靠，中文會變成豆腐方塊 -->
+        <div v-if="exportStats" id="export-report"
+            style="display: none; width: 800px; padding: 40px; background-color: #f8f9fb; font-family: 'PingFang TC', 'Heiti TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Hiragino Sans GB', sans-serif;">
             <div
                 style="background-color: white; border-radius: 40px; padding: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.05);">
                 <!-- Header -->
@@ -1878,7 +1881,7 @@
                         <p
                             style="font-size: 11px; font-weight: 800; color: #94a3b8; margin-bottom: 5px; text-transform: uppercase;">
                             平均熱量</p>
-                        <p style="font-size: 22px; font-weight: 900; color: #F97316;">{{ getRangeStats().avgCalories }}
+                        <p style="font-size: 22px; font-weight: 900; color: #F97316;">{{ exportStats.avgCalories }}
                             <span style="font-size: 12px;">kcal</span></p>
                     </div>
                     <div
@@ -1887,7 +1890,7 @@
                             style="font-size: 11px; font-weight: 800; color: #94a3b8; margin-bottom: 5px; text-transform: uppercase;">
                             淨碳水比例</p>
                         <p style="font-size: 22px; font-weight: 900; color: #F97316;">{{
-                            getRangeStats().nutrientPercents.carbs }}%</p>
+                            exportStats.nutrientPercents.carbs }}%</p>
                     </div>
                     <div
                         style="background-color: #f8fafc; padding: 20px; border-radius: 25px; border: 1px solid #f1f5f9; text-align: center;">
@@ -1895,7 +1898,7 @@
                             style="font-size: 11px; font-weight: 800; color: #94a3b8; margin-bottom: 5px; text-transform: uppercase;">
                             蛋白比例</p>
                         <p style="font-size: 22px; font-weight: 900; color: #8b5cf6;">{{
-                            getRangeStats().nutrientPercents.protein }}%</p>
+                            exportStats.nutrientPercents.protein }}%</p>
                     </div>
                     <div
                         style="background-color: #f8fafc; padding: 20px; border-radius: 25px; border: 1px solid #f1f5f9; text-align: center;">
@@ -1903,13 +1906,13 @@
                             style="font-size: 11px; font-weight: 800; color: #94a3b8; margin-bottom: 5px; text-transform: uppercase;">
                             脂肪比例</p>
                         <p style="font-size: 22px; font-weight: 900; color: #ec4899;">{{
-                            getRangeStats().nutrientPercents.fat }}%</p>
+                            exportStats.nutrientPercents.fat }}%</p>
                     </div>
                 </div>
 
                 <!-- Day Type Distribution -->
                 <div style="display: flex; gap: 10px; margin-bottom: 40px; justify-content: center;">
-                    <div v-for="(count, type) in getRangeStats().daysByType" :key="type"
+                    <div v-for="(count, type) in exportStats.daysByType" :key="type"
                         style="padding: 8px 16px; border-radius: 12px; font-size: 12px; font-weight: 800;"
                         :style="{ backgroundColor: {high:'#E6F7F0', med:'#EEF0FE', low:'#FEECEF', rest:'#F1F5F9'}[type], color: {high:'#0A9C6D', med:'#4F46E5', low:'#BE123C', rest:'#475569'}[type] }">
                         {{ {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[type] }}: {{ count }}天
@@ -1948,13 +1951,13 @@
                                 <td style="padding: 12px; font-size: 13px; font-weight: 800; color: #1e293b;">{{
                                     {high:'高碳日', med:'中碳日', low:'低碳日'}[type] }}</td>
                                 <td style="padding: 12px; text-align: center; font-size: 13px; font-weight: 700;">{{
-                                    getRangeStats().planAverages[type]?.calories || '-' }}</td>
+                                    exportStats.planAverages[type]?.calories || '-' }}</td>
                                 <td style="padding: 12px; text-align: center; font-size: 13px; font-weight: 700;">{{
-                                    getRangeStats().planAverages[type]?.carbs || '-' }}</td>
+                                    exportStats.planAverages[type]?.carbs || '-' }}</td>
                                 <td style="padding: 12px; text-align: center; font-size: 13px; font-weight: 700;">{{
-                                    getRangeStats().planAverages[type]?.protein || '-' }}</td>
+                                    exportStats.planAverages[type]?.protein || '-' }}</td>
                                 <td style="padding: 12px; text-align: center; font-size: 13px; font-weight: 700;">{{
-                                    getRangeStats().planAverages[type]?.fat || '-' }}</td>
+                                    exportStats.planAverages[type]?.fat || '-' }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -1984,45 +1987,62 @@
                 <div>
                     <h3
                         style="font-size: 14px; font-weight: 800; color: #64748b; margin-bottom: 25px; text-transform: uppercase; border-left: 4px solid #F97316; padding-left: 10px;">
-                        每日飲食詳情</h3>
-                    <div style="display: flex; flex-direction: column; gap: 30px;">
-                        <div v-for="day in getRangeStats().dailyRecords" :key="day.date">
-                            <div v-if="day.meals.length > 0">
-                                <div
-                                    style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding-bottom: 8px;">
-                                    <span style="font-size: 14px; font-weight: 900; color: #1e293b;">📅 {{ day.date }}
-                                        ({{ {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[day.planType] || '-' }})</span>
-                                    <span style="font-size: 12px; font-weight: 800; color: #F97316;">當日總計: {{
-                                        day.totalCalories }} kcal</span>
-                                </div>
-                                <div style="display: flex; flex-direction: column; gap: 8px;">
-                                    <div v-for="m in day.meals" :key="m.name"
-                                        style="display: flex; justify-content: space-between; align-items: center; background-color: #fff; border: 1px solid #f1f5f9; padding: 12px 20px; border-radius: 15px;">
-                                        <div style="display: flex; align-items: center; gap: 10px;">
+                        每日紀錄詳情</h3>
+                    <div style="display: flex; flex-direction: column; gap: 26px;">
+                        <div v-for="day in exportStats.dailyRecords" :key="day.date"
+                            v-show="dayTimeline(day).length > 0" style="break-inside: avoid;">
+                            <div
+                                style="margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding-bottom: 8px;">
+                                <span style="font-size: 14px; font-weight: 900; color: #1e293b;">{{ day.date }}
+                                    ({{ {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[day.planType] || '-' }})</span>
+                                <span style="font-size: 12px; font-weight: 800; color: #F97316;">當日總計 {{
+                                    day.totalCalories }} kcal</span>
+                            </div>
+
+                            <!-- 依時間排序，餐點與運動同列呈現；每筆固定兩行版面，不再把品項擠進同一列 -->
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                                <div v-for="(row, i) in dayTimeline(day)" :key="row.kind + '-' + i"
+                                    style="background-color: #fff; border: 1px solid #f1f5f9; padding: 10px 16px; border-radius: 14px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px;">
+                                        <div style="display: flex; align-items: baseline; gap: 8px; min-width: 0;">
                                             <span
-                                                style="font-size: 10px; font-weight: 900; color: #F97316; background: #FFF1E7; padding: 2px 8px; border-radius: 6px;">{{
-                                                getMealLabel(m.type).split(' ')[1] }}</span>
-                                            <span style="font-size: 14px; font-weight: 800; color: #1e293b;">{{ m.name
-                                                }}</span>
-                                            <span style="font-size: 11px; font-weight: 700; color: #94a3b8;">{{ m.amount
-                                                }}{{ m.unit }}</span>
+                                                style="font-size: 11px; font-weight: 800; color: #94a3b8; font-variant-numeric: tabular-nums;">{{ row.time }}</span>
+                                            <span style="font-size: 10px; font-weight: 900; padding: 2px 7px; border-radius: 6px;"
+                                                :style="{ color: rowColor(row), backgroundColor: rowColor(row) + '1f' }">{{
+                                                row.kind === 'workout' ? getWorkoutMeta(row.data.type).name : getMealMeta(row.data.type).name }}</span>
+                                            <span style="font-size: 13px; font-weight: 800; color: #1e293b;">{{
+                                                row.kind === 'workout' ? (row.data.name || getWorkoutMeta(row.data.type).name) : (row.data.name || '未命名餐點') }}</span>
+                                            <span v-if="row.kind === 'meal'"
+                                                style="font-size: 11px; font-weight: 700; color: #94a3b8;">{{ row.data.amount }}{{ row.data.unit || '份' }}</span>
                                         </div>
-                                        <div v-if="m.items && m.items.length > 0" style="margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; padding-left: 45px;">
-                                            <span v-for="item in m.items" :key="item.name" style="font-size: 10px; font-weight: 700; color: #64748b; background-color: #f1f5f9; padding: 2px 8px; border-radius: 6px;">
+                                        <div style="font-weight: 900; color: #1e293b; font-size: 13px; white-space: nowrap;">
+                                            <template v-if="row.kind === 'workout'">{{ row.data.duration }} <span
+                                                    style="font-size: 10px; color: #94a3b8;">min</span></template>
+                                            <template v-else>{{ row.data.calories }} <span
+                                                    style="font-size: 10px; color: #cbd5e1;">kcal</span></template>
+                                        </div>
+                                    </div>
+
+                                    <!-- 第二行：餐點的營養素與組合品項 -->
+                                    <div v-if="row.kind === 'meal'" style="margin-top: 6px; padding-left: 44px;">
+                                        <div style="font-size: 10px; font-weight: 700; color: #94a3b8;">
+                                            淨碳水 {{ row.data.carbs }}g · 蛋白 {{ row.data.protein }}g · 脂肪 {{ row.data.fat }}g
+                                        </div>
+                                        <div v-if="row.data.items && row.data.items.length > 0"
+                                            style="margin-top: 5px; display: flex; flex-wrap: wrap; gap: 5px;">
+                                            <span v-for="(item, j) in row.data.items" :key="j"
+                                                style="font-size: 10px; font-weight: 700; color: #64748b; background-color: #f1f5f9; padding: 2px 8px; border-radius: 6px;">
                                                 {{ item.name }} ({{ item.amount }}{{ item.unit }})
                                             </span>
-                                        </div>
-                                        <div style="font-weight: 900; color: #1e293b; font-size: 13px;">
-                                            {{ m.calories }} <span style="font-size: 10px; color: #cbd5e1;">kcal</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div v-if="getRangeStats().meals.length === 0"
+                    <div v-if="exportStats.dailyRecords.every(d => dayTimeline(d).length === 0)"
                         style="text-align: center; padding: 40px; color: #94a3b8; font-weight: 700;">
-                        此區間尚無飲食紀錄
+                        此區間尚無紀錄
                     </div>
                 </div>
                 <div style="margin-top: 50px; text-align: center; border-top: 1px solid #f1f5f9; padding-top: 20px;">
@@ -2035,7 +2055,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.4.6"></script>
+    <script type="module" src="app.js?v=0.4.7"></script>
 </body>
 
 </html>

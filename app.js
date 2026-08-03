@@ -51,7 +51,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.4.6');
+                console.log('App initialization starting... v0.4.7');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -164,16 +164,27 @@
                     updateTotalsFromItems();
                 };
 
+                // 報告資料快照:模板改讀這份而非每次呼叫 getRangeStats()
+                // (報告區塊常駐 DOM,原本任何反應式變動都會重算 11 次、每次掃整個日期區間)
+                const exportStats = ref(null);
+                const dayTimeline = (day) => buildTimeline(day.meals, day.workouts);
+
                 const exportPDF = async () => {
                     isExporting.value = true;
+                    exportStats.value = getRangeStats(); // 先算好快照,報告才會用同一份資料渲染
                     await Vue.nextTick();
+
                     const reportEl = document.getElementById('export-report');
+                    if (!reportEl) {
+                        isExporting.value = false;
+                        exportStats.value = null;
+                        return;
+                    }
                     reportEl.style.display = 'block';
+                    renderExportCharts(exportStats.value);
 
-                    const stats = getRangeStats();
-                    renderExportCharts(stats);
-
-                    await new Promise(r => setTimeout(r, 1000));
+                    // 圖表已關閉動畫,只需等字體與 layout 穩定
+                    await new Promise(r => setTimeout(r, 400));
 
                     try {
                         const { jsPDF } = window.jspdf;
@@ -186,19 +197,21 @@
 
                         const imgData = canvas.toDataURL('image/png');
                         const pdf = new jsPDF('p', 'mm', 'a4');
+                        const pageW = pdf.internal.pageSize.getWidth();
+                        const pageH = pdf.internal.pageSize.getHeight();
+                        const imgH = (canvas.height * pageW) / canvas.width;
 
-                        const imgProps = pdf.getImageProperties(imgData);
-                        const pdfWidth = pdf.internal.pageSize.getWidth();
-                        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-                        if (pdfHeight > pdf.internal.pageSize.getHeight()) {
-                            const longPdf = new jsPDF('p', 'mm', [pdfWidth, pdfHeight]);
-                            longPdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                            longPdf.save(`健康報告_${exportRange.start}_to_${exportRange.end}.pdf`);
-                        } else {
-                            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                            pdf.save(`健康報告_${exportRange.start}_to_${exportRange.end}.pdf`);
+                        // 切成多張 A4,而不是產生一張跟內容一樣高的巨大單頁
+                        let offset = 0;
+                        pdf.addImage(imgData, 'PNG', 0, 0, pageW, imgH);
+                        let remaining = imgH - pageH;
+                        while (remaining > 0) {
+                            offset -= pageH;
+                            pdf.addPage();
+                            pdf.addImage(imgData, 'PNG', 0, offset, pageW, imgH);
+                            remaining -= pageH;
                         }
+                        pdf.save(`健康報告_${exportRange.start}_to_${exportRange.end}.pdf`);
 
                         showExportModal.value = false;
                     } catch (e) {
@@ -206,6 +219,7 @@
                         alert('匯出失敗，請稍後再試');
                     } finally {
                         reportEl.style.display = 'none';
+                        exportStats.value = null;
                         isExporting.value = false;
                     }
                 };
@@ -258,6 +272,7 @@
                         stats.dailyRecords.push({
                             date: dateStr,
                             meals: dayMeals,
+                            workouts: (record && record.workouts) || [],
                             totalCalories: dayCal,
                             planType: dayType
                         });
@@ -336,7 +351,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.4.6');
+                const appVersion = ref('0.4.7');
                 const editingMeal = reactive({ type: 'lunch', time: '12:00', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -905,11 +920,6 @@
                 const currentMonthYearDisplay = computed(() => {
                     return new Date(selectedDate.value).toLocaleDateString('zh-TW', { year: 'numeric', month: 'long' });
                 });
-
-                const getMealLabel = (type) => {
-                    const map = { breakfast: '🌅 早餐', lunch: '☀️ 午餐', dinner: '🌙 晚餐', snack: '🍰 點心' };
-                    return map[type] || '餐點';
-                };
 
                 const getPlanLabel = (key) => {
                     const map = { high: '高碳日', med: '中碳日', low: '低碳日', rest: '自由日' };
@@ -1509,23 +1519,39 @@
                 };
 
                 const exportCSV = () => {
-                    let csvContent = "data:text/csv;charset=utf-8,日期,計畫類型,餐點名稱,餐點類型,份量,單位,熱量,淨碳水,蛋白質,脂肪,品項內容\n";
+                    // 文字欄位一律加引號並轉義,否則名稱含逗號會讓整列欄位錯位
+                    const q = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+                    const rows = [['日期', '時間', '類別', '計畫類型', '名稱', '份量', '單位', '熱量', '淨碳水', '蛋白質', '脂肪', '品項內容'].join(',')];
+
                     Object.keys(allData).sort().forEach(date => {
                         const day = allData[date];
-                        if (day.meals && day.meals.length > 0) {
-                            day.meals.forEach(m => {
-                                const itemsStr = m.items ? m.items.map(i => `${i.name}(${i.amount}${i.unit})`).join('; ') : '';
-                                csvContent += `${date},${getPlanLabel(day.planType)},${m.name},${getMealLabel(m.type)},${m.amount},${m.unit || '份'},${m.calories},${m.carbs},${m.protein},${m.fat},"${itemsStr}"\n`;
-                            });
-                        }
+                        const plan = getPlanLabel(day.planType) || '';
+                        (day.meals || []).forEach(m => {
+                            const itemsStr = m.items ? m.items.map(i => `${i.name}(${i.amount}${i.unit})`).join('; ') : '';
+                            rows.push([
+                                date, mealTime(m), q(getMealMeta(m.type).name), q(plan), q(m.name),
+                                m.amount, q(m.unit || '份'), m.calories, m.carbs, m.protein, m.fat, q(itemsStr)
+                            ].join(','));
+                        });
+                        (day.workouts || []).forEach(w => {
+                            rows.push([
+                                date, w.time || '', q('運動'), q(plan),
+                                q(w.name || getWorkoutMeta(w.type).name),
+                                w.duration, q('分鐘'), '', '', '', '', ''
+                            ].join(','));
+                        });
                     });
-                    const encodedUri = encodeURI(csvContent);
+
+                    // BOM 是必要的:少了它 Excel 會用系統編碼讀 UTF-8,中文全部變亂碼
+                    const blob = new Blob(['\uFEFF' + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
                     const link = document.createElement("a");
-                    link.setAttribute("href", encodedUri);
+                    link.setAttribute("href", url);
                     link.setAttribute("download", `健康飲食紀錄_${new Date().toLocaleDateString('sv-SE')}.csv`);
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
                 };
 
                 const onlyNumber = (e) => {
@@ -1555,7 +1581,7 @@
                         const day = allData[selectedDate.value];
                         return activePlan(selectedDate.value, day);
                     }),
-                    getMealLabel, getPlanLabel,
+                    getPlanLabel,
                     getDailySum: (type) => (allData[selectedDate.value]?.meals || []).reduce((s, m) => s + (Number(m[type]) || 0), 0),
                     getGoalDisplay: (type, planObj = null) => {
                         const day = allData[selectedDate.value];
@@ -1666,7 +1692,7 @@
                     activeSuggestItem, itemSuggestions, applyItemSuggestion, itemSuggestPage, suggestPageCount, pagedSuggestions,
                     beginItemAmount, changeItemAmount,
                     quickNutrientInput, parseQuickInput, parseItemInput,
-                    showExportModal, isExporting, exportRange, exportPDF, getRangeStats,
+                    showExportModal, isExporting, exportRange, exportPDF, getRangeStats, exportStats, dayTimeline,
                     excludedDates, exportDateList, toggleExcludedDate, toggleAllExportDates, setQuickRange,
                     isMobile, screenWidth, isCalendarExpanded, toggleCalendar, showMonthModal, showCalendarModal, jumpYear, jumpToMonth, showMobileMenu,
                     handleAuth: async (mode) => {
