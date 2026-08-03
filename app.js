@@ -416,57 +416,59 @@
                 const mealToDelete = ref(null);
                 const historyToDelete = ref(null);
 
-                // === 長按拖曳切換餐別 ===
-                const dragMeal = ref(null);        // { index, name, type }
+                // === 長按拖曳調整時間 ===
+                // 垂直位移換算時間,15 分鐘一格。DRAG_PX_PER_STEP 是手感校準值,拖起來太快/太慢就調這個
+                const DRAG_PX_PER_STEP = 24;
+                const dragRow = ref(null);         // { kind, originalIndex, startTime, time }
                 const dragPos = ref({ x: 0, y: 0 });
-                const dragOverType = ref(null);
-                const pendingMove = ref(null);     // { index, name, type, to }
                 let pressTimer = null, pressStart = null;
 
                 const resetPress = () => { clearTimeout(pressTimer); pressStart = null; };
 
-                const onMealPointerDown = (e, meal) => {
+                const onRowPointerDown = (e, row) => {
                     if (e.target.closest('button, input, textarea')) return;
                     pressStart = { x: e.clientX, y: e.clientY };
                     e.currentTarget.setPointerCapture?.(e.pointerId);
                     clearTimeout(pressTimer);
                     pressTimer = setTimeout(() => {
-                        dragMeal.value = { index: meal.originalIndex, name: meal.name || '未命名餐點', type: meal.type };
-                        dragOverType.value = meal.type;
+                        dragRow.value = {
+                            kind: row.kind,
+                            originalIndex: row.originalIndex,
+                            startTime: row.time,
+                            time: row.time
+                        };
                         dragPos.value = { ...pressStart };
                         navigator.vibrate?.(30);
                     }, 400);
                 };
 
-                const onMealPointerMove = (e) => {
-                    if (!dragMeal.value) {
+                const onRowPointerMove = (e) => {
+                    if (!dragRow.value) {
                         if (pressStart && Math.hypot(e.clientX - pressStart.x, e.clientY - pressStart.y) > 10) resetPress();
                         return;
                     }
                     dragPos.value = { x: e.clientX, y: e.clientY };
-                    const el = document.elementFromPoint(e.clientX, e.clientY)?.closest('[data-meal-type]');
-                    dragOverType.value = el?.dataset.mealType || null;
+                    const dy = e.clientY - pressStart.y;
+                    dragRow.value.time = snapTime(dragRow.value.startTime, Math.round(dy / DRAG_PX_PER_STEP) * 15);
                 };
 
                 // 拖曳中阻止頁面滾動（touch-action 無法在手勢中途生效，只能 preventDefault）
-                const onMealTouchMove = (e) => { if (dragMeal.value) e.preventDefault(); };
+                const onRowTouchMove = (e) => { if (dragRow.value) e.preventDefault(); };
 
-                const onMealPointerUp = () => {
+                const onRowPointerUp = () => {
                     resetPress();
-                    const drag = dragMeal.value, to = dragOverType.value;
-                    dragMeal.value = null;
-                    dragOverType.value = null;
-                    if (drag && to && to !== drag.type) pendingMove.value = { ...drag, to };
+                    const drag = dragRow.value;
+                    dragRow.value = null;
+                    if (!drag || drag.time === drag.startTime) return;
+                    const day = allData[selectedDate.value];
+                    const target = drag.kind === 'meal' ? day?.meals?.[drag.originalIndex] : day?.workouts?.[drag.originalIndex];
+                    if (!target) return;
+                    target.time = drag.time;
+                    if (drag.kind === 'meal') sortMeals();
+                    saveData();
                 };
 
-                const cancelMealDrag = () => { resetPress(); dragMeal.value = null; dragOverType.value = null; };
-
-                const executeMealMove = () => {
-                    const mv = pendingMove.value;
-                    const meal = mv && allData[selectedDate.value]?.meals?.[mv.index];
-                    if (meal) { meal.type = mv.to; saveData(); }
-                    pendingMove.value = null;
-                };
+                const cancelRowDrag = () => { resetPress(); dragRow.value = null; };
                 const showSyncModal = ref(false);
                 const lastAmount = ref(1);
                 const originalNutrients = reactive({ calories: 0, carbs: 0, protein: 0, fat: 0 });
@@ -1558,8 +1560,8 @@
                     timeline, WORKOUT_TYPES, getWorkoutMeta, getMealMeta, pickMealType,
                     editingWorkout, editingWorkoutIndex, isAddingWorkout, addWorkout, startEditWorkout,
                     saveWorkout, cancelEditWorkout, workoutToDelete, confirmDeleteWorkout, executeDeleteWorkout,
-                    dragMeal, dragPos, dragOverType, pendingMove,
-                    onMealPointerDown, onMealPointerMove, onMealTouchMove, onMealPointerUp, cancelMealDrag, executeMealMove,
+                    dragRow, dragPos,
+                    onRowPointerDown, onRowPointerMove, onRowTouchMove, onRowPointerUp, cancelRowDrag,
                     addMeal, startEdit, cancelEdit, saveMeal, addFromHistory, saveToHistoryOnly,
                     confirmDeleteHistory: (item) => { historyToDelete.value = item; }, executeDeleteHistory,
                     confirmDelete: (i) => { mealToDelete.value = i; },

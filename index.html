@@ -449,7 +449,14 @@
 
                                     <!-- 運動卡 -->
                                     <div v-if="row.kind === 'workout'"
-                                        class="meal-card rounded-card relative overflow-hidden flex-1 min-w-0 p-3.5 sm:p-4 select-none">
+                                        @pointerdown="onRowPointerDown($event, row)"
+                                        @pointermove="onRowPointerMove"
+                                        @pointerup="onRowPointerUp"
+                                        @pointercancel="cancelRowDrag"
+                                        @touchmove="onRowTouchMove"
+                                        @contextmenu.prevent
+                                        class="meal-card rounded-card relative overflow-hidden flex-1 min-w-0 p-3.5 sm:p-4 select-none"
+                                        :class="dragRow && dragRow.kind === 'workout' && dragRow.originalIndex === row.originalIndex ? 'opacity-40 scale-[0.98]' : ''">
                                         <div class="flex items-center gap-3">
                                             <span class="w-9 h-9 rounded-full bg-emerald-500/10 flex items-center justify-center text-lg shrink-0">{{ getWorkoutMeta(row.data.type).icon }}</span>
                                             <div class="min-w-0 flex-1">
@@ -473,7 +480,14 @@
 
                                     <!-- 餐點卡 -->
                                     <div v-else
-                                        class="meal-card rounded-card relative overflow-hidden group flex-1 min-w-0 p-4 sm:p-5 select-none">
+                                        @pointerdown="onRowPointerDown($event, row)"
+                                        @pointermove="onRowPointerMove"
+                                        @pointerup="onRowPointerUp"
+                                        @pointercancel="cancelRowDrag"
+                                        @touchmove="onRowTouchMove"
+                                        @contextmenu.prevent
+                                        class="meal-card rounded-card relative overflow-hidden group flex-1 min-w-0 p-4 sm:p-5 select-none"
+                                        :class="dragRow && dragRow.kind === 'meal' && dragRow.originalIndex === row.originalIndex ? 'opacity-40 scale-[0.98]' : ''">
                                         <!-- 第一行：名稱 + 餐別 chip + 編輯/刪除 -->
                                         <div class="flex items-start gap-2 mb-2">
                                             <span class="flex-1 text-base sm:text-lg font-semibold break-words min-w-0 leading-snug">{{
@@ -1559,37 +1573,15 @@
         </div>
         </Teleport>
 
-        <!-- 拖曳中的浮動標籤 -->
+        <!-- 拖曳中的目標時間 -->
         <Teleport to="body">
-            <div v-if="dragMeal" class="fixed z-[300] pointer-events-none -translate-x-1/2 -translate-y-1/2"
+            <div v-if="dragRow" class="fixed z-[300] pointer-events-none -translate-x-1/2 -translate-y-1/2"
                 :style="{ left: dragPos.x + 'px', top: dragPos.y + 'px' }">
-                <div class="bg-brand text-white px-4 py-2 rounded-control text-sm font-black shadow-2xl whitespace-nowrap">
-                    {{ dragMeal.name }}
+                <div class="bg-brand text-white px-4 py-2 rounded-control text-lg font-black shadow-2xl whitespace-nowrap tabular-nums">
+                    {{ dragRow.time }}
                 </div>
             </div>
         </Teleport>
-
-        <!-- 確認搬移餐別 Modal -->
-        <div v-if="pendingMove" class="fixed inset-0 z-[130] flex items-center justify-center p-4">
-            <div class="modal-overlay absolute inset-0"></div>
-            <div class="bg-surface rounded-panel p-10 relative z-10 w-full max-w-xs text-center shadow-2xl border border-line">
-                <div class="w-20 h-20 bg-brand/10 text-brand rounded-panel flex items-center justify-center mx-auto mb-6 shadow-inner">
-                    <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                    </svg>
-                </div>
-                <h4 class="text-xl font-black text-ink mb-2 tracking-tight">移動餐點？</h4>
-                <p class="text-sm text-muted mb-8 leading-relaxed">
-                    將「{{ pendingMove.name }}」從 {{ getMealLabel(pendingMove.type) }} 移到 {{ getMealLabel(pendingMove.to) }}
-                </p>
-                <div class="flex gap-3">
-                    <button @click="pendingMove = null"
-                        class="flex-1 py-4 bg-page text-muted rounded-control font-black text-sm hover:bg-line active:scale-95 transition-all">取消</button>
-                    <button @click="executeMealMove"
-                        class="flex-1 py-4 bg-brand text-white rounded-control font-black text-sm shadow-xl hover:opacity-90 active:scale-95 transition-all">確定</button>
-                </div>
-            </div>
-        </div>
 
         <!-- 確認刪除 Modal (餐點紀錄) -->
         <div v-if="mealToDelete !== null && mealToDelete !== undefined" class="fixed inset-0 z-[130] flex items-center justify-center p-4">
