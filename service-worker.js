@@ -6,6 +6,8 @@ const urlsToCache = [
     '/',
     'index.html',
     'app.js',
+    'recommend.js',
+    'timeline.js',
     'styles.css',
     'manifest.json',
     'leaf.png',
