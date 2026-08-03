@@ -337,7 +337,7 @@
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
                 const appVersion = ref('0.3.5');
-                const editingMeal = reactive({ type: 'lunch', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
+                const editingMeal = reactive({ type: 'lunch', time: '12:00', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
                 const updateTotalsFromItems = () => {
@@ -1274,6 +1274,8 @@
                     const meal = allData[selectedDate.value].meals[index];
                     const copiedMeal = JSON.parse(JSON.stringify(meal));
                     if (!copiedMeal.items) copiedMeal.items = [];
+                    // 舊資料沒有 time,Object.assign 不會覆蓋 → 要顯式補上餐別預設值,否則殘留上一筆的時間
+                    if (!copiedMeal.time) copiedMeal.time = mealTime(copiedMeal);
                     Object.assign(editingMeal, copiedMeal);
 
                     // 檢查名稱是否與品項串接相符，判斷是否為自動生成
@@ -1285,6 +1287,13 @@
                     skipHistorySave.value = false;
                     lastAmount.value = editingMeal.amount;
                     tempMealBackup.value = JSON.parse(JSON.stringify(copiedMeal));
+                };
+
+                // 切換餐別:若目前時間還是上一個餐別的預設值(使用者沒手動調過),就一起更新
+                const pickMealType = (key) => {
+                    const wasDefault = editingMeal.time === DEFAULT_MEAL_TIME[editingMeal.type];
+                    editingMeal.type = key;
+                    if (wasDefault || !editingMeal.time) editingMeal.time = DEFAULT_MEAL_TIME[key];
                 };
 
                 // type 傳 null 時依當下時間推導餐別與時間;傳餐別時用該餐別的預設時間
@@ -1486,7 +1495,7 @@
                         await loadMonthData(pickerMonth.value);
                     },
                     mealTypes, nowHHMM, DEFAULT_MEAL_TIME,
-                    timeline, WORKOUT_TYPES, getWorkoutMeta, getMealMeta,
+                    timeline, WORKOUT_TYPES, getWorkoutMeta, getMealMeta, pickMealType,
                     dragMeal, dragPos, dragOverType, pendingMove,
                     onMealPointerDown, onMealPointerMove, onMealTouchMove, onMealPointerUp, cancelMealDrag, executeMealMove,
                     addMeal, startEdit, cancelEdit, saveMeal, addFromHistory, saveToHistoryOnly,

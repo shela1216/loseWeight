@@ -630,11 +630,11 @@
                         </button>
                     </div>
 
-                    <!-- 第2排: 時段 (圓形圖示 + 文字) -->
+                    <!-- 第2排: 餐別 (圓形圖示 + 文字) -->
                     <div class="flex justify-between px-2 sm:px-4">
                         <button
                             v-for="t in [{k:'breakfast', l:'早餐', i:'🌅'}, {k:'lunch', l:'午餐', i:'☀️'}, {k:'dinner', l:'晚餐', i:'🌙'}, {k:'snack', l:'點心', i:'🍰'}]"
-                            :key="t.k" @click="editingMeal.type = t.k"
+                            :key="t.k" @click="pickMealType(t.k)"
                             class="flex flex-col items-center gap-2 group transition-all">
                             <div class="w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300"
                                 :class="editingMeal.type === t.k ? 'bg-brand text-white shadow-xl shadow-brand-soft scale-110' : 'bg-page text-muted grayscale opacity-50 hover:opacity-100 hover:grayscale-0'">
@@ -643,6 +643,13 @@
                             <span class="text-xs font-black transition-colors"
                                 :class="editingMeal.type === t.k ? 'text-ink' : 'text-muted'">{{ t.l }}</span>
                         </button>
+                    </div>
+
+                    <!-- 第3排: 進食時間 -->
+                    <div class="bg-page rounded-control px-4 py-3 flex items-center gap-3">
+                        <label class="text-[10px] font-black text-muted uppercase tracking-widest shrink-0">時間</label>
+                        <input type="time" v-model="editingMeal.time"
+                            class="flex-1 bg-transparent text-xl font-black text-ink outline-none w-full min-w-0 text-right">
                     </div>
 
                     <!-- 品項組合區 (組合餐功能) -->
