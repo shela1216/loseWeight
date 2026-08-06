@@ -19,8 +19,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
     <!-- CSS 也要帶版號：tailwind.css 是 purge 產物，沒有 cache buster 時新 class 會被舊快取吃掉 -->
-    <link rel="stylesheet" href="tailwind.css?v=0.5.0">
-    <link rel="stylesheet" href="styles.css?v=0.5.0">
+    <link rel="stylesheet" href="tailwind.css?v=0.5.1">
+    <link rel="stylesheet" href="styles.css?v=0.5.1">
     <script src="https://unpkg.com/vue@3.5.35/dist/vue.global.prod.js"></script>
 
     <link rel="manifest" href='manifest.json'>
@@ -1940,50 +1940,6 @@
                     </div>
                 </div>
 
-                <!-- Plan Goals Table -->
-                <div style="margin-bottom: 40px;">
-                    <h3
-                        style="font-size: 14px; font-weight: 800; color: #64748b; margin-bottom: 15px; text-transform: uppercase; border-left: 4px solid #F97316; padding-left: 10px;">
-                        計畫目標概覽</h3>
-                    <table
-                        style="width: 100%; border-collapse: collapse; border-radius: 20px; overflow: hidden; border: 1px solid #f1f5f9;">
-                        <thead style="background-color: #f8fafc;">
-                            <tr>
-                                <th
-                                    style="padding: 12px; text-align: left; font-size: 12px; font-weight: 900; color: #64748b;">
-                                    計畫類型</th>
-                                <th
-                                    style="padding: 12px; text-align: center; font-size: 12px; font-weight: 900; color: #64748b;">
-                                    熱量 (kcal)</th>
-                                <th
-                                    style="padding: 12px; text-align: center; font-size: 12px; font-weight: 900; color: #64748b;">
-                                    淨碳水 (g)</th>
-                                <th
-                                    style="padding: 12px; text-align: center; font-size: 12px; font-weight: 900; color: #64748b;">
-                                    蛋白 (g)</th>
-                                <th
-                                    style="padding: 12px; text-align: center; font-size: 12px; font-weight: 900; color: #64748b;">
-                                    脂肪 (g)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="type in ['high', 'med', 'low']" :key="type"
-                                style="border-top: 1px solid #f1f5f9;">
-                                <td style="padding: 12px; font-size: 13px; font-weight: 800; color: #1e293b;">{{
-                                    {high:'高碳日', med:'中碳日', low:'低碳日'}[type] }}</td>
-                                <td style="padding: 12px; text-align: center; font-size: 13px; font-weight: 700;">{{
-                                    exportStats.planAverages[type]?.calories || '-' }}</td>
-                                <td style="padding: 12px; text-align: center; font-size: 13px; font-weight: 700;">{{
-                                    exportStats.planAverages[type]?.carbs || '-' }}</td>
-                                <td style="padding: 12px; text-align: center; font-size: 13px; font-weight: 700;">{{
-                                    exportStats.planAverages[type]?.protein || '-' }}</td>
-                                <td style="padding: 12px; text-align: center; font-size: 13px; font-weight: 700;">{{
-                                    exportStats.planAverages[type]?.fat || '-' }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
                 <!-- 各碳日實際平均攝取 -->
                 <div style="margin-bottom: 40px;">
                     <h3
@@ -2047,7 +2003,9 @@
                             style="font-size: 14px; font-weight: 800; color: #64748b; margin-bottom: 20px; text-transform: uppercase;">
                             每日總熱量組成 (kcal)</h3>
                         <div style="display: flex; justify-content: center;">
-                            <canvas id="trendChart" width="620" height="260"></canvas>
+                            <!-- 固定寬 480,高度隨天數長(每天 22px),避免日期多時把版面壓扁 -->
+                            <canvas id="trendChart" width="480"
+                                :height="Math.max(160, exportStats.dailyLabels.length * 22 + 50)"></canvas>
                         </div>
                     </div>
                     <div style="text-align: center;">
@@ -2132,7 +2090,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.5.0"></script>
+    <script type="module" src="app.js?v=0.5.1"></script>
 </body>
 
 </html>

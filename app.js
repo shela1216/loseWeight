@@ -52,7 +52,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.5.0');
+                console.log('App initialization starting... v0.5.1');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -243,8 +243,7 @@
                         meals: [],
                         dailyRecords: [],
                         daysByType: { high: 0, med: 0, low: 0, rest: 0 },
-                        planAverages: { high: null, med: null, low: null },
-                        typeAverages: {}, // 各碳日「實際」平均攝取,對照 planAverages 的目標值
+                        typeAverages: {}, // 各碳日實際平均攝取
                         topMeals: [],
                         nutrientPercents: { carbs: 0, protein: 0, fat: 0 }
                     };
@@ -264,9 +263,6 @@
                         if (record && record.planType) {
                             dayType = record.planType;
                             stats.daysByType[record.planType]++;
-                            if (!stats.planAverages[record.planType] && record.planType !== 'rest') {
-                                stats.planAverages[record.planType] = record.goals || plans[record.planType];
-                            }
                         }
 
                         let dayCal = 0, dayCarbs = 0, dayProtein = 0, dayFat = 0;
@@ -348,7 +344,8 @@
                         data: { labels: ['淨碳水', '蛋白', '脂肪'], datasets: [{ data: [stats.totalCarbs, stats.totalProtein, stats.totalFat], backgroundColor: ['#6366f1', '#8b5cf6', '#ec4899'], borderWidth: 0 }] },
                         options: { responsive: false, animation: false, plugins: { legend: { position: 'bottom', labels: { font: { weight: 'bold' } } } } }
                     });
-                    // 堆疊柱狀圖:柱高 = 當日總熱量,分段顏色 = 三大營養素各自貢獻的熱量
+                    // 橫向堆疊柱狀圖:柱長 = 當日總熱量,分段顏色 = 三大營養素各自貢獻的熱量
+                    // 寬度固定,日期多只會往下長(canvas 高度由模板依天數綁定),不會撐爆版面
                     const ctx2 = document.getElementById('trendChart').getContext('2d');
                     trendChart = new Chart(ctx2, {
                         type: 'bar',
@@ -361,13 +358,14 @@
                             ]
                         },
                         options: {
+                            indexAxis: 'y',
                             responsive: false,
                             animation: false,
                             scales: {
-                                x: { stacked: true, grid: { display: false }, ticks: { font: { size: 9 } } },
-                                y: { stacked: true, beginAtZero: true, grid: { display: false } }
+                                x: { stacked: true, beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 9 } } },
+                                y: { stacked: true, grid: { display: false }, ticks: { font: { size: 9, weight: 'bold' }, autoSkip: false } }
                             },
-                            plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10, weight: 'bold' } } } }
+                            plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10, weight: 'bold' } } } }
                         }
                     });
                 };
@@ -412,7 +410,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.5.0');
+                const appVersion = ref('0.5.1');
                 const editingMeal = reactive({ type: 'lunch', time: '12:00', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
