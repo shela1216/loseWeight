@@ -4,6 +4,7 @@
 
         import { pickPriorityNutrient } from './recommend.js';
         import { mealTime, mealTypeForTime, snapTime, buildTimeline, DEFAULT_MEAL_TIME } from './timeline.js';
+        import { topMealRanking } from './stats.js';
 
         const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
 
@@ -51,7 +52,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.4.13');
+                console.log('App initialization starting... v0.5.0');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -227,24 +228,34 @@
                 const getRangeStats = () => {
                     const stats = {
                         days: 0,
+                        recordedDays: 0,
                         totalCalories: 0,
                         avgCalories: 0,
+                        avgCarbs: 0,
+                        avgProtein: 0,
+                        avgFat: 0,
                         totalCarbs: 0,
                         totalProtein: 0,
                         totalFat: 0,
                         dailyLabels: [],
                         dailyCals: [],
+                        dailyMacroCals: { carbs: [], protein: [], fat: [] },
                         meals: [],
                         dailyRecords: [],
                         daysByType: { high: 0, med: 0, low: 0, rest: 0 },
                         planAverages: { high: null, med: null, low: null },
+                        typeAverages: {}, // 各碳日「實際」平均攝取,對照 planAverages 的目標值
+                        topMeals: [],
                         nutrientPercents: { carbs: 0, protein: 0, fat: 0 }
                     };
                     const start = new Date(exportRange.start);
                     const end = new Date(exportRange.end);
+                    // 各碳日累計:只算有紀錄餐點的日子,否則空白日會把平均拉低
+                    const typeAcc = {};
 
                     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
                         const dateStr = formatDate(d);
+                        if (excludedDates.value.has(dateStr)) continue; // 使用者在匯出清單取消勾選的日期
                         const record = allData[dateStr];
                         stats.days++;
                         stats.dailyLabels.push(dateStr.slice(5));
@@ -258,17 +269,34 @@
                             }
                         }
 
-                        let dayCal = 0;
+                        let dayCal = 0, dayCarbs = 0, dayProtein = 0, dayFat = 0;
                         const dayMeals = record && record.meals ? record.meals : [];
                         dayMeals.forEach(m => {
                             dayCal += Number(m.calories) || 0;
-                            stats.totalCalories += Number(m.calories) || 0;
-                            stats.totalCarbs += Number(m.carbs) || 0;
-                            stats.totalProtein += Number(m.protein) || 0;
-                            stats.totalFat += Number(m.fat) || 0;
+                            dayCarbs += Number(m.carbs) || 0;
+                            dayProtein += Number(m.protein) || 0;
+                            dayFat += Number(m.fat) || 0;
                             stats.meals.push({ date: dateStr, ...m });
                         });
+                        stats.totalCalories += dayCal;
+                        stats.totalCarbs += dayCarbs;
+                        stats.totalProtein += dayProtein;
+                        stats.totalFat += dayFat;
+
+                        if (dayMeals.length > 0) {
+                            stats.recordedDays++;
+                            const acc = typeAcc[dayType] || (typeAcc[dayType] = { days: 0, calories: 0, carbs: 0, protein: 0, fat: 0 });
+                            acc.days++;
+                            acc.calories += dayCal;
+                            acc.carbs += dayCarbs;
+                            acc.protein += dayProtein;
+                            acc.fat += dayFat;
+                        }
+
                         stats.dailyCals.push(dayCal);
+                        stats.dailyMacroCals.carbs.push(Math.round(dayCarbs * 4));
+                        stats.dailyMacroCals.protein.push(Math.round(dayProtein * 4));
+                        stats.dailyMacroCals.fat.push(Math.round(dayFat * 9));
                         stats.dailyRecords.push({
                             date: dateStr,
                             meals: dayMeals,
@@ -277,7 +305,24 @@
                             planType: dayType
                         });
                     }
-                    stats.avgCalories = stats.days > 0 ? Math.round(stats.totalCalories / stats.days) : 0;
+
+                    const avgOver = stats.recordedDays || 1;
+                    stats.avgCalories = Math.round(stats.totalCalories / avgOver);
+                    stats.avgCarbs = Math.round(stats.totalCarbs / avgOver);
+                    stats.avgProtein = Math.round(stats.totalProtein / avgOver);
+                    stats.avgFat = Math.round(stats.totalFat / avgOver);
+
+                    Object.entries(typeAcc).forEach(([type, a]) => {
+                        stats.typeAverages[type] = {
+                            days: a.days,
+                            calories: Math.round(a.calories / a.days),
+                            carbs: Math.round(a.carbs / a.days),
+                            protein: Math.round(a.protein / a.days),
+                            fat: Math.round(a.fat / a.days)
+                        };
+                    });
+
+                    stats.topMeals = topMealRanking(stats.meals);
 
                     const cCal = stats.totalCarbs * 4;
                     const pCal = stats.totalProtein * 4;
@@ -303,11 +348,27 @@
                         data: { labels: ['淨碳水', '蛋白', '脂肪'], datasets: [{ data: [stats.totalCarbs, stats.totalProtein, stats.totalFat], backgroundColor: ['#6366f1', '#8b5cf6', '#ec4899'], borderWidth: 0 }] },
                         options: { responsive: false, animation: false, plugins: { legend: { position: 'bottom', labels: { font: { weight: 'bold' } } } } }
                     });
+                    // 堆疊柱狀圖:柱高 = 當日總熱量,分段顏色 = 三大營養素各自貢獻的熱量
                     const ctx2 = document.getElementById('trendChart').getContext('2d');
                     trendChart = new Chart(ctx2, {
-                        type: 'line',
-                        data: { labels: stats.dailyLabels, datasets: [{ label: '每日熱量 (kcal)', data: stats.dailyCals, borderColor: '#6366f1', backgroundColor: 'rgba(99, 102, 241, 0.1)', fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: '#6366f1' }] },
-                        options: { responsive: false, animation: false, scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } }
+                        type: 'bar',
+                        data: {
+                            labels: stats.dailyLabels,
+                            datasets: [
+                                { label: '淨碳水', data: stats.dailyMacroCals.carbs, backgroundColor: '#6366f1' },
+                                { label: '蛋白', data: stats.dailyMacroCals.protein, backgroundColor: '#8b5cf6' },
+                                { label: '脂肪', data: stats.dailyMacroCals.fat, backgroundColor: '#ec4899' }
+                            ]
+                        },
+                        options: {
+                            responsive: false,
+                            animation: false,
+                            scales: {
+                                x: { stacked: true, grid: { display: false }, ticks: { font: { size: 9 } } },
+                                y: { stacked: true, beginAtZero: true, grid: { display: false } }
+                            },
+                            plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10, weight: 'bold' } } } }
+                        }
                     });
                 };
 
@@ -351,7 +412,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.4.13');
+                const appVersion = ref('0.5.0');
                 const editingMeal = reactive({ type: 'lunch', time: '12:00', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
