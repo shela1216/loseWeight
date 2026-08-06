@@ -2,9 +2,13 @@
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { initializeFirestore, persistentLocalCache, doc, setDoc, updateDoc, onSnapshot, collection, query, where, getDocs, writeBatch, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        import { pickPriorityNutrient } from './recommend.js';
-        import { mealTime, mealTypeForTime, snapTime, buildTimeline, DEFAULT_MEAL_TIME } from './timeline.js';
-        import { topMealRanking, paginate, monthsInRange } from './stats.js';
+        // 本地模組的 import 必須帶 ?v= 版號:service worker 的 network-first 用的
+        // fetch() 仍會吃瀏覽器 HTTP 快取,URL 不變就抓不到新檔,會出現
+        // 「新 app.js 配舊模組」的 does not provide an export named ... 錯誤。
+        // 版號要跟 index.html 的 app.js?v= 一起改(見 CLAUDE.md 的 commit 檢查清單)。
+        import { pickPriorityNutrient } from './recommend.js?v=0.5.5';
+        import { mealTime, mealTypeForTime, snapTime, buildTimeline, DEFAULT_MEAL_TIME } from './timeline.js?v=0.5.5';
+        import { topMealRanking, paginate, monthsInRange } from './stats.js?v=0.5.5';
 
         const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
 
@@ -52,7 +56,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.5.4');
+                console.log('App initialization starting... v0.5.5');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -428,7 +432,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.5.4');
+                const appVersion = ref('0.5.5');
                 const editingMeal = reactive({ type: 'lunch', time: '12:00', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
