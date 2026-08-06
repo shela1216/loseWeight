@@ -1,5 +1,5 @@
 // 快取版本號
-const CACHE_NAME = 'diet-tracker-v0.5.2';
+const CACHE_NAME = 'diet-tracker-v0.5.3';
 
 // 需要快取的靜態資源列表
 const urlsToCache = [
@@ -71,11 +71,14 @@ self.addEventListener('fetch', (event) => {
     const req = event.request;
     const url = new URL(req.url);
 
-    // 應用程式外殼(導覽/HTML/app.js)採「網路優先」：確保永遠拿到最新版，離線才退回快取
+    // 應用程式外殼(導覽/HTML/本站所有 JS)採「網路優先」：確保永遠拿到最新版，離線才退回快取。
+    // 必須涵蓋 app.js import 的每個模組(stats.js / timeline.js / recommend.js)：
+    // 這些 import 沒有 ?v= 版號，若走快取優先就會出現「新 app.js 配舊模組」的
+    // does not provide an export named ... 錯誤。第三方 CDN 資源不在此列，仍走快取優先。
     const isAppShell = req.mode === 'navigate'
         || url.pathname === '/'
         || url.pathname.endsWith('/index.html')
-        || url.pathname.endsWith('/app.js');
+        || (url.origin === self.location.origin && url.pathname.endsWith('.js'));
 
     if (isAppShell) {
         event.respondWith(
