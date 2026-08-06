@@ -4,7 +4,7 @@
 
         import { pickPriorityNutrient } from './recommend.js';
         import { mealTime, mealTypeForTime, snapTime, buildTimeline, DEFAULT_MEAL_TIME } from './timeline.js';
-        import { topMealRanking } from './stats.js';
+        import { topMealRanking, paginate } from './stats.js';
 
         const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
 
@@ -52,7 +52,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.5.1');
+                console.log('App initialization starting... v0.5.2');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -196,22 +196,32 @@
                             logging: false
                         });
 
-                        const imgData = canvas.toDataURL('image/png');
                         const pdf = new jsPDF('p', 'mm', 'a4');
                         const pageW = pdf.internal.pageSize.getWidth();
                         const pageH = pdf.internal.pageSize.getHeight();
-                        const imgH = (canvas.height * pageW) / canvas.width;
+                        const pxPerMm = canvas.width / pageW;
 
-                        // 切成多張 A4,而不是產生一張跟內容一樣高的巨大單頁
-                        let offset = 0;
-                        pdf.addImage(imgData, 'PNG', 0, 0, pageW, imgH);
-                        let remaining = imgH - pageH;
-                        while (remaining > 0) {
-                            offset -= pageH;
-                            pdf.addPage();
-                            pdf.addImage(imgData, 'PNG', 0, offset, pageW, imgH);
-                            remaining -= pageH;
-                        }
+                        // 換頁只切在 [data-break] 區塊的邊界上,不再固定每 pageH 硬切穿內容。
+                        // reportEl 此時仍是 display:block,量得到版面座標。
+                        const ratio = canvas.width / reportEl.offsetWidth;
+                        const baseTop = reportEl.getBoundingClientRect().top;
+                        const cuts = [...reportEl.querySelectorAll('[data-break]')]
+                            .map(el => Math.round((el.getBoundingClientRect().top - baseTop) * ratio));
+
+                        // 每頁裁一張,而不是把整張長圖用負位移疊在每一頁上
+                        const slice = document.createElement('canvas');
+                        const sctx = slice.getContext('2d');
+                        slice.width = canvas.width;
+                        // 全部取整,切片高度才不會有次像素誤差
+                        paginate(canvas.height, Math.floor(pageH * pxPerMm), cuts).forEach((p, i) => {
+                            const h = p.end - p.start;
+                            slice.height = h;
+                            sctx.fillStyle = '#f8f9fb';
+                            sctx.fillRect(0, 0, slice.width, h);
+                            sctx.drawImage(canvas, 0, p.start, canvas.width, h, 0, 0, canvas.width, h);
+                            if (i > 0) pdf.addPage();
+                            pdf.addImage(slice.toDataURL('image/png'), 'PNG', 0, 0, pageW, h / pxPerMm);
+                        });
                         pdf.save(`健康報告_${exportRange.start}_to_${exportRange.end}.pdf`);
 
                         showExportModal.value = false;
@@ -410,7 +420,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.5.1');
+                const appVersion = ref('0.5.2');
                 const editingMeal = reactive({ type: 'lunch', time: '12:00', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 

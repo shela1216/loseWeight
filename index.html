@@ -19,8 +19,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
     <!-- CSS 也要帶版號：tailwind.css 是 purge 產物，沒有 cache buster 時新 class 會被舊快取吃掉 -->
-    <link rel="stylesheet" href="tailwind.css?v=0.5.1">
-    <link rel="stylesheet" href="styles.css?v=0.5.1">
+    <link rel="stylesheet" href="tailwind.css?v=0.5.2">
+    <link rel="stylesheet" href="styles.css?v=0.5.2">
     <script src="https://unpkg.com/vue@3.5.35/dist/vue.global.prod.js"></script>
 
     <link rel="manifest" href='manifest.json'>
@@ -1888,7 +1888,7 @@
                 </div>
 
                 <!-- Summary Stats -->
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px;">
+                <div data-break style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px;">
                     <div
                         style="background-color: #f8fafc; padding: 20px; border-radius: 25px; border: 1px solid #f1f5f9; text-align: center;">
                         <p
@@ -1932,7 +1932,7 @@
                 </div>
 
                 <!-- Day Type Distribution -->
-                <div style="display: flex; gap: 10px; margin-bottom: 40px; justify-content: center;">
+                <div data-break style="display: flex; gap: 10px; margin-bottom: 40px; justify-content: center;">
                     <div v-for="(count, type) in exportStats.daysByType" :key="type"
                         style="padding: 8px 16px; border-radius: 12px; font-size: 12px; font-weight: 800;"
                         :style="{ backgroundColor: {high:'#E6F7F0', med:'#EEF0FE', low:'#FEECEF', rest:'#F1F5F9'}[type], color: {high:'#0A9C6D', med:'#4F46E5', low:'#BE123C', rest:'#475569'}[type] }">
@@ -1941,7 +1941,7 @@
                 </div>
 
                 <!-- 各碳日實際平均攝取 -->
-                <div style="margin-bottom: 40px;">
+                <div data-break style="margin-bottom: 40px;">
                     <h3
                         style="font-size: 14px; font-weight: 800; color: #64748b; margin-bottom: 15px; text-transform: uppercase; border-left: 4px solid #F97316; padding-left: 10px;">
                         各碳日實際平均攝取</h3>
@@ -1979,7 +1979,7 @@
                 </div>
 
                 <!-- 常吃餐點 TOP 5 -->
-                <div v-if="exportStats.topMeals.length > 0" style="margin-bottom: 40px;">
+                <div data-break v-if="exportStats.topMeals.length > 0" style="margin-bottom: 40px;">
                     <h3
                         style="font-size: 14px; font-weight: 800; color: #64748b; margin-bottom: 15px; text-transform: uppercase; border-left: 4px solid #F97316; padding-left: 10px;">
                         常吃餐點 TOP 5</h3>
@@ -1998,7 +1998,7 @@
 
                 <!-- Charts Area -->
                 <div style="margin-bottom: 40px;">
-                    <div style="text-align: center; margin-bottom: 40px;">
+                    <div data-break style="text-align: center; margin-bottom: 40px;">
                         <h3
                             style="font-size: 14px; font-weight: 800; color: #64748b; margin-bottom: 20px; text-transform: uppercase;">
                             每日總熱量組成 (kcal)</h3>
@@ -2008,7 +2008,7 @@
                                 :height="Math.max(160, exportStats.dailyLabels.length * 22 + 50)"></canvas>
                         </div>
                     </div>
-                    <div style="text-align: center;">
+                    <div data-break style="text-align: center;">
                         <h3
                             style="font-size: 14px; font-weight: 800; color: #64748b; margin-bottom: 20px; text-transform: uppercase;">
                             三大營養素佔比</h3>
@@ -2019,12 +2019,12 @@
                 </div>
 
                 <!-- Daily Details -->
-                <div>
+                <div data-break>
                     <h3
                         style="font-size: 14px; font-weight: 800; color: #64748b; margin-bottom: 25px; text-transform: uppercase; border-left: 4px solid #F97316; padding-left: 10px;">
                         每日紀錄詳情</h3>
                     <div style="display: flex; flex-direction: column; gap: 26px;">
-                        <div v-for="day in exportStats.dailyRecords" :key="day.date"
+                        <div data-break v-for="day in exportStats.dailyRecords" :key="day.date"
                             v-show="dayTimeline(day).length > 0" style="break-inside: avoid;">
                             <div
                                 style="margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding-bottom: 8px;">
@@ -2036,7 +2036,7 @@
 
                             <!-- 依時間排序，餐點與運動同列呈現；每筆固定兩行版面，不再把品項擠進同一列 -->
                             <div style="display: flex; flex-direction: column; gap: 6px;">
-                                <div v-for="(row, i) in dayTimeline(day)" :key="row.kind + '-' + i"
+                                <div data-break v-for="(row, i) in dayTimeline(day)" :key="row.kind + '-' + i"
                                     style="background-color: #fff; border: 1px solid #f1f5f9; padding: 10px 16px; border-radius: 14px;">
                                     <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px;">
                                         <div style="display: flex; align-items: baseline; gap: 8px; min-width: 0;">
@@ -2080,7 +2080,7 @@
                         此區間尚無紀錄
                     </div>
                 </div>
-                <div style="margin-top: 50px; text-align: center; border-top: 1px solid #f1f5f9; padding-top: 20px;">
+                <div data-break style="margin-top: 50px; text-align: center; border-top: 1px solid #f1f5f9; padding-top: 20px;">
                     <p style="font-size: 12px; font-weight: 800; color: #cbd5e1;">REPORT GENERATED BY 輕盈飲食 APP</p>
                 </div>
             </div>
@@ -2090,7 +2090,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.5.1"></script>
+    <script type="module" src="app.js?v=0.5.2"></script>
 </body>
 
 </html>
