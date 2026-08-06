@@ -1,5 +1,5 @@
 import assert from 'node:assert';
-import { topMealRanking, paginate } from './stats.js';
+import { topMealRanking, paginate, monthsInRange } from './stats.js';
 
 // 組合餐點本身與品項都計次;同名跨天累加
 assert.deepStrictEqual(topMealRanking([
@@ -63,5 +63,30 @@ pages.forEach((p, i) => {
 // 無效輸入 → 空陣列(不當機)
 assert.deepStrictEqual(paginate(0, 100, []), []);
 assert.deepStrictEqual(paginate(100, 0, []), []);
+
+// --- monthsInRange ---
+
+// 同月 → 一個月
+assert.deepStrictEqual(monthsInRange('2026-03-05', '2026-03-28'), ['2026-03']);
+
+// 跨月 → 含頭尾每一個月
+assert.deepStrictEqual(monthsInRange('2026-01-28', '2026-04-02'),
+    ['2026-01', '2026-02', '2026-03', '2026-04']);
+
+// 跨年 → 月份正確進位、不會卡在 12 月
+assert.deepStrictEqual(monthsInRange('2025-11-15', '2026-02-01'),
+    ['2025-11', '2025-12', '2026-01', '2026-02']);
+
+// 從 1/31 起算不會因 setMonth 溢位跳過 2 月
+assert.deepStrictEqual(monthsInRange('2026-01-31', '2026-03-31'),
+    ['2026-01', '2026-02', '2026-03']);
+
+// 起訖同一天 → 一個月
+assert.deepStrictEqual(monthsInRange('2026-06-10', '2026-06-10'), ['2026-06']);
+
+// 顛倒或無效日期 → 空陣列(不當機)
+assert.deepStrictEqual(monthsInRange('2026-05-01', '2026-04-01'), []);
+assert.deepStrictEqual(monthsInRange('', '2026-04-01'), []);
+assert.deepStrictEqual(monthsInRange('abc', 'def'), []);
 
 console.log('stats tests passed');

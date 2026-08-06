@@ -22,6 +22,22 @@ export function paginate(totalHeight, pageHeight, cuts = []) {
     return pages;
 }
 
+// 列出日期區間跨到的每一個月(含頭尾),格式 'YYYY-MM'。
+// 資料是分月按需載入的,匯出前要靠這份清單把沒載入的月份補齊。
+export function monthsInRange(startStr, endStr) {
+    const start = new Date(startStr);
+    const end = new Date(endStr);
+    if (isNaN(start.getTime()) || isNaN(end.getTime()) || start > end) return [];
+    const out = [];
+    const m = new Date(start.getFullYear(), start.getMonth(), 1);
+    const last = new Date(end.getFullYear(), end.getMonth(), 1);
+    while (m <= last) {
+        out.push(`${m.getFullYear()}-${String(m.getMonth() + 1).padStart(2, '0')}`);
+        m.setMonth(m.getMonth() + 1);
+    }
+    return out;
+}
+
 // 餐點重複次數排行。組合餐點本身與其所含品項都各算一次,
 // 名稱去頭尾空白後比對,空名稱不列入。
 export function topMealRanking(meals, limit = 5) {

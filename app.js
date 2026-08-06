@@ -4,7 +4,7 @@
 
         import { pickPriorityNutrient } from './recommend.js';
         import { mealTime, mealTypeForTime, snapTime, buildTimeline, DEFAULT_MEAL_TIME } from './timeline.js';
-        import { topMealRanking, paginate } from './stats.js';
+        import { topMealRanking, paginate, monthsInRange } from './stats.js';
 
         const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
 
@@ -52,7 +52,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.5.3');
+                console.log('App initialization starting... v0.5.4');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -170,8 +170,16 @@
                 const exportStats = ref(null);
                 const dayTimeline = (day) => buildTimeline(day.meals, day.workouts);
 
+                // 資料是分月按需載入的(loadMonthData / loadedMonths),使用者沒瀏覽過的月份
+                // 不在 allData 裡。匯出前必須把區間跨到的每個月補齊,否則報告會整份空白。
+                const ensureRangeLoaded = () => Promise.all(
+                    monthsInRange(exportRange.start, exportRange.end).map(ym =>
+                        loadMonthData(new Date(Number(ym.slice(0, 4)), Number(ym.slice(5, 7)) - 1, 1)))
+                );
+
                 const exportPDF = async () => {
                     isExporting.value = true;
+                    await ensureRangeLoaded();
                     exportStats.value = getRangeStats(); // 先算好快照,報告才會用同一份資料渲染
                     await Vue.nextTick();
 
@@ -420,7 +428,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.5.3');
+                const appVersion = ref('0.5.4');
                 const editingMeal = reactive({ type: 'lunch', time: '12:00', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -1587,7 +1595,8 @@
                     }
                 };
 
-                const exportCSV = () => {
+                const exportCSV = async () => {
+                    await ensureRangeLoaded(); // 同上:未載入的月份不會出現在 allData
                     // 文字欄位一律加引號並轉義,否則名稱含逗號會讓整列欄位錯位
                     const q = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
                     const rows = [['日期', '時間', '類別', '計畫類型', '名稱', '份量', '單位', '熱量', '淨碳水', '蛋白質', '脂肪', '品項內容'].join(',')];
