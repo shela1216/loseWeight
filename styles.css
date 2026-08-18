@@ -370,19 +370,13 @@ textarea:not([hidden]):not(.bg-transparent):focus,
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
 
-/* === 手機鍵盤彈出時的 Modal 幾何 ===
-   鍵盤打開後 visual viewport 會縮小,但 fixed + 100vh 的面板仍是整個 layout viewport 高,
-   超出可視範圍的部分讓瀏覽器可以平移視口,滑動時看起來就是「整個面板被拖著跑」。
-   --vvh / --vvt 由 app.js 隨 visualViewport 更新(高度與位移),面板改吃它們,
-   內層清單止住 scroll chaining。 */
-.fixed:has(> .modal-overlay) {
-    top: var(--vvt, 0px);
-    bottom: auto;
-    height: var(--vvh, 100%);
-}
+/* === 手機鍵盤彈出時的 Modal 行為 ===
+   刻意「不」依鍵盤縮放面板高度:曾用 height: var(--vvh) 把外框壓成可視高度,
+   結果鍵盤一出現整個面板就被擠扁。那段壓縮原本是為了解決「面板被拖著跑」,
+   而下面的背景捲動鎖已經從根源擋掉了(拖動來自 document 捲動),所以壓縮多餘。
+   現在鍵盤只是蓋住面板下緣,面板尺寸不變,焦點欄位由內層捲動區帶到可視範圍。 */
 
-/* 遮罩必須自己蓋滿整個螢幕。原本是 absolute inset-0,會跟著上面被壓縮的
-   外框只蓋住可視區那一塊,鍵盤與外框之間就直接露出背景頁面。 */
+/* 遮罩自己蓋滿整個螢幕,不依賴外框幾何。 */
 .fixed:has(> .modal-overlay) > .modal-overlay {
     position: fixed;
     inset: 0;
@@ -395,8 +389,7 @@ textarea:not([hidden]):not(.bg-transparent):focus,
    露出可視區,那正是「整個畫面位移」的來源 —— document 沒有捲動空間就不會位移,
    面板內部的 overflow-y-auto 仍可照常捲動(iOS 會改捲最近的可捲動祖先)。
    :has() 是動態的,Modal 關閉、遮罩從 DOM 移除後自動解鎖,不需要 JS 收尾;
-   用 overflow 而非 position:fixed,才不會丟失頁面原本的捲動位置。
-   上面的 --vvt 補償仍留著當保險:萬一某個 iOS 版本仍平移視口,面板會跟著走。 */
+   用 overflow 而非 position:fixed,才不會丟失頁面原本的捲動位置。 */
 html:has(.modal-overlay),
 body:has(.modal-overlay) {
     overflow: hidden;
