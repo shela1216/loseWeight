@@ -19,8 +19,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
     <!-- CSS 也要帶版號：tailwind.css 是 purge 產物，沒有 cache buster 時新 class 會被舊快取吃掉 -->
-    <link rel="stylesheet" href="tailwind.css?v=0.7.8">
-    <link rel="stylesheet" href="styles.css?v=0.7.8">
+    <link rel="stylesheet" href="tailwind.css?v=0.7.9">
+    <link rel="stylesheet" href="styles.css?v=0.7.9">
     <script src="https://unpkg.com/vue@3.5.35/dist/vue.global.prod.js"></script>
 
     <link rel="manifest" href='manifest.json'>
@@ -789,10 +789,10 @@
                                         </div>
                                     </div>
                                     <div class="grid grid-cols-4 gap-2 bg-surface rounded-card p-3 border border-line">
-                                        <div v-for="n in [{k:'calories',l:'熱量',u:'k'},{k:'carbs',l:'碳水',u:'g'},{k:'protein',l:'蛋白',u:'g'},{k:'fat',l:'脂肪',u:'g'}]" :key="n.k" class="text-center transition-all">
+                                        <div v-for="n in [{k:'calories',l:'熱量',u:'k',c:'text-orange-600'},{k:'carbs',l:'碳水',u:'g',c:'text-brand'},{k:'protein',l:'蛋白',u:'g',c:'text-violet-600'},{k:'fat',l:'脂肪',u:'g',c:'text-pink-600'}]" :key="n.k" class="text-center transition-all">
                                             <div class="text-[8px] font-bold text-muted uppercase leading-none mb-1.5">{{ n.l }}</div>
                                             <input type="number" v-model.number="item[n.k]" @input="updateTotalsFromItems"
-                                                class="w-full text-center text-sm font-black text-ink leading-none outline-none px-1 py-2 focus:text-brand">
+                                                class="w-full text-center text-sm font-black leading-none outline-none px-1 py-2" :class="n.c">
                                             <div class="text-[7px] opacity-30 font-bold uppercase mt-1">{{ n.u }}</div>
                                         </div>
                                     </div>
@@ -827,12 +827,12 @@
 
                         <!-- 數值預覽與手動修正格 -->
                         <div class="grid grid-cols-4 gap-2">
-                            <div v-for="n in [{k:'calories',l:'熱量',u:'kcal',c:'orange'},{k:'carbs',l:'淨碳水',u:'g',c:'brand'},{k:'protein',l:'蛋白',u:'g',c:'violet'},{k:'fat',l:'脂肪',u:'g',c:'pink'}]"
+                            <div v-for="n in [{k:'calories',l:'熱量',u:'kcal',c:'text-orange-600'},{k:'carbs',l:'淨碳水',u:'g',c:'text-brand'},{k:'protein',l:'蛋白',u:'g',c:'text-violet-600'},{k:'fat',l:'脂肪',u:'g',c:'text-pink-600'}]"
                                 :key="n.k" class="bg-surface rounded-control p-2.5 border border-line text-center shadow-sm focus-within:border-brand transition-all">
                                 <div class="text-[9px] font-bold text-muted uppercase mb-1">{{ n.l }}</div>
                                 <input type="number" v-model.number="editingMeal[n.k]"
                                     :disabled="editingMeal.items && editingMeal.items.length > 0"
-                                    class="w-full bg-transparent text-center text-lg font-black leading-none outline-none disabled:opacity-30" :class="n.c === 'brand' ? 'text-brand' : 'text-'+n.c+'-600'">
+                                    class="w-full bg-transparent text-center text-lg font-black leading-none outline-none disabled:opacity-30" :class="n.c">
                                 <div class="text-[8px] font-bold text-muted opacity-60 uppercase mt-1">{{ n.u }}</div>
                             </div>
                         </div>
@@ -2099,7 +2099,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.7.8"></script>
+    <script type="module" src="app.js?v=0.7.9"></script>
 </body>
 
 </html>

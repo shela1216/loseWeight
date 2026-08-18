@@ -190,6 +190,7 @@ textarea:not([hidden]):not(.bg-transparent):focus,
 .dark .bg-pink-50       { background-color: rgba(236, 72, 153, 0.08) !important; }
 .dark .border-violet-100{ border-color: rgba(139, 92, 246, 0.2) !important; }
 .dark .border-pink-100  { border-color: rgba(236, 72, 153, 0.2) !important; }
+.dark .text-orange-600  { color: #fb923c !important; }
 .dark .text-violet-600  { color: #a78bfa !important; }
 .dark .text-pink-600    { color: #f472b6 !important; }
 .dark .text-amber-500   { color: #fbbf24 !important; }
