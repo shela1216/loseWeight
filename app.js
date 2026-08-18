@@ -6,18 +6,28 @@
         // fetch() 仍會吃瀏覽器 HTTP 快取,URL 不變就抓不到新檔,會出現
         // 「新 app.js 配舊模組」的 does not provide an export named ... 錯誤。
         // 版號要跟 index.html 的 app.js?v= 一起改(見 CLAUDE.md 的 commit 檢查清單)。
-        import { pickPriorityNutrient } from './recommend.js?v=0.7.5';
-        import { mealTime, mealTypeForTime, snapTime, buildTimeline, DEFAULT_MEAL_TIME } from './timeline.js?v=0.7.5';
-        import { topMealRanking, paginate, monthsInRange } from './stats.js?v=0.7.5';
+        import { pickPriorityNutrient } from './recommend.js?v=0.7.6';
+        import { mealTime, mealTypeForTime, snapTime, buildTimeline, DEFAULT_MEAL_TIME } from './timeline.js?v=0.7.6';
+        import { topMealRanking, paginate, monthsInRange } from './stats.js?v=0.7.6';
 
         const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
 
         // 手機鍵盤彈出時 visual viewport 會縮小,fixed 面板若比它高,滑動就會把整個面板拖著跑。
-        // 把真實可視高度餵給 CSS 的 --vvh,面板高度改吃這個值(見 styles.css)。
-        const syncViewportHeight = () => document.documentElement.style.setProperty('--vvh', (window.visualViewport?.height || window.innerHeight) + 'px');
-        window.visualViewport?.addEventListener('resize', syncViewportHeight);
-        window.addEventListener('resize', syncViewportHeight);
-        syncViewportHeight();
+        // 把真實可視區的高度與位移餵給 CSS(見 styles.css):
+        //   --vvh 高度;--vvt 距離 layout viewport 頂端的位移。
+        // offsetTop 是必要的:iOS 為了露出焦點欄位會平移 visual viewport,
+        // 而 position:fixed 是相對 layout viewport 定位,不補位移面板就會被留在畫面外。
+        // 位移只會觸發 visualViewport 的 scroll,不會觸發 resize,兩個事件都要聽。
+        const syncViewport = () => {
+            const vv = window.visualViewport;
+            const root = document.documentElement.style;
+            root.setProperty('--vvh', (vv?.height || window.innerHeight) + 'px');
+            root.setProperty('--vvt', (vv?.offsetTop || 0) + 'px');
+        };
+        window.visualViewport?.addEventListener('resize', syncViewport);
+        window.visualViewport?.addEventListener('scroll', syncViewport);
+        window.addEventListener('resize', syncViewport);
+        syncViewport();
 
         if ('serviceWorker' in navigator) {
             let reloadOnControllerChange = false;
@@ -63,7 +73,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.7.5');
+                console.log('App initialization starting... v0.7.6');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -439,7 +449,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.7.5');
+                const appVersion = ref('0.7.6');
                 const editingMeal = reactive({ type: 'lunch', time: '12:00', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
