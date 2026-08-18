@@ -29,6 +29,11 @@
     --c-low-rgb: 244 63 94;     --c-low: rgb(var(--c-low-rgb));
     --c-rest-rgb: 100 116 139;  --c-rest: rgb(var(--c-rest-rgb));
     --c-good: #14B8A6; --c-danger: #F43F5E;
+    /* 表單欄位底色:淡灰填充(vs 白卡 1.16:1、vs 頁底 1.07:1 —— 刻意很淡,
+       欄位邊界主要靠填充色塊本身,不是靠線條),focus 時轉白浮起來。
+       文字 --text-main 在兩者上的對比 17:1 / 20:1。 */
+    --c-field: #F1EDE9;
+    --c-field-focus: #FFFFFF;
     --r-chip: 12px; --r-control: 16px; --r-card: 20px; --r-panel: 24px;
 }
 
@@ -57,6 +62,10 @@
     --c-low-rgb: 251 113 133;   --c-low: rgb(var(--c-low-rgb));
     --c-rest-rgb: 148 163 184;  --c-rest: rgb(var(--c-rest-rgb));
     --c-good: #2DD4BF; --c-danger: #FB7185;
+    /* 深色模式同樣是 focus 時提亮(而非加深),方向與淺色一致。
+       白字對比 13.1:1 / 10.9:1。 */
+    --c-field: #372F28;
+    --c-field-focus: #443B33;
 }
 
 body {
@@ -116,9 +125,10 @@ body {
 }
 
 /* === Filled 表單樣式 ===================================================
-   灰底填充 + 上圓下直角 + 底線,focus 時底線加粗成品牌橘、底色轉暖。
-   底線用 inset box-shadow 而非 border-bottom:focus 時加粗不會改變
-   box model,欄位不會跳動。
+   淡灰填充 + 全圓角,未 focus 時不畫任何線條(邊界靠填充色塊本身),
+   focus 時底色提亮並浮出一圈品牌橘細框。
+   框線用 inset box-shadow 而非 border:出現/消失不會改變 box model,
+   欄位不會跳動,也不必為了留框線的位置而預留透明邊框。
 
    兩種套用對象,用屬性選擇器精準命中,markup 不必動:
    (1) 自己帶外觀的 input/select/textarea
@@ -134,10 +144,10 @@ input:not([type="checkbox"]):not([type="radio"]):not(.bg-transparent),
 select:not([hidden]):not(.bg-transparent),
 textarea:not([hidden]):not(.bg-transparent),
 :is([class~="bg-page"], [class~="bg-surface"])[class~="rounded-control"]:has(> :is(input:not([type="checkbox"]), select, textarea)) {
-    background-color: var(--c-page);
+    background-color: var(--c-field);
     border: 0;
-    border-radius: var(--r-control) var(--r-control) 0 0;
-    box-shadow: inset 0 -1.5px 0 var(--c-line);
+    border-radius: var(--r-control);
+    box-shadow: none;
     transition: background-color 0.2s, box-shadow 0.2s;
 }
 
@@ -153,8 +163,8 @@ input:not([type="checkbox"]):not([type="radio"]):not(.bg-transparent):focus,
 select:not([hidden]):not(.bg-transparent):focus,
 textarea:not([hidden]):not(.bg-transparent):focus,
 :is([class~="bg-page"], [class~="bg-surface"])[class~="rounded-control"]:has(> :is(input:not([type="checkbox"]), select, textarea)):focus-within {
-    background-color: var(--c-brand-soft);
-    box-shadow: inset 0 -2px 0 rgb(var(--c-brand-rgb));
+    background-color: var(--c-field-focus);
+    box-shadow: inset 0 0 0 1.5px rgb(var(--c-brand-rgb));
 }
 
 /* Modal 背景遮罩 */
