@@ -93,7 +93,10 @@ body {
 
 /* === Typography & Colors === */
 
-input, select, textarea {
+/* 全域輸入框樣式只當「預設值」:包在 :where() 裡讓 specificity 歸零,
+   markup 上任何 Tailwind class(px-3、border-0、rounded-* …)都能直接蓋過去,
+   不必再靠加長 class 或 !important 硬拚。 */
+:where(input, select, textarea) {
     background-color: var(--bg-card);
     border: 1px solid var(--border-color);
     color: var(--text-main);
@@ -102,6 +105,14 @@ input, select, textarea {
     outline: none;
     font-weight: 600;
     transition: border-color 0.2s;
+}
+
+/* bg-transparent 的輸入框是刻意「裸奔」的:背景、邊框、內距都由外層容器負責。
+   再疊上面那 1.25rem 的左右內距,容器一窄文字就沒地方擺
+   (品項單位的 80px 容器扣掉父層 px-2 只剩 64px,光內距就吃掉 40px)。
+   同樣包 :where() 保持 specificity 0,自己寫了 px-* 的仍然說了算。 */
+:where(input, select, textarea):where(.bg-transparent) {
+    padding-inline: 0;
 }
 
 input:focus, select:focus, textarea:focus {
