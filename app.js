@@ -6,9 +6,9 @@
         // fetch() 仍會吃瀏覽器 HTTP 快取,URL 不變就抓不到新檔,會出現
         // 「新 app.js 配舊模組」的 does not provide an export named ... 錯誤。
         // 版號要跟 index.html 的 app.js?v= 一起改(見 CLAUDE.md 的 commit 檢查清單)。
-        import { pickPriorityNutrient } from './recommend.js?v=0.6.1';
-        import { mealTime, mealTypeForTime, snapTime, buildTimeline, DEFAULT_MEAL_TIME } from './timeline.js?v=0.6.1';
-        import { topMealRanking, paginate, monthsInRange } from './stats.js?v=0.6.1';
+        import { pickPriorityNutrient } from './recommend.js?v=0.6.3';
+        import { mealTime, mealTypeForTime, snapTime, buildTimeline, DEFAULT_MEAL_TIME } from './timeline.js?v=0.6.3';
+        import { topMealRanking, paginate, monthsInRange } from './stats.js?v=0.6.3';
 
         const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
 
@@ -63,7 +63,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.6.1');
+                console.log('App initialization starting... v0.6.3');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -439,7 +439,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.6.1');
+                const appVersion = ref('0.6.3');
                 const editingMeal = reactive({ type: 'lunch', time: '12:00', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -493,8 +493,16 @@
 
                 const addItem = () => {
                     if (!editingMeal.items) editingMeal.items = [];
+                    // 變成組合餐點的那一刻預設不存入資料庫(組合多半是當餐一次性的),要存需自行取消勾選
+                    if (editingMeal.items.length === 0) skipHistorySave.value = true;
                     editingMeal.items.unshift({ name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, qInput: '', _amt: 1 });
                 };
+
+                // 名稱、份量、熱量都填完,且資料庫裡還沒有這筆時,才給存入按鈕
+                const canSaveItemToHistory = (item) => !!(item.name || '').trim()
+                    && Number(item.amount) > 0
+                    && Number(item.calories) > 0
+                    && !templates[(item.name || '').toLowerCase().trim()];
 
                 // 組合品項在資料庫裡找不到時,一鍵當成一般餐點存入(四格為該品項總量,先還原成單份)
                 const saveItemToHistory = (item) => {
@@ -516,6 +524,8 @@
 
                 const removeItem = (idx) => {
                     editingMeal.items.splice(idx, 1);
+                    // 品項清空 = 退回一般餐點,連同上面的預設一起還原
+                    if (editingMeal.items.length === 0) skipHistorySave.value = false;
                     updateTotalsFromItems();
                 };
 
@@ -1795,7 +1805,7 @@
                     manageBeforeDate, manageCountMin, manageCountMax, manageFilterCount,
                     setManageRangePreset, setManageBeforePreset, clearManageFilters,
                     openSettings, saveSettings,
-                    addItem, removeItem, saveItemToHistory, updateTotalsFromItems,
+                    addItem, removeItem, saveItemToHistory, canSaveItemToHistory, updateTotalsFromItems,
                     activeSuggestItem, itemSuggestions, applyItemSuggestion, itemSuggestPage, suggestPageCount, pagedSuggestions,
                     beginItemAmount, changeItemAmount,
                     quickNutrientInput, parseQuickInput, parseItemInput,
