@@ -115,8 +115,46 @@ body {
     padding-inline: 0;
 }
 
-input:focus, select:focus, textarea:focus {
-    border-color: var(--accent-primary);
+/* === Filled 表單樣式 ===================================================
+   灰底填充 + 上圓下直角 + 底線,focus 時底線加粗成品牌橘、底色轉暖。
+   底線用 inset box-shadow 而非 border-bottom:focus 時加粗不會改變
+   box model,欄位不會跳動。
+
+   兩種套用對象,用屬性選擇器精準命中,markup 不必動:
+   (1) 自己帶外觀的 input/select/textarea
+   (2) 「灰底圓角容器 + 裸 input」的包裝結構 —— 視覺主體是容器,
+       所以 filled 要套在容器上,不是裡面那個透明 input。
+       條件限定「有 bg-page/bg-surface 且有 rounded-control」,
+       才不會誤傷 text-center、flex items-center 這種純排版容器。
+
+   checkbox 一律排除:它要維持方形小勾選框,套 filled 會變成一塊灰條。
+   bg-transparent 也排除:那是刻意交給外層容器(或刻意透明)的,
+   自己再長出灰底會變成框中框。 */
+input:not([type="checkbox"]):not([type="radio"]):not(.bg-transparent),
+select:not([hidden]):not(.bg-transparent),
+textarea:not([hidden]):not(.bg-transparent),
+:is([class~="bg-page"], [class~="bg-surface"])[class~="rounded-control"]:has(> :is(input:not([type="checkbox"]), select, textarea)) {
+    background-color: var(--c-page);
+    border: 0;
+    border-radius: var(--r-control) var(--r-control) 0 0;
+    box-shadow: inset 0 -1.5px 0 var(--c-line);
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+/* 包裝結構裡的 input 已由容器負責外觀,自己要完全隱形,
+   否則會出現「框中框」兩層底線。 */
+:is([class~="bg-page"], [class~="bg-surface"])[class~="rounded-control"]:has(> :is(input:not([type="checkbox"]), select, textarea)) > :is(input, select, textarea) {
+    background-color: transparent;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not(.bg-transparent):focus,
+select:not([hidden]):not(.bg-transparent):focus,
+textarea:not([hidden]):not(.bg-transparent):focus,
+:is([class~="bg-page"], [class~="bg-surface"])[class~="rounded-control"]:has(> :is(input:not([type="checkbox"]), select, textarea)):focus-within {
+    background-color: var(--c-brand-soft);
+    box-shadow: inset 0 -2px 0 rgb(var(--c-brand-rgb));
 }
 
 /* Modal 背景遮罩 */
@@ -150,9 +188,7 @@ input:focus, select:focus, textarea:focus {
 .dark input,
 .dark select,
 .dark textarea {
-    background-color: var(--btn-bg) !important;
     color: var(--text-main) !important;
-    border-color: var(--border-color) !important;
 }
 .dark input::placeholder,
 .dark textarea::placeholder {
