@@ -390,3 +390,14 @@ textarea:not([hidden]):not(.bg-transparent):focus,
 .fixed:has(> .modal-overlay) .overflow-y-auto {
     overscroll-behavior: contain;
 }
+
+/* Modal 開啟時鎖住背景捲動。iOS 鍵盤彈出時會自動捲動 document 讓焦點欄位
+   露出可視區,那正是「整個畫面位移」的來源 —— document 沒有捲動空間就不會位移,
+   面板內部的 overflow-y-auto 仍可照常捲動(iOS 會改捲最近的可捲動祖先)。
+   :has() 是動態的,Modal 關閉、遮罩從 DOM 移除後自動解鎖,不需要 JS 收尾;
+   用 overflow 而非 position:fixed,才不會丟失頁面原本的捲動位置。
+   上面的 --vvt 補償仍留著當保險:萬一某個 iOS 版本仍平移視口,面板會跟著走。 */
+html:has(.modal-overlay),
+body:has(.modal-overlay) {
+    overflow: hidden;
+}
