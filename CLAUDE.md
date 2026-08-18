@@ -31,3 +31,15 @@ sed -i '' 's/0\.5\.5/0.5.6/g' app.js service-worker.js index.html
 service worker 對本站 `.js` 是 network-first，但它用的 `fetch(req)` 仍會吃瀏覽器 HTTP 快取。
 import 路徑不帶版號時 URL 從不改變，瀏覽器就繼續給舊檔，於是新版 `app.js` 搭到舊版模組，
 在 console 噴 `does not provide an export named ...`。改 URL 是唯一可靠的破解方式。
+
+## 改到 Tailwind 任意值 class 要重新 build
+
+`tailwind.css` 是 purge 過的預先產物，**不是** CDN 版。在 markup 寫下 build 時不存在的
+class（尤其 `max-h-[85%]` 這類任意值），CSS 裡不會有對應規則，畫面上就是該樣式完全失效
+（例：面板失去 max-height 被內容撐破畫面）。改完務必：
+
+```sh
+./tailwindcss -i tailwind.input.css -o tailwind.css --minify
+```
+
+`tailwind.config.js` 的 `content` 只掃 `index.html` 與 `app.js`，新增檔案時要一起加。
