@@ -122,6 +122,7 @@ body {
    同樣包 :where() 保持 specificity 0,自己寫了 px-* 的仍然說了算。 */
 :where(input, select, textarea):where(.bg-transparent) {
     padding-inline: 0;
+    border: 0;
 }
 
 /* === Filled 表單樣式 ===================================================
@@ -152,9 +153,12 @@ textarea:not([hidden]):not(.bg-transparent),
 }
 
 /* 包裝結構裡的 input 已由容器負責外觀,自己要完全隱形,
-   否則會出現「框中框」兩層底線。 */
+   否則會出現「框中框」。border 也要一起清:上面 :where() 那組預設值
+   帶著 1px 邊框,filled 規則又刻意跳過 .bg-transparent,漏掉就會留下
+   一圈灰框(營養素四格的數字、時間欄位都中過)。 */
 :is([class~="bg-page"], [class~="bg-surface"])[class~="rounded-control"]:has(> :is(input:not([type="checkbox"]), select, textarea)) > :is(input, select, textarea) {
     background-color: transparent;
+    border: 0;
     border-radius: 0;
     box-shadow: none;
 }
