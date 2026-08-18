@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
     <title>健康體態追蹤器</title>
     <link rel="shortcut icon" href="https://img.icons8.com/fluent/48/leaf.png" type="image/x-icon">
     <link rel="apple-touch-icon" sizes="180x180" href="https://img.icons8.com/fluent/180/leaf.png">
@@ -19,8 +19,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
     <!-- CSS 也要帶版號：tailwind.css 是 purge 產物，沒有 cache buster 時新 class 會被舊快取吃掉 -->
-    <link rel="stylesheet" href="tailwind.css?v=0.5.5">
-    <link rel="stylesheet" href="styles.css?v=0.5.5">
+    <link rel="stylesheet" href="tailwind.css?v=0.6.0">
+    <link rel="stylesheet" href="styles.css?v=0.6.0">
     <script src="https://unpkg.com/vue@3.5.35/dist/vue.global.prod.js"></script>
 
     <link rel="manifest" href='manifest.json'>
@@ -638,7 +638,7 @@
         <div v-if="editingIndex !== null" class="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
             <div class="modal-overlay absolute inset-0" @click="cancelEdit"></div>
             <div
-                class="bg-surface w-full max-w-lg rounded-t-panel sm:rounded-panel relative z-10 shadow-2xl flex flex-col max-h-[92vh] border-t border-x border-line sm:border overflow-hidden animate-in fade-in slide-in-from-bottom-10 duration-300">
+                class="bg-surface w-full max-w-lg rounded-t-panel sm:rounded-panel relative z-10 shadow-2xl flex flex-col max-h-[92%] border-t border-x border-line sm:border overflow-hidden animate-in fade-in slide-in-from-bottom-10 duration-300">
 
                 <!-- 控制手柄 (僅行動端顯示) -->
                 <div class="sm:hidden w-12 h-1.5 bg-line rounded-full mx-auto mt-4 mb-2"></div>
@@ -752,6 +752,13 @@
                                             class="w-10 shrink-0 flex items-center justify-center bg-brand-soft text-brand rounded-control hover:brightness-95 transition-all active:scale-95">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2 3 3 8 3s8-1 8-3V7M4 7c0 2 3 3 8 3s8-1 8-3M4 7c0-2 3-3 8-3s8 1 8 3" />
+                                            </svg>
+                                        </button>
+                                        <button type="button" v-if="item.name && item.name.trim() && !templates[item.name.toLowerCase().trim()]"
+                                            @click="saveItemToHistory(item)" title="存入食物資料庫"
+                                            class="w-10 shrink-0 flex items-center justify-center bg-emerald-50 text-emerald-600 rounded-control hover:brightness-95 transition-all active:scale-95">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                                             </svg>
                                         </button>
                                         <div class="flex-1 sm:w-28 flex items-center bg-surface px-3 py-2 rounded-control border border-transparent focus-within:border-brand shadow-sm transition-all">
@@ -892,7 +899,7 @@
         <!-- 運動編輯 sheet -->
         <div v-if="editingWorkoutIndex !== null" class="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
             <div class="modal-overlay absolute inset-0" @click="cancelEditWorkout"></div>
-            <div class="bg-surface w-full max-w-lg rounded-t-panel sm:rounded-panel relative z-10 shadow-2xl flex flex-col max-h-[92vh] border-t border-x border-line sm:border overflow-hidden animate-in fade-in slide-in-from-bottom-10 duration-300">
+            <div class="bg-surface w-full max-w-lg rounded-t-panel sm:rounded-panel relative z-10 shadow-2xl flex flex-col max-h-[92%] border-t border-x border-line sm:border overflow-hidden animate-in fade-in slide-in-from-bottom-10 duration-300">
 
                 <div class="sm:hidden w-12 h-1.5 bg-line rounded-full mx-auto mt-4 mb-2"></div>
 
@@ -995,7 +1002,7 @@
         <div v-if="showHistory" class="fixed inset-0 z-[110] flex items-center justify-center p-4">
             <div class="modal-overlay absolute inset-0" @click="closeHistory()"></div>
             <div
-                class="bg-surface w-full max-w-lg lg:max-w-4xl rounded-panel p-8 relative z-10 shadow-2xl flex flex-col max-h-[85vh] border border-line overflow-hidden">
+                class="bg-surface w-full max-w-lg lg:max-w-4xl rounded-panel p-8 relative z-10 shadow-2xl flex flex-col max-h-[85%] border border-line overflow-hidden">
                 <div class="flex justify-between items-center mb-8 px-2 shrink-0">
                     <div>
                         <h3 class="text-2xl font-black text-ink tracking-tight">食物資料庫</h3>
@@ -1175,7 +1182,7 @@
         <!-- 餐點資料庫管理面板 (批次刪除 + 篩選排序) -->
         <div v-if="showManage" class="fixed inset-0 z-[120] flex items-center justify-center p-4">
             <div class="modal-overlay absolute inset-0" @click="closeManage()"></div>
-            <div class="bg-surface w-full max-w-lg lg:max-w-4xl rounded-panel p-6 sm:p-8 relative z-10 shadow-2xl flex flex-col max-h-[88vh] border border-line overflow-hidden">
+            <div class="bg-surface w-full max-w-lg lg:max-w-4xl rounded-panel p-6 sm:p-8 relative z-10 shadow-2xl flex flex-col max-h-[88%] border border-line overflow-hidden">
                 <!-- Header -->
                 <div class="flex justify-between items-center mb-5 px-1 shrink-0">
                     <div>
@@ -1358,7 +1365,7 @@
         <Teleport to="body">
         <div v-if="showSettings" class="fixed inset-0 z-[150] flex items-center justify-center p-4">
             <div class="modal-overlay absolute inset-0" @click="showSettings = false"></div>
-            <div class="bg-surface w-full max-w-xl rounded-panel relative z-10 shadow-2xl flex flex-col max-h-[90vh] border border-line overflow-hidden">
+            <div class="bg-surface w-full max-w-xl rounded-panel relative z-10 shadow-2xl flex flex-col max-h-[90%] border border-line overflow-hidden">
 
                 <!-- 固定 Header -->
                 <div class="flex justify-between items-center px-8 sm:px-10 pt-8 pb-4 shrink-0">
@@ -1782,7 +1789,7 @@
         <!-- 日曆月份跳轉 Modal -->
         <div v-if="showCalendarModal" class="fixed inset-0 z-[300] flex items-end sm:items-center justify-center p-0 sm:p-4">
             <div class="modal-overlay absolute inset-0" @click="showCalendarModal = false"></div>
-            <div class="bg-surface w-full max-w-lg rounded-t-panel sm:rounded-panel relative z-10 shadow-2xl flex flex-col max-h-[90vh] border border-line overflow-hidden animate-in fade-in slide-in-from-bottom-10 duration-300">
+            <div class="bg-surface w-full max-w-lg rounded-t-panel sm:rounded-panel relative z-10 shadow-2xl flex flex-col max-h-[90%] border border-line overflow-hidden animate-in fade-in slide-in-from-bottom-10 duration-300">
                 <div class="p-6 sm:p-8">
                     <div class="flex justify-between items-center mb-6">
                         <div class="flex items-center gap-3">
@@ -2090,7 +2097,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.5.5"></script>
+    <script type="module" src="app.js?v=0.6.0"></script>
 </body>
 
 </html>

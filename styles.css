@@ -308,3 +308,15 @@ input:focus, select:focus, textarea:focus {
     border-color: var(--accent-primary);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
+
+/* === 手機鍵盤彈出時的 Modal 高度 ===
+   鍵盤打開後 visual viewport 會縮小,但 fixed + 100vh 的面板仍是整個 layout viewport 高,
+   超出可視範圍的部分讓瀏覽器可以平移視口,滑動時看起來就是「整個面板被拖著跑」。
+   --vvh 由 app.js 隨 visualViewport 更新;面板改吃它,內層清單止住 scroll chaining。 */
+.fixed:has(> .modal-overlay) {
+    bottom: auto;
+    height: var(--vvh, 100%);
+}
+.fixed:has(> .modal-overlay) .overflow-y-auto {
+    overscroll-behavior: contain;
+}

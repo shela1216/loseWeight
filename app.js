@@ -6,11 +6,18 @@
         // fetch() 仍會吃瀏覽器 HTTP 快取,URL 不變就抓不到新檔,會出現
         // 「新 app.js 配舊模組」的 does not provide an export named ... 錯誤。
         // 版號要跟 index.html 的 app.js?v= 一起改(見 CLAUDE.md 的 commit 檢查清單)。
-        import { pickPriorityNutrient } from './recommend.js?v=0.5.5';
-        import { mealTime, mealTypeForTime, snapTime, buildTimeline, DEFAULT_MEAL_TIME } from './timeline.js?v=0.5.5';
-        import { topMealRanking, paginate, monthsInRange } from './stats.js?v=0.5.5';
+        import { pickPriorityNutrient } from './recommend.js?v=0.6.0';
+        import { mealTime, mealTypeForTime, snapTime, buildTimeline, DEFAULT_MEAL_TIME } from './timeline.js?v=0.6.0';
+        import { topMealRanking, paginate, monthsInRange } from './stats.js?v=0.6.0';
 
         const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
+
+        // 手機鍵盤彈出時 visual viewport 會縮小,fixed 面板若比它高,滑動就會把整個面板拖著跑。
+        // 把真實可視高度餵給 CSS 的 --vvh,面板高度改吃這個值(見 styles.css)。
+        const syncViewportHeight = () => document.documentElement.style.setProperty('--vvh', (window.visualViewport?.height || window.innerHeight) + 'px');
+        window.visualViewport?.addEventListener('resize', syncViewportHeight);
+        window.addEventListener('resize', syncViewportHeight);
+        syncViewportHeight();
 
         if ('serviceWorker' in navigator) {
             let reloadOnControllerChange = false;
@@ -56,7 +63,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.5.5');
+                console.log('App initialization starting... v0.6.0');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -432,7 +439,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.5.5');
+                const appVersion = ref('0.6.0');
                 const editingMeal = reactive({ type: 'lunch', time: '12:00', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
 
@@ -487,6 +494,24 @@
                 const addItem = () => {
                     if (!editingMeal.items) editingMeal.items = [];
                     editingMeal.items.unshift({ name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, qInput: '', _amt: 1 });
+                };
+
+                // 組合品項在資料庫裡找不到時,一鍵當成一般餐點存入(四格為該品項總量,先還原成單份)
+                const saveItemToHistory = (item) => {
+                    const k = (item.name || '').toLowerCase().trim();
+                    if (!k) return;
+                    const a = Number(item.amount) > 0 ? Number(item.amount) : 1;
+                    templates[k] = {
+                        name: item.name.trim(),
+                        amount: 1,
+                        unit: item.unit || '份',
+                        calories: formatFloat((Number(item.calories) || 0) / a),
+                        carbs: formatFloat((Number(item.carbs) || 0) / a),
+                        protein: formatFloat((Number(item.protein) || 0) / a),
+                        fat: formatFloat((Number(item.fat) || 0) / a),
+                        count: templates[k]?.count || 0
+                    };
+                    saveData();
                 };
 
                 const removeItem = (idx) => {
@@ -1770,7 +1795,7 @@
                     manageBeforeDate, manageCountMin, manageCountMax, manageFilterCount,
                     setManageRangePreset, setManageBeforePreset, clearManageFilters,
                     openSettings, saveSettings,
-                    addItem, removeItem, updateTotalsFromItems,
+                    addItem, removeItem, saveItemToHistory, updateTotalsFromItems,
                     activeSuggestItem, itemSuggestions, applyItemSuggestion, itemSuggestPage, suggestPageCount, pagedSuggestions,
                     beginItemAmount, changeItemAmount,
                     quickNutrientInput, parseQuickInput, parseItemInput,
