@@ -19,8 +19,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
     <!-- CSS 也要帶版號：tailwind.css 是 purge 產物，沒有 cache buster 時新 class 會被舊快取吃掉 -->
-    <link rel="stylesheet" href="tailwind.css?v=0.7.9">
-    <link rel="stylesheet" href="styles.css?v=0.7.9">
+    <link rel="stylesheet" href="tailwind.css?v=0.7.10">
+    <link rel="stylesheet" href="styles.css?v=0.7.10">
     <script src="https://unpkg.com/vue@3.5.35/dist/vue.global.prod.js"></script>
 
     <link rel="manifest" href='manifest.json'>
@@ -210,7 +210,7 @@
                                         <div :class="day.date === new Date().toLocaleDateString('sv-SE') ? 'today-number-circle' : ''"
                                             class="relative z-10 flex items-center justify-center">
                                             <span class="text-xs sm:text-sm"
-                                                :class="selectedDate === day.date && day.date !== new Date().toLocaleDateString('sv-SE') ? 'text-teal-600' : ''">{{
+                                                :class="selectedDate === day.date && day.date !== new Date().toLocaleDateString('sv-SE') ? 'text-brand' : ''">{{
                                                 day.dayNum }}</span>
                                         </div>
                                     </div>
@@ -289,7 +289,7 @@
 
                             <!-- 目標與已攝取 -->
                             <div class="flex flex-col justify-center gap-6 sm:gap-12 w-auto">
-                                <div class="flex flex-col items-center md:items-start min-w-0">
+                                <div class="flex flex-col items-center lg:items-start min-w-0">
                                     <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-4">
                                         <div
                                             class="w-7 h-7 sm:w-10 sm:h-10 rounded-control flex items-center justify-center bg-brand/10 text-brand border border-brand/20 p-1.5 sm:p-2.5">
@@ -309,7 +309,7 @@
                                             class="text-[10px] sm:text-xs font-bold text-muted uppercase">kcal</span>
                                     </div>
                                 </div>
-                                <div class="flex flex-col items-center md:items-start min-w-0">
+                                <div class="flex flex-col items-center lg:items-start min-w-0">
                                     <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-4">
                                         <div
                                             class="w-7 h-7 sm:w-10 sm:h-10 rounded-control flex items-center justify-center bg-theme border border-theme text-muted p-1.5 sm:p-2.5">
@@ -652,7 +652,7 @@
                         </p>
                     </div>
                     <button @click="cancelEdit"
-                        class="w-10 h-10 flex items-center justify-center bg-page rounded-full text-muted hover:text-muted transition-all hover:rotate-90">
+                        class="w-10 h-10 flex items-center justify-center bg-page rounded-full text-muted hover:text-ink transition-all hover:rotate-90">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
                             <path d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -725,7 +725,7 @@
                                             placeholder="品項名稱 (如：蔥花蛋)">
                                         <button type="button" v-if="canSaveItemToHistory(item)"
                                             @mousedown.prevent="saveItemToHistory(item)" title="存入食物資料庫"
-                                            class="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-emerald-50 text-emerald-600 rounded-control hover:brightness-95 transition-all active:scale-95">
+                                            class="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-emerald-500/10 text-emerald-500 rounded-control hover:brightness-95 transition-all active:scale-95">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
                                                 <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                                                 <polyline points="17 21 17 13 7 13 7 21"></polyline>
@@ -911,7 +911,7 @@
                         <p class="text-xs font-bold text-muted mt-1 uppercase tracking-widest">Activity Log</p>
                     </div>
                     <button @click="cancelEditWorkout"
-                        class="w-10 h-10 flex items-center justify-center bg-page rounded-full text-muted hover:text-muted transition-all hover:rotate-90">
+                        class="w-10 h-10 flex items-center justify-center bg-page rounded-full text-muted hover:text-ink transition-all hover:rotate-90">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
                             <path d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -1075,7 +1075,7 @@
                 </div>
 
                 <div v-if="historySortBy === 'recommend'" class="px-2 mb-3 shrink-0">
-                    <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-chip inline-block">{{ priorityNutrientLabel }}</span>
+                    <span class="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-chip inline-block">{{ priorityNutrientLabel }}</span>
                 </div>
 
                 <div class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden custom-scroll grid grid-cols-1 lg:grid-cols-2 gap-3 content-start px-2 pb-4" @scroll="handleHistoryScroll">
@@ -1088,7 +1088,7 @@
                                     class="text-[10px] sm:text-xs bg-line text-muted px-2 py-0.5 rounded-chip font-bold uppercase group-hover:bg-brand-soft group-hover:text-brand transition-colors shrink-0 whitespace-nowrap">{{
                                     item.count }} 次記錄</span>
                                 <span v-if="item.unit === 'g'"
-                                    class="text-[10px] bg-teal-50 text-teal-500 border border-teal-100 px-2 py-0.5 rounded-chip font-bold shrink-0 whitespace-nowrap">per 100g</span>
+                                    class="text-[10px] bg-teal-500/10 text-teal-500 border border-teal-500/20 px-2 py-0.5 rounded-chip font-bold shrink-0 whitespace-nowrap">per 100g</span>
                             </div>
                             <div v-if="item.items && item.items.length > 0" class="flex flex-wrap gap-1.5 mb-2.5">
                                 <span v-for="sub in item.items" :key="sub.name" class="text-[9px] font-bold bg-page text-muted px-2 py-0.5 rounded-chip border border-line">
@@ -2099,7 +2099,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.7.9"></script>
+    <script type="module" src="app.js?v=0.7.10"></script>
 </body>
 
 </html>
