@@ -19,8 +19,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
     <!-- CSS 也要帶版號：tailwind.css 是 purge 產物，沒有 cache buster 時新 class 會被舊快取吃掉 -->
-    <link rel="stylesheet" href="tailwind.css?v=0.7.14">
-    <link rel="stylesheet" href="styles.css?v=0.7.14">
+    <link rel="stylesheet" href="tailwind.css?v=0.7.15">
+    <link rel="stylesheet" href="styles.css?v=0.7.15">
     <script src="https://unpkg.com/vue@3.5.35/dist/vue.global.prod.js"></script>
 
     <link rel="manifest" href='manifest.json'>
@@ -61,7 +61,7 @@
                                     d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                             </svg>
                             <input type="email" v-model="loginEmail"
-                                class="w-full pl-12 pr-4 py-4 focus:border-brand transition-all"
+                                class="w-full pl-12 pr-4 py-4"
                                 placeholder="電子郵件">
                         </div>
                         <div class="relative">
@@ -71,7 +71,7 @@
                                     d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                             </svg>
                             <input type="password" v-model="loginPassword"
-                                class="w-full pl-12 pr-4 py-4 focus:border-brand transition-all"
+                                class="w-full pl-12 pr-4 py-4"
                                 placeholder="密碼">
                         </div>
                     </div>
@@ -1045,7 +1045,7 @@
                     <!-- 搜尋框：全寬 -->
                     <div class="relative">
                         <input type="text" v-model="historySearch"
-                            class="w-full pl-12 pr-4 py-3.5 bg-page border border-line rounded-control text-sm font-bold outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand focus:bg-surface transition-all"
+                            class="w-full pl-12 pr-4 py-3.5 text-sm font-bold outline-none"
                             placeholder="搜尋餐點名稱...">
                         <svg class="w-5 h-5 text-muted opacity-60 absolute left-4 top-1/2 -translate-y-1/2" fill="none"
                             stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -1065,7 +1065,7 @@
                                 class="flex-1 py-2 rounded-control text-xs font-black tracking-wide transition-all">組合餐點</button>
                         </div>
                         <select v-model="historySortBy"
-                            class="pl-3 pr-8 py-2.5 bg-page border border-line rounded-control text-xs font-black text-muted outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand transition-all cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%2364748b%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1rem_1rem] bg-[right_0.4rem_center] bg-no-repeat shrink-0">
+                            class="pl-3 pr-8 py-2.5 text-xs font-black text-muted outline-none cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%2364748b%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1rem_1rem] bg-[right_0.4rem_center] bg-no-repeat shrink-0">
                             <option value="recommend">推薦</option>
                             <option value="count">次數</option>
                             <option value="calories">熱量</option>
@@ -1215,7 +1215,7 @@
                 <div class="flex flex-col gap-3 mb-3 shrink-0">
                     <div class="relative">
                         <input type="text" v-model="manageSearch"
-                            class="w-full pl-11 pr-4 py-3 bg-page border border-line rounded-control text-sm font-bold outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand focus:bg-surface transition-all"
+                            class="w-full pl-11 pr-4 py-3 text-sm font-bold outline-none"
                             placeholder="搜尋餐點名稱...">
                         <svg class="w-5 h-5 text-muted opacity-60 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -1230,7 +1230,7 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <select v-model="manageSortBy"
-                            class="flex-1 pl-3 pr-8 py-2.5 bg-page border border-line rounded-control text-xs font-black text-muted outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand transition-all cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%2364748b%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1rem_1rem] bg-[right_0.5rem_center] bg-no-repeat">
+                            class="flex-1 pl-3 pr-8 py-2.5 text-xs font-black text-muted outline-none cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%2364748b%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1rem_1rem] bg-[right_0.5rem_center] bg-no-repeat">
                             <option value="lastUsed">最近使用</option>
                             <option value="firstUsed">最早使用</option>
                             <option value="count">使用次數</option>
@@ -1278,9 +1278,9 @@
                                         class="px-2.5 py-1 rounded-chip text-[11px] font-black bg-surface border border-line text-muted hover:text-brand hover:border-brand/30 transition-all">{{ p.l }}</button>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <input type="date" v-model="manageDateStart" class="flex-1 min-w-0 px-2 py-2 bg-surface border border-line rounded-control text-xs font-bold text-ink outline-none focus:border-brand">
+                                    <input type="date" v-model="manageDateStart" class="flex-1 min-w-0 px-2 py-2 text-xs font-bold text-ink outline-none">
                                     <span class="text-muted text-xs font-bold">~</span>
-                                    <input type="date" v-model="manageDateEnd" class="flex-1 min-w-0 px-2 py-2 bg-surface border border-line rounded-control text-xs font-bold text-ink outline-none focus:border-brand">
+                                    <input type="date" v-model="manageDateEnd" class="flex-1 min-w-0 px-2 py-2 text-xs font-bold text-ink outline-none">
                                 </div>
                             </div>
                             <!-- 早於門檻 -->
@@ -1292,7 +1292,7 @@
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <span class="text-[11px] font-bold text-muted shrink-0">最近使用早於</span>
-                                    <input type="date" v-model="manageBeforeDate" class="flex-1 min-w-0 px-2 py-2 bg-surface border border-line rounded-control text-xs font-bold text-ink outline-none focus:border-brand">
+                                    <input type="date" v-model="manageBeforeDate" class="flex-1 min-w-0 px-2 py-2 text-xs font-bold text-ink outline-none">
                                 </div>
                             </div>
                         </div>
@@ -1300,9 +1300,9 @@
                         <div>
                             <span class="text-[10px] font-black text-muted uppercase tracking-widest">使用次數範圍</span>
                             <div class="flex items-center gap-2 mt-2">
-                                <input type="number" min="0" v-model="manageCountMin" @keydown="onlyNumber" placeholder="最少" class="flex-1 min-w-0 px-3 py-2 bg-surface border border-line rounded-control text-xs font-bold text-ink outline-none focus:border-brand">
+                                <input type="number" min="0" v-model="manageCountMin" @keydown="onlyNumber" placeholder="最少" class="flex-1 min-w-0 px-3 py-2 text-xs font-bold text-ink outline-none">
                                 <span class="text-muted text-xs font-bold">~</span>
-                                <input type="number" min="0" v-model="manageCountMax" @keydown="onlyNumber" placeholder="最多" class="flex-1 min-w-0 px-3 py-2 bg-surface border border-line rounded-control text-xs font-bold text-ink outline-none focus:border-brand">
+                                <input type="number" min="0" v-model="manageCountMax" @keydown="onlyNumber" placeholder="最多" class="flex-1 min-w-0 px-3 py-2 text-xs font-bold text-ink outline-none">
                             </div>
                         </div>
                         <button v-if="manageFilterCount > 0" @click="clearManageFilters()"
@@ -1437,7 +1437,7 @@
                                 <label class="text-xs font-bold text-muted uppercase tracking-widest pl-1">體重</label>
                                 <div class="relative">
                                     <input type="number" v-model.number="profile.weight"
-                                        class="w-full bg-page px-3 py-3.5 rounded-control text-sm border border-line font-black outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand transition-all pr-8">
+                                        class="w-full px-3 py-3.5 text-sm font-black outline-none pr-8">
                                     <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted opacity-60 font-bold pointer-events-none">kg</span>
                                 </div>
                             </div>
@@ -1445,7 +1445,7 @@
                                 <label class="text-xs font-bold text-muted uppercase tracking-widest pl-1">身高</label>
                                 <div class="relative">
                                     <input type="number" v-model.number="profile.height"
-                                        class="w-full bg-page px-3 py-3.5 rounded-control text-sm border border-line font-black outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand transition-all pr-9">
+                                        class="w-full px-3 py-3.5 text-sm font-black outline-none pr-9">
                                     <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted opacity-60 font-bold pointer-events-none">cm</span>
                                 </div>
                             </div>
@@ -1453,7 +1453,7 @@
                                 <label class="text-xs font-bold text-muted uppercase tracking-widest pl-1">年齡</label>
                                 <div class="relative">
                                     <input type="number" v-model.number="profile.age"
-                                        class="w-full bg-page px-3 py-3.5 rounded-control text-sm border border-line font-black outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand transition-all pr-8">
+                                        class="w-full px-3 py-3.5 text-sm font-black outline-none pr-8">
                                     <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted opacity-60 font-bold pointer-events-none">歲</span>
                                 </div>
                             </div>
@@ -1544,23 +1544,23 @@
                                 <div class="flex items-center gap-1">
                                     <input type="number" v-model.number="p.calories.min"
                                         min="500" max="4000" step="50"
-                                        class="no-spin w-16 text-center text-sm font-black border rounded-control p-1.5 bg-surface outline-none transition-all focus:ring-2"
+                                        class="no-spin w-16 text-center text-sm font-black p-1.5 outline-none"
                                         :class="{
-                                            'border-high/40 text-high focus:ring-high/20 focus:border-high': key === 'high',
-                                            'border-med/40 text-med focus:ring-med/20 focus:border-med': key === 'med',
-                                            'border-low/40 text-low focus:ring-low/20 focus:border-low': key === 'low',
-                                            'border-rest/40 text-rest focus:ring-rest/20 focus:border-rest': key === 'rest'
+                                            'text-high': key === 'high',
+                                            'text-med': key === 'med',
+                                            'text-low': key === 'low',
+                                            'text-rest': key === 'rest'
                                         }"
                                         placeholder="最小">
                                     <span class="font-bold text-xs opacity-30">–</span>
                                     <input type="number" v-model.number="p.calories.max"
                                         min="500" max="4000" step="50"
-                                        class="no-spin w-16 text-center text-sm font-black border rounded-control p-1.5 bg-surface outline-none transition-all focus:ring-2"
+                                        class="no-spin w-16 text-center text-sm font-black p-1.5 outline-none"
                                         :class="{
-                                            'border-high/40 text-high focus:ring-high/20 focus:border-high': key === 'high',
-                                            'border-med/40 text-med focus:ring-med/20 focus:border-med': key === 'med',
-                                            'border-low/40 text-low focus:ring-low/20 focus:border-low': key === 'low',
-                                            'border-rest/40 text-rest focus:ring-rest/20 focus:border-rest': key === 'rest'
+                                            'text-high': key === 'high',
+                                            'text-med': key === 'med',
+                                            'text-low': key === 'low',
+                                            'text-rest': key === 'rest'
                                         }"
                                         placeholder="最大">
                                     <span class="text-xs font-bold text-muted opacity-60">kcal</span>
@@ -1592,9 +1592,9 @@
                             <!-- 蛋白/碳水/脂肪 min-max 範圍 -->
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                 <div v-for="n in [
-                                    {k:'protein', l:'蛋白質', u:'g', bg:'bg-violet-50', border:'border-violet-100', text:'text-violet-600', ring:'focus:ring-violet-500/10 focus:border-violet-400'},
-                                    {k:'carbs',   l:'淨碳水', u:'g', bg:'bg-brand-soft', border:'border-brand/20', text:'text-brand', ring:'focus:ring-brand/10 focus:border-brand'},
-                                    {k:'fat',     l:'脂肪',   u:'g', bg:'bg-pink-50',   border:'border-pink-100',   text:'text-pink-600',   ring:'focus:ring-pink-500/10 focus:border-pink-400'}
+                                    {k:'protein', l:'蛋白質', u:'g', bg:'bg-violet-50', border:'border-violet-100', text:'text-violet-600'},
+                                    {k:'carbs',   l:'淨碳水', u:'g', bg:'bg-brand-soft', border:'border-brand/20', text:'text-brand'},
+                                    {k:'fat',     l:'脂肪',   u:'g', bg:'bg-pink-50',   border:'border-pink-100',   text:'text-pink-600'}
                                 ]" :key="n.k"
                                     class="flex sm:flex-col items-center sm:items-stretch gap-3 sm:gap-0 rounded-control p-3 border"
                                     :class="[n.bg, n.border]">
@@ -1606,13 +1606,11 @@
                                     <!-- 輸入框：手機 flex-1 撐開，電腦正常寬度 -->
                                     <div class="flex items-center gap-1 flex-1 sm:flex-none">
                                         <input type="number" v-model.number="p[n.k].min"
-                                            class="no-spin w-full text-center text-sm sm:text-xs p-2 sm:p-1.5 bg-surface border rounded-control font-black outline-none focus:ring-2 transition-all"
-                                            :class="[n.border, n.ring]"
+                                            class="no-spin w-full text-center text-sm sm:text-xs p-2 sm:p-1.5 font-black outline-none"
                                             placeholder="最小">
                                         <span class="font-bold text-sm sm:text-xs flex-shrink-0 opacity-30" :class="n.text">–</span>
                                         <input type="number" v-model.number="p[n.k].max"
-                                            class="no-spin w-full text-center text-sm sm:text-xs p-2 sm:p-1.5 bg-surface border rounded-control font-black outline-none focus:ring-2 transition-all"
-                                            :class="[n.border, n.ring]"
+                                            class="no-spin w-full text-center text-sm sm:text-xs p-2 sm:p-1.5 font-black outline-none"
                                             placeholder="最大">
                                     </div>
                                 </div>
@@ -1743,13 +1741,13 @@
                             <label
                                 class="text-[10px] font-bold text-muted uppercase tracking-widest block mb-2 px-1">開始日期</label>
                             <input type="date" v-model="exportRange.start"
-                                class="w-full px-4 py-3 bg-page border border-line rounded-control font-black text-muted outline-none focus:ring-4 focus:ring-brand/10 text-xs">
+                                class="w-full px-4 py-3 font-black text-muted outline-none text-xs">
                         </div>
                         <div>
                             <label
                                 class="text-[10px] font-bold text-muted uppercase tracking-widest block mb-2 px-1">結束日期</label>
                             <input type="date" v-model="exportRange.end"
-                                class="w-full px-4 py-3 bg-page border border-line rounded-control font-black text-muted outline-none focus:ring-4 focus:ring-brand/10 text-xs">
+                                class="w-full px-4 py-3 font-black text-muted outline-none text-xs">
                         </div>
                     </div>
 
@@ -2112,7 +2110,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.7.14"></script>
+    <script type="module" src="app.js?v=0.7.15"></script>
 </body>
 
 </html>
