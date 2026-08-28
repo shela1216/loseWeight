@@ -6,9 +6,9 @@
         // fetch() 仍會吃瀏覽器 HTTP 快取,URL 不變就抓不到新檔,會出現
         // 「新 app.js 配舊模組」的 does not provide an export named ... 錯誤。
         // 版號要跟 index.html 的 app.js?v= 一起改(見 CLAUDE.md 的 commit 檢查清單)。
-        import { pickPriorityNutrient } from './recommend.js?v=0.7.12';
-        import { mealTime, mealTypeForTime, snapTime, buildTimeline, DEFAULT_MEAL_TIME } from './timeline.js?v=0.7.12';
-        import { topMealRanking, paginate, monthsInRange } from './stats.js?v=0.7.12';
+        import { pickPriorityNutrient } from './recommend.js?v=0.7.13';
+        import { mealTime, mealTypeForTime, snapTime, buildTimeline, DEFAULT_MEAL_TIME } from './timeline.js?v=0.7.13';
+        import { topMealRanking, paginate, monthsInRange } from './stats.js?v=0.7.13';
 
         const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
 
@@ -56,7 +56,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.7.12');
+                console.log('App initialization starting... v0.7.13');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -432,7 +432,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.7.12');
+                const appVersion = ref('0.7.13');
                 const editingMeal = reactive({ type: 'lunch', time: '12:00', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
                 // 「是否為組合餐」在 markup 裡原本被展開重複了 8 次,
@@ -1717,6 +1717,21 @@
                         return false;
                     },
                     getGoalMidpoint: (type) => goalMidpoint(type),
+                    // 當日計畫色。原本這個 map 在 markup 裡被展開重複了 3 次
+                    // （進度圈底環、進度圈主弧、segmented control 指示器），改一次要改三處。
+                    planColor: computed(() => {
+                        const day = allData[selectedDate.value];
+                        return { high: 'var(--c-high)', med: 'var(--c-med)', low: 'var(--c-low)', rest: 'var(--c-rest)' }[day?.planType || 'med'];
+                    }),
+                    // 超出量佔「實際攝取」的比例（0–1），沒超標就是 0。
+                    // 進度圈與營養素條在超標時改以實際攝取為滿刻度，這個比例就是尾端那截紅色的長度，
+                    // 於是「超出 50」和「超出 500」在圖上看得出差別，而不是同樣一圈填滿。
+                    // 用 |gap| / sum 推導，不必另外取 goal.max：sum - |gap| 正好就是被超過的那個門檻。
+                    overRatio: (type) => {
+                        const sum = (allData[selectedDate.value]?.meals || []).reduce((acc, m) => acc + (Number(m[type]) || 0), 0);
+                        const gap = goalGap(type);
+                        return gap < 0 && sum > 0 ? Math.min(Math.abs(gap) / sum, 1) : 0;
+                    },
                     changeMonth: async (dir) => {
                         const d = new Date(selectedDate.value);
                         const oldDay = d.getDate();

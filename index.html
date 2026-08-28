@@ -19,8 +19,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
     <!-- CSS 也要帶版號：tailwind.css 是 purge 產物，沒有 cache buster 時新 class 會被舊快取吃掉 -->
-    <link rel="stylesheet" href="tailwind.css?v=0.7.12">
-    <link rel="stylesheet" href="styles.css?v=0.7.12">
+    <link rel="stylesheet" href="tailwind.css?v=0.7.13">
+    <link rel="stylesheet" href="styles.css?v=0.7.13">
     <script src="https://unpkg.com/vue@3.5.35/dist/vue.global.prod.js"></script>
 
     <link rel="manifest" href='manifest.json'>
@@ -163,14 +163,12 @@
                             <!-- 右側：今日 + 收合/展開 -->
                             <div class="flex items-center gap-1.5 shrink-0">
                                 <button @click="goToToday()"
-                                    class="h-8 px-3 shrink-0 flex items-center justify-center rounded-control font-black text-xs transition-all hover:opacity-80"
-                                    style="background:color-mix(in srgb, var(--accent-primary) 12%, transparent); color:var(--accent-primary);">
+                                    class="h-8 px-3 shrink-0 flex items-center justify-center rounded-control font-black text-xs transition-all bg-brand-soft text-brand border border-brand/20 hover:brightness-95">
                                     今日
                                 </button>
                                 <!-- 收合/展開按鈕：電腦版才顯示，帶文字標籤 -->
                                 <button @click="toggleCalendar()"
-                                    class="hidden lg:flex items-center gap-1 h-8 px-2.5 rounded-control font-black text-xs transition-all hover:bg-line"
-                                    style="background:var(--bg-main); border:1px solid var(--border-color); color:var(--text-muted);">
+                                    class="hidden lg:flex items-center gap-1 h-8 px-2.5 rounded-control font-black text-xs transition-all bg-page text-muted border border-line hover:bg-line">
                                     <svg class="w-3.5 h-3.5 transition-transform duration-300"
                                         :class="isCalendarExpanded ? 'rotate-180' : ''"
                                         fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -232,20 +230,20 @@
                         </div>
                         <div class="segmented-control relative">
                             <div class="segment-indicator shadow-xl shadow-brand/30"
-                                :style="{ width: 'calc((100% - 12px) / 4 - 8px)', transform: `translateX(calc(${Object.keys(plans).indexOf(currentDayRecord.planType)} * (100% + 8px) + 4px))`, backgroundColor: {high:'var(--c-high)', med:'var(--c-med)', low:'var(--c-low)', rest:'var(--c-rest)'}[currentDayRecord.planType] }">
+                                :style="{ width: 'calc((100% - 12px) / 4 - 8px)', transform: `translateX(calc(${Object.keys(plans).indexOf(currentDayRecord.planType)} * (100% + 8px) + 4px))`, backgroundColor: planColor }">
                             </div>
                             <div v-for="key in ['high', 'med', 'low', 'rest']"
                                 :key="key" @click="setPlanType(key)" class="segment-item"
                                 :class="{ active: currentDayRecord.planType === key }">
                                 <span class="w-5 h-5 mb-1 transition-transform flex items-center justify-center"
                                     :class="currentDayRecord.planType === key ? 'scale-110' : ''">
-                                    <!-- 高碳: 啞鈴/力量 -->
+                                    <!-- 高碳（訓練日）: 啞鈴 -->
                                     <svg v-if="key === 'high'" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18M5 6v12M19 6v12M9 10v4M15 10v4" /></svg>
-                                    <!-- 中碳: 葉子 -->
+                                    <!-- 中碳: 半滿圓（原註解寫「葉子」，但 path 一直是半滿圓；圖示本身沒問題，改的是註解） -->
                                     <svg v-if="key === 'med'" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18m0-18A9 9 0 003 12h9V3zm0 18A9 9 0 0021 12h-9v9z" /></svg>
-                                    <!-- 低碳: 火焰 -->
+                                    <!-- 低碳（燃脂日）: 火焰 -->
                                     <svg v-if="key === 'low'" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" /><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" /></svg>
-                                    <!-- 自由: 休息/愛心 -->
+                                    <!-- 自由: 愛心 -->
                                     <svg v-if="key === 'rest'" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
                                 </span>
                                 <span class="text-[10px] uppercase">{{ {high:'高碳', med:'中碳', low:'低碳', rest:'自由'}[key] }}</span>
@@ -265,12 +263,19 @@
                             <div class="relative shrink-0 w-[140px] h-[140px] sm:w-[240px] sm:h-[240px]">
                                 <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
                                     <circle cx="50" cy="50" r="38" fill="none" stroke-width="5" class="opacity-10"
-                                        :style="{ stroke: {high:'var(--c-high)', med:'var(--c-med)', low:'var(--c-low)', rest:'var(--c-rest)'}[currentDayRecord.planType] }" />
+                                        :style="{ stroke: planColor }" />
+                                    <!-- 未超標：滿刻度是目標值，弧長 = 已攝取 / 目標。
+                                         超標：滿刻度改成「實際攝取」，這條計畫色弧畫到目標為止，
+                                         剩下的尾巴由下面那條紅弧接手 —— 超出 50 和超出 500 才看得出差別。 -->
                                     <circle cx="50" cy="50" r="38" fill="none" stroke-width="6" stroke-linecap="round"
-                                        :style="{ stroke: getGap('calories') < 0 ? 'var(--c-danger)' : ({high:'var(--c-high)', med:'var(--c-med)', low:'var(--c-low)', rest:'var(--c-rest)'}[currentDayRecord.planType]) }"
+                                        :style="{ stroke: planColor }"
                                         :stroke-dasharray="`${2 * 3.14159 * 38}`"
-                                        :stroke-dashoffset="2 * 3.14159 * 38 * (1 - Math.min(getDailySum('calories') / getGoalMidpoint('calories'), 1))"
+                                        :stroke-dashoffset="2 * 3.14159 * 38 * (overRatio('calories') ? overRatio('calories') : 1 - Math.min(getDailySum('calories') / getGoalMidpoint('calories'), 1))"
                                         style="transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s ease" />
+                                    <circle v-if="overRatio('calories')" cx="50" cy="50" r="38" fill="none" stroke-width="6" stroke-linecap="butt"
+                                        style="stroke: var(--c-danger); transition: stroke-dasharray 1s cubic-bezier(0.4, 0, 0.2, 1), stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1)"
+                                        :stroke-dasharray="`${2 * 3.14159 * 38 * overRatio('calories')} ${2 * 3.14159 * 38}`"
+                                        :stroke-dashoffset="-2 * 3.14159 * 38 * (1 - overRatio('calories'))" />
                                 </svg>
                                 <div
                                     class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none px-2 sm:px-4">
@@ -334,7 +339,7 @@
                         </div>
 
                         <!-- 三大營養素 -->
-                        <div class="grid grid-cols-3 gap-3 sm:gap-10 pt-10 border-t border-theme">
+                        <div class="grid grid-cols-3 gap-3 sm:gap-10 pt-6 sm:pt-10 border-t border-theme">
                             <div v-for="n in nutrientKeys" :key="n.key" class="min-w-0">
                                 <div class="flex flex-col items-center sm:items-start mb-3 sm:mb-4">
                                     <div
@@ -352,11 +357,16 @@
                                         {{ isGoalInRange(n.key) ? '已達標' : getGap(n.key) >= 0 ? '還可以吃' : '已超出' }}
                                     </div>
                                 </div>
-                                <div class="rounded-full overflow-hidden h-1.5 sm:h-2 mb-3 sm:mb-4"
+                                <!-- 與進度圈同一套規則：超標時整條改以「實際攝取」為滿刻度，
+                                     左段是目標以內的量，右邊那截紅色就是超出量。 -->
+                                <div class="relative rounded-full overflow-hidden h-1.5 sm:h-2 mb-3 sm:mb-4"
                                     :class="n.key === 'carbs' ? 'bg-brand/20' : n.key === 'protein' ? 'bg-violet-500/20' : 'bg-pink-500/20'">
                                     <div class="h-full rounded-full transition-all duration-1000"
-                                        :class="isGoalInRange(n.key) ? 'bg-good' : getGap(n.key) < 0 ? 'bg-danger' : n.key === 'carbs' ? 'bg-brand' : n.key === 'protein' ? 'bg-violet-500' : 'bg-pink-500'"
-                                        :style="{ width: Math.min((getDailySum(n.key) / getGoalMidpoint(n.key)) * 100, 100) + '%' }">
+                                        :class="isGoalInRange(n.key) ? 'bg-good' : n.key === 'carbs' ? 'bg-brand' : n.key === 'protein' ? 'bg-violet-500' : 'bg-pink-500'"
+                                        :style="{ width: (overRatio(n.key) ? (1 - overRatio(n.key)) * 100 : Math.min((getDailySum(n.key) / getGoalMidpoint(n.key)) * 100, 100)) + '%' }">
+                                    </div>
+                                    <div v-if="overRatio(n.key)" class="absolute inset-y-0 right-0 bg-danger transition-all duration-1000"
+                                        :style="{ width: overRatio(n.key) * 100 + '%' }">
                                     </div>
                                 </div>
                                 <div class="text-center sm:text-left">
@@ -2100,7 +2110,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.7.12"></script>
+    <script type="module" src="app.js?v=0.7.13"></script>
 </body>
 
 </html>
