@@ -19,8 +19,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
     <!-- CSS 也要帶版號：tailwind.css 是 purge 產物，沒有 cache buster 時新 class 會被舊快取吃掉 -->
-    <link rel="stylesheet" href="tailwind.css?v=0.7.11">
-    <link rel="stylesheet" href="styles.css?v=0.7.11">
+    <link rel="stylesheet" href="tailwind.css?v=0.7.12">
+    <link rel="stylesheet" href="styles.css?v=0.7.12">
     <script src="https://unpkg.com/vue@3.5.35/dist/vue.global.prod.js"></script>
 
     <link rel="manifest" href='manifest.json'>
@@ -111,9 +111,6 @@
                                     <h1
                                         class="text-2xl font-black tracking-tight leading-none truncate">
                                         輕盈飲食</h1>
-                                    <p
-                                        class="text-[10px] font-bold text-muted mt-1 uppercase tracking-widest truncate">
-                                        Premium tracker</p>
                                 </div>
                             </div>
                         </div>
@@ -648,8 +645,6 @@
                     <div>
                         <h3 class="text-3xl font-black text-ink tracking-tight">{{ isAddingMeal ? '新增餐點' : '編輯餐點'
                             }}</h3>
-                        <p class="text-xs font-bold text-muted mt-1 uppercase tracking-widest">Calorie Intelligence
-                        </p>
                     </div>
                     <button @click="cancelEdit"
                         class="w-10 h-10 flex items-center justify-center bg-page rounded-full text-muted hover:text-ink transition-all hover:rotate-90">
@@ -683,7 +678,7 @@
                             :key="t.k" @click="pickMealType(t.k)"
                             class="flex flex-col items-center gap-2 group transition-all">
                             <div class="w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300"
-                                :class="editingMeal.type === t.k ? 'bg-brand text-white shadow-xl shadow-brand-soft scale-110' : 'bg-page text-muted grayscale opacity-50 hover:opacity-100 hover:grayscale-0'">
+                                :class="editingMeal.type === t.k ? 'bg-brand text-white shadow-xl shadow-brand-soft scale-110' : 'bg-page text-muted opacity-60 hover:opacity-100'">
                                 {{ t.i }}
                             </div>
                             <span class="text-xs font-black transition-colors"
@@ -701,60 +696,62 @@
                     <!-- 品項組合區 (組合餐功能) -->
                     <div class="space-y-4 border-t border-line pt-6">
                         <div class="flex justify-between items-center px-1">
-                            <div>
-                                <label class="text-xs font-bold text-muted uppercase tracking-widest">餐點組成品項 (選填)</label>
-                                <p class="text-[9px] text-muted opacity-60 font-bold uppercase mt-0.5">Components & Details</p>
-                            </div>
+                            <label class="text-xs font-bold text-muted uppercase tracking-widest">餐點組成品項 (選填)</label>
                             <button @click="addItem" class="flex items-center gap-1.5 text-[10px] font-black text-brand bg-brand-soft px-3 py-1.5 rounded-control hover:brightness-95 transition-all shadow-sm">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
                                 <span>新增品項</span>
                             </button>
                         </div>
-                        <div v-if="editingMeal.items && editingMeal.items.length > 0" class="space-y-3">
-                            <div v-for="(item, idx) in editingMeal.items" :key="idx" class="bg-page rounded-card p-4 border border-line space-y-3 relative group">
-                                <button @click="removeItem(idx)" class="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-control bg-surface text-muted opacity-60 hover:text-rose-500 hover:shadow-sm transition-all">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
-                                </button>
+                        <div v-if="hasItems" class="space-y-3">
+                            <div v-for="(item, idx) in editingMeal.items" :key="idx" class="bg-page rounded-card p-4 border border-line space-y-3">
                                 <div class="flex flex-col gap-2">
-                                    <div class="relative w-full">
-                                        <input v-model="item.name"
-                                            @input="activeSuggestItem = idx; itemSuggestPage = 0; updateTotalsFromItems()"
-                                            @focus="activeSuggestItem = idx; itemSuggestPage = 0"
-                                            @blur="activeSuggestItem = null"
-                                            class="w-full bg-surface pl-4 pr-12 py-2.5 rounded-control text-sm font-black outline-none border border-transparent focus:border-brand shadow-sm transition-all"
-                                            placeholder="品項名稱 (如：蔥花蛋)">
-                                        <button type="button" v-if="canSaveItemToHistory(item)"
-                                            @mousedown.prevent="saveItemToHistory(item)" title="存入食物資料庫"
-                                            class="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-emerald-500/10 text-emerald-500 rounded-control hover:brightness-95 transition-all active:scale-95">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-                                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                                                <polyline points="7 3 7 8 15 8"></polyline>
-                                            </svg>
-                                        </button>
-                                        <div v-if="activeSuggestItem === idx && itemSuggestions(item.name).length > 0"
-                                            class="absolute z-30 left-0 right-0 mt-1 bg-surface rounded-card shadow-xl border border-line overflow-hidden">
-                                            <div class="flex items-center justify-between px-4 py-2 border-b border-line bg-page">
-                                                <span class="text-[9px] font-bold text-muted uppercase tracking-widest">推薦帶入</span>
-                                                <button type="button" @mousedown.prevent="activeSuggestItem = null" title="關閉"
-                                                    class="w-6 h-6 flex items-center justify-center rounded-control text-muted opacity-60 hover:text-rose-500 hover:bg-surface transition-all">
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
-                                                </button>
-                                            </div>
-                                            <button v-for="s in pagedSuggestions(item.name)" :key="s.name" type="button"
-                                                @mousedown.prevent="applyItemSuggestion(item, s)"
-                                                class="w-full text-left px-4 py-2 text-xs font-bold text-muted hover:bg-brand-soft hover:text-brand transition-colors flex justify-between gap-2">
-                                                <span class="truncate">{{ s.name }}</span>
-                                                <span class="text-muted opacity-60 shrink-0 whitespace-nowrap">{{ s.count || 0 }}次 · {{ formatFloat(s.calories) }}kcal</span>
+                                    <!-- 刪除鈕與名稱欄同一列：原本是絕對定位的 24px 小鈕，壓在名稱輸入框的
+                                         右上角，正好和框內的「存入資料庫」鈕重疊，且遠低於 44px 觸控目標。 -->
+                                    <div class="flex items-center gap-1">
+                                        <div class="relative flex-1 min-w-0">
+                                            <input v-model="item.name"
+                                                @input="activeSuggestItem = idx; itemSuggestPage = 0; updateTotalsFromItems()"
+                                                @focus="activeSuggestItem = idx; itemSuggestPage = 0"
+                                                @blur="activeSuggestItem = null"
+                                                class="w-full bg-surface pl-4 pr-12 py-2.5 rounded-control text-sm font-black outline-none border border-transparent focus:border-brand shadow-sm transition-all"
+                                                placeholder="品項名稱 (如：蔥花蛋)">
+                                            <button type="button" v-if="canSaveItemToHistory(item)"
+                                                @mousedown.prevent="saveItemToHistory(item)" title="存入食物資料庫"
+                                                class="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-emerald-500/10 text-emerald-500 rounded-control hover:brightness-95 transition-all active:scale-95">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                                    <polyline points="7 3 7 8 15 8"></polyline>
+                                                </svg>
                                             </button>
-                                            <div v-if="suggestPageCount(item.name) > 1" class="flex items-center justify-between px-3 py-2 border-t border-line bg-page">
-                                                <button type="button" @mousedown.prevent="itemSuggestPage = Math.max(0, itemSuggestPage - 1)" :disabled="itemSuggestPage === 0"
-                                                    class="px-2 py-1 text-[10px] font-black text-brand rounded-control hover:bg-brand-soft disabled:opacity-30 disabled:hover:bg-transparent transition-all">上一頁</button>
-                                                <span class="text-[10px] font-bold text-muted">第 {{ itemSuggestPage + 1 }} / {{ suggestPageCount(item.name) }} 頁</span>
-                                                <button type="button" @mousedown.prevent="itemSuggestPage = Math.min(suggestPageCount(item.name) - 1, itemSuggestPage + 1)" :disabled="itemSuggestPage >= suggestPageCount(item.name) - 1"
-                                                    class="px-2 py-1 text-[10px] font-black text-brand rounded-control hover:bg-brand-soft disabled:opacity-30 disabled:hover:bg-transparent transition-all">下一頁</button>
+                                            <div v-if="activeSuggestItem === idx && itemSuggestions(item.name).length > 0"
+                                                class="absolute z-30 left-0 right-0 mt-1 bg-surface rounded-card shadow-xl border border-line overflow-hidden">
+                                                <div class="flex items-center justify-between px-4 py-2 border-b border-line bg-page">
+                                                    <span class="text-[9px] font-bold text-muted uppercase tracking-widest">推薦帶入</span>
+                                                    <button type="button" @mousedown.prevent="activeSuggestItem = null" title="關閉"
+                                                        class="w-6 h-6 flex items-center justify-center rounded-control text-muted opacity-60 hover:text-rose-500 hover:bg-surface transition-all">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                    </button>
+                                                </div>
+                                                <button v-for="s in pagedSuggestions(item.name)" :key="s.name" type="button"
+                                                    @mousedown.prevent="applyItemSuggestion(item, s)"
+                                                    class="w-full text-left px-4 py-2 text-xs font-bold text-muted hover:bg-brand-soft hover:text-brand transition-colors flex justify-between gap-2">
+                                                    <span class="truncate">{{ s.name }}</span>
+                                                    <span class="text-muted opacity-60 shrink-0 whitespace-nowrap">{{ s.count || 0 }}次 · {{ formatFloat(s.calories) }}kcal</span>
+                                                </button>
+                                                <div v-if="suggestPageCount(item.name) > 1" class="flex items-center justify-between px-3 py-2 border-t border-line bg-page">
+                                                    <button type="button" @mousedown.prevent="itemSuggestPage = Math.max(0, itemSuggestPage - 1)" :disabled="itemSuggestPage === 0"
+                                                        class="px-2 py-1 text-[10px] font-black text-brand rounded-control hover:bg-brand-soft disabled:opacity-30 disabled:hover:bg-transparent transition-all">上一頁</button>
+                                                    <span class="text-[10px] font-bold text-muted">第 {{ itemSuggestPage + 1 }} / {{ suggestPageCount(item.name) }} 頁</span>
+                                                    <button type="button" @mousedown.prevent="itemSuggestPage = Math.min(suggestPageCount(item.name) - 1, itemSuggestPage + 1)" :disabled="itemSuggestPage >= suggestPageCount(item.name) - 1"
+                                                        class="px-2 py-1 text-[10px] font-black text-brand rounded-control hover:bg-brand-soft disabled:opacity-30 disabled:hover:bg-transparent transition-all">下一頁</button>
+                                                </div>
                                             </div>
                                         </div>
+                                    <button @click="removeItem(idx)" title="移除品項"
+                                        class="w-11 h-11 shrink-0 flex items-center justify-center text-muted opacity-60 hover:text-danger hover:opacity-100 transition-all active:scale-95">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+                                    </button>
                                     </div>
                                     <div class="flex items-center gap-2 w-full">
                                         <button type="button" @click="openHistory(idx)" title="從資料庫挑選"
@@ -803,24 +800,30 @@
                     </div>
 
                     <!-- 快速營養素輸入 (核心輸入區) -->
-                    <div class="bg-brand-soft rounded-card p-5 border border-brand/50 shadow-inner">
+                    <!-- 有品項時整區都是唯讀的（數值由品項加總同步），沒必要留著滿版的輸入介面
+                         佔 Modal 高度，折成一行總計摘要即可。 -->
+                    <div v-if="hasItems" class="bg-brand-soft rounded-card px-4 py-3 border border-brand/50 flex items-center justify-between gap-3 flex-wrap">
+                        <span class="text-[10px] font-black text-brand uppercase tracking-widest shrink-0">品項總計</span>
+                        <div class="flex items-baseline gap-x-3 gap-y-1 flex-wrap justify-end text-xs font-black">
+                            <span class="text-orange-600">{{ formatFloat(editingMeal.calories) }}<span class="text-[9px] font-bold opacity-60 ml-0.5">kcal</span></span>
+                            <span class="text-brand">碳 {{ formatFloat(editingMeal.carbs) }}</span>
+                            <span class="text-violet-600">蛋 {{ formatFloat(editingMeal.protein) }}</span>
+                            <span class="text-pink-600">脂 {{ formatFloat(editingMeal.fat) }}</span>
+                        </div>
+                    </div>
+
+                    <div v-else class="bg-brand-soft rounded-card p-5 border border-brand/50 shadow-inner">
                         <div class="flex justify-between items-center mb-3 px-1">
-                            <div>
-                                <label class="text-xs font-bold text-brand uppercase tracking-widest">營養素快速輸入</label>
-                                <p class="text-[9px] text-brand font-bold uppercase">Batch Nutrient Entry</p>
-                            </div>
-                            <span v-if="editingMeal.items && editingMeal.items.length > 0" class="text-[10px] font-bold text-amber-500 bg-amber-50 px-2 py-1 rounded-chip border border-amber-100">已啟用組合餐同步</span>
+                            <label class="text-xs font-bold text-brand uppercase tracking-widest">營養素快速輸入</label>
                         </div>
                         
                         <!-- 輸入框 -->
                         <div class="flex gap-2 mb-5">
                             <input v-model="quickNutrientInput" @keyup.enter="parseQuickInput"
-                                :disabled="editingMeal.items && editingMeal.items.length > 0"
-                                class="flex-1 min-w-0 bg-surface px-5 py-3.5 rounded-control text-base font-black outline-none border border-transparent focus:border-brand shadow-md transition-all disabled:opacity-50 disabled:bg-page disabled:cursor-not-allowed"
-                                :placeholder="editingMeal.items && editingMeal.items.length > 0 ? '請直接修改上方品項內容' : '範例：70/7/5/1'">
-                            <button @click="parseQuickInput" 
-                                :disabled="editingMeal.items && editingMeal.items.length > 0"
-                                class="px-4 sm:px-6 bg-brand text-white rounded-control text-sm font-black hover:brightness-95 transition-all shadow-lg shadow-brand-soft active:scale-95 disabled:opacity-50 disabled:shadow-none whitespace-nowrap">
+                                class="flex-1 min-w-0 bg-surface px-5 py-3.5 rounded-control text-base font-black outline-none border border-transparent focus:border-brand shadow-md transition-all"
+                                placeholder="範例：70/7/5/1">
+                            <button @click="parseQuickInput"
+                                class="px-4 sm:px-6 bg-brand text-white rounded-control text-sm font-black hover:brightness-95 transition-all shadow-lg shadow-brand-soft active:scale-95 whitespace-nowrap">
                                 解析
                             </button>
                         </div>
@@ -831,8 +834,7 @@
                                 :key="n.k" class="bg-surface rounded-control p-2.5 border border-line text-center shadow-sm focus-within:border-brand transition-all">
                                 <div class="text-[9px] font-bold text-muted uppercase mb-1">{{ n.l }}</div>
                                 <input type="number" v-model.number="editingMeal[n.k]"
-                                    :disabled="editingMeal.items && editingMeal.items.length > 0"
-                                    class="w-full bg-transparent text-center text-lg font-black leading-none outline-none disabled:opacity-30" :class="n.c">
+                                    class="w-full bg-transparent text-center text-lg font-black leading-none outline-none" :class="n.c">
                                 <div class="text-[8px] font-bold text-muted opacity-60 uppercase mt-1">{{ n.u }}</div>
                             </div>
                         </div>
@@ -868,7 +870,7 @@
                                     class="w-5 h-5 rounded-control border-2 border-line text-brand focus:ring-brand transition-all cursor-pointer">
                                 <div class="flex flex-col">
                                     <span class="text-xs font-semibold text-muted group-hover:text-brand transition-colors">本次不存入食物資料庫</span>
-                                    <span class="text-[9px] text-muted font-bold uppercase tracking-tight">{{ editingMeal.items && editingMeal.items.length > 0 ? '組合餐點預設不存入，取消勾選即可存入' : 'One-time entry only' }}</span>
+                                    <span v-if="hasItems" class="text-[9px] text-muted font-bold tracking-tight">組合餐點預設不存入，取消勾選即可存入</span>
                                 </div>
                             </label>
                         </div>
@@ -908,7 +910,6 @@
                 <div class="px-5 sm:px-6 pt-5 sm:pt-6 pb-4 flex justify-between items-center">
                     <div>
                         <h3 class="text-3xl font-black text-ink tracking-tight">{{ isAddingWorkout ? '新增運動' : '編輯運動' }}</h3>
-                        <p class="text-xs font-bold text-muted mt-1 uppercase tracking-widest">Activity Log</p>
                     </div>
                     <button @click="cancelEditWorkout"
                         class="w-10 h-10 flex items-center justify-center bg-page rounded-full text-muted hover:text-ink transition-all hover:rotate-90">
@@ -924,7 +925,7 @@
                         <button v-for="w in WORKOUT_TYPES" :key="w.key" @click="editingWorkout.type = w.key"
                             class="flex flex-col items-center gap-2 py-2 transition-all">
                             <div class="w-14 h-14 rounded-full flex items-center justify-center text-xl transition-all duration-300"
-                                :class="editingWorkout.type === w.key ? 'bg-emerald-500 text-white shadow-xl scale-110' : 'bg-page text-muted grayscale opacity-50 hover:opacity-100 hover:grayscale-0'">
+                                :class="editingWorkout.type === w.key ? 'bg-emerald-500 text-white shadow-xl scale-110' : 'bg-page text-muted opacity-60 hover:opacity-100'">
                                 {{ w.icon }}
                             </div>
                             <span class="text-[11px] font-black transition-colors"
@@ -2099,7 +2100,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.7.11"></script>
+    <script type="module" src="app.js?v=0.7.12"></script>
 </body>
 
 </html>
