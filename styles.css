@@ -380,3 +380,16 @@ html:has(.modal-overlay),
 body:has(.modal-overlay) {
     overflow: hidden;
 }
+
+/* === 運動卡：與餐點卡同為白底時難以分辨，改成運動色淡底 + 左側色條 === */
+.meal-card.workout-card {
+    background: rgb(var(--c-high-rgb) / 0.07);
+    border-color: rgb(var(--c-high-rgb) / 0.28);
+    border-left: 3px solid rgb(var(--c-high-rgb) / 0.55);
+}
+
+.meal-card.workout-card:hover {
+    border-color: rgb(var(--c-high-rgb) / 0.5);
+    border-left-color: rgb(var(--c-high-rgb));
+    box-shadow: 0 4px 20px rgb(var(--c-high-rgb) / 0.12);
+}
