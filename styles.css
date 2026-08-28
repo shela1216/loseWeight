@@ -137,6 +137,9 @@ body {
        所以 filled 要套在容器上,不是裡面那個透明 input。
        條件限定「有 bg-page/bg-surface 且有 rounded-control」,
        才不會誤傷 text-center、flex items-center 這種純排版容器。
+       注意:包裝容器上的 bg-page/bg-surface 與 rounded-control 是這條規則的
+       「選擇器鉤子」,不是實際生效的塗色指令(底色其實來自下面的 --c-field)。
+       看到它們被覆蓋就順手刪掉的話,整個包裝會掉出 filled、變成透明無框。
 
    checkbox 一律排除:它要維持方形小勾選框,套 filled 會變成一塊灰條。
    bg-transparent 也排除:那是刻意交給外層容器(或刻意透明)的,
@@ -353,23 +356,6 @@ textarea:not([hidden]):not(.bg-transparent):focus,
 .no-spin::-webkit-inner-spin-button,
 .no-spin::-webkit-outer-spin-button { -webkit-appearance: none; appearance: none; margin: 0; }
 .no-spin { -moz-appearance: textfield; appearance: textfield; }
-
-/* === Modal 輸入框 === */
-.modal-input {
-    background: var(--btn-bg);
-    border: 1.5px solid var(--border-color);
-    border-radius: var(--r-control);
-    padding: 0.75rem 1.25rem;
-    color: var(--text-main);
-    font-weight: 700;
-    outline: none;
-    width: 100%;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-.modal-input:focus {
-    border-color: var(--accent-primary);
-    box-shadow: 0 0 0 3px rgb(var(--c-brand-rgb) / 0.12);
-}
 
 /* === 手機鍵盤彈出時的 Modal 行為 ===
    刻意「不」依鍵盤縮放面板高度:曾用 height: var(--vvh) 把外框壓成可視高度,

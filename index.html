@@ -19,8 +19,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
     <!-- CSS 也要帶版號：tailwind.css 是 purge 產物，沒有 cache buster 時新 class 會被舊快取吃掉 -->
-    <link rel="stylesheet" href="tailwind.css?v=0.7.13">
-    <link rel="stylesheet" href="styles.css?v=0.7.13">
+    <link rel="stylesheet" href="tailwind.css?v=0.7.14">
+    <link rel="stylesheet" href="styles.css?v=0.7.14">
     <script src="https://unpkg.com/vue@3.5.35/dist/vue.global.prod.js"></script>
 
     <link rel="manifest" href='manifest.json'>
@@ -671,9 +671,11 @@
                         <div class="flex-1 relative">
                             <textarea v-model="editingMeal.name" 
                                 @input="if (!editingMeal.name) { isNameAuto = true; updateTotalsFromItems(); } else { isNameAuto = false; }"
-                                class="w-full px-3 py-1 text-2xl font-black placeholder:text-muted placeholder:opacity-60 text-ink bg-transparent border-none outline-none resize-none min-h-[60px] leading-tight"
+                                class="peer w-full px-3 py-1 text-2xl font-black placeholder:text-muted placeholder:opacity-60 text-ink bg-transparent border-none outline-none resize-none min-h-[60px] leading-tight"
                                 placeholder="食物名稱..."></textarea>
-                            <div class="absolute -bottom-1 left-0 w-10 h-1 bg-brand rounded-full"></div>
+                            <!-- 這條原本純裝飾的橘線兼任 focus 指示器：這個欄位刻意不套 filled
+                                 （它是 Modal 的大標題輸入），但 outline-none 之後不能什麼指示都沒有。 -->
+                            <div class="absolute -bottom-1 left-0 w-10 peer-focus:w-full h-1 bg-brand rounded-full transition-all duration-300"></div>
                         </div>
                         <button v-if="isAddingMeal" @click="openHistory()"
                             class="shrink-0 bg-brand-soft text-brand text-xs font-black uppercase tracking-widest hover:brightness-95 px-4 py-2.5 rounded-control transition-all shadow-sm">
@@ -723,7 +725,7 @@
                                                 @input="activeSuggestItem = idx; itemSuggestPage = 0; updateTotalsFromItems()"
                                                 @focus="activeSuggestItem = idx; itemSuggestPage = 0"
                                                 @blur="activeSuggestItem = null"
-                                                class="w-full bg-surface pl-4 pr-12 py-2.5 rounded-control text-sm font-black outline-none border border-transparent focus:border-brand shadow-sm transition-all"
+                                                class="w-full pl-4 pr-12 py-2.5 text-sm font-black outline-none"
                                                 placeholder="品項名稱 (如：蔥花蛋)">
                                             <button type="button" v-if="canSaveItemToHistory(item)"
                                                 @mousedown.prevent="saveItemToHistory(item)" title="存入食物資料庫"
@@ -770,10 +772,10 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2 3 3 8 3s8-1 8-3V7M4 7c0 2 3 3 8 3s8-1 8-3M4 7c0-2 3-3 8-3s8 1 8 3" />
                                             </svg>
                                         </button>
-                                        <div class="flex-1 sm:w-28 flex items-center bg-surface px-3 py-2 rounded-control border border-transparent focus-within:border-brand shadow-sm transition-all">
+                                        <div class="flex-1 sm:w-28 flex items-center bg-surface px-3 py-2 rounded-control">
                                             <input type="number" v-model.number="item.amount" @focus="beginItemAmount(item)" @input="changeItemAmount(item)" class="w-full bg-transparent text-sm font-black outline-none text-center" placeholder="份量">
                                         </div>
-                                        <div class="w-20 shrink-0 flex items-center bg-surface px-2 py-2 rounded-control border border-transparent focus-within:border-brand shadow-sm transition-all">
+                                        <div class="w-20 shrink-0 flex items-center bg-surface px-2 py-2 rounded-control">
                                             <select v-model="item.unit" @change="updateTotalsFromItems" class="w-full bg-transparent text-center text-xs font-black text-muted outline-none cursor-pointer appearance-none">
                                                 <option value="份">份</option>
                                                 <option value="g">g</option>
@@ -787,7 +789,7 @@
                                         <label class="text-[9px] font-bold text-brand uppercase tracking-widest pl-1 mb-1 block">快速輸入 (熱/碳/蛋/脂)</label>
                                         <div class="flex gap-2">
                                             <input v-model="item.qInput" @keyup.enter="parseItemInput(item)" 
-                                                class="flex-1 bg-surface px-4 py-2.5 rounded-control text-sm font-black outline-none border border-transparent focus:border-brand shadow-sm transition-all" 
+                                                class="flex-1 px-4 py-2.5 text-sm font-black outline-none" 
                                                 placeholder="70/7/5/1">
                                             <button @click="parseItemInput(item)" 
                                                 class="px-4 bg-brand-soft text-brand rounded-control text-[10px] font-black hover:brightness-95 transition-all active:scale-95">
@@ -830,7 +832,7 @@
                         <!-- 輸入框 -->
                         <div class="flex gap-2 mb-5">
                             <input v-model="quickNutrientInput" @keyup.enter="parseQuickInput"
-                                class="flex-1 min-w-0 bg-surface px-5 py-3.5 rounded-control text-base font-black outline-none border border-transparent focus:border-brand shadow-md transition-all"
+                                class="flex-1 min-w-0 px-5 py-3.5 text-base font-black outline-none"
                                 placeholder="範例：70/7/5/1">
                             <button @click="parseQuickInput"
                                 class="px-4 sm:px-6 bg-brand text-white rounded-control text-sm font-black hover:brightness-95 transition-all shadow-lg shadow-brand-soft active:scale-95 whitespace-nowrap">
@@ -841,7 +843,7 @@
                         <!-- 數值預覽與手動修正格 -->
                         <div class="grid grid-cols-4 gap-2">
                             <div v-for="n in [{k:'calories',l:'熱量',u:'kcal',c:'text-orange-600'},{k:'carbs',l:'淨碳水',u:'g',c:'text-brand'},{k:'protein',l:'蛋白',u:'g',c:'text-violet-600'},{k:'fat',l:'脂肪',u:'g',c:'text-pink-600'}]"
-                                :key="n.k" class="bg-surface rounded-control p-2.5 border border-line text-center shadow-sm focus-within:border-brand transition-all">
+                                :key="n.k" class="bg-surface rounded-control p-2.5 text-center">
                                 <div class="text-[9px] font-bold text-muted uppercase mb-1">{{ n.l }}</div>
                                 <input type="number" v-model.number="editingMeal[n.k]"
                                     class="w-full bg-transparent text-center text-lg font-black leading-none outline-none" :class="n.c">
@@ -854,7 +856,7 @@
                     <div class="flex flex-col gap-3">
                         <div class="flex items-center gap-3">
                             <div
-                                class="flex-1 bg-page rounded-control px-5 py-4 flex flex-col border border-transparent focus-within:border-brand focus-within:bg-surface transition-all">
+                                class="flex-1 bg-page rounded-control px-5 py-4 flex flex-col">
                                 <label class="text-xs font-bold text-muted uppercase tracking-widest mb-1">份量數值 (調整會縮放營養素)</label>
                                 <input type="number" inputmode="decimal" pattern="[0-9]*"
                                     v-model.number="editingMeal.amount" @focus="prepareScale" @input="scaleNutrients"
@@ -862,7 +864,7 @@
                                     @keypress="onlyNumber">
                             </div>
                             <div
-                                class="w-1/3 bg-page rounded-control px-5 py-4 flex flex-col border border-transparent focus-within:border-brand focus-within:bg-surface transition-all">
+                                class="w-1/3 bg-page rounded-control px-5 py-4 flex flex-col">
                                 <label class="text-xs font-bold text-muted uppercase tracking-widest mb-1">單位</label>
                                 <select v-model="editingMeal.unit"
                                     class="bg-transparent text-base font-black text-muted outline-none cursor-pointer appearance-none">
@@ -2110,7 +2112,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.7.13"></script>
+    <script type="module" src="app.js?v=0.7.14"></script>
 </body>
 
 </html>
