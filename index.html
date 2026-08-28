@@ -19,8 +19,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
     <!-- CSS 也要帶版號：tailwind.css 是 purge 產物，沒有 cache buster 時新 class 會被舊快取吃掉 -->
-    <link rel="stylesheet" href="tailwind.css?v=0.7.10">
-    <link rel="stylesheet" href="styles.css?v=0.7.10">
+    <link rel="stylesheet" href="tailwind.css?v=0.7.11">
+    <link rel="stylesheet" href="styles.css?v=0.7.11">
     <script src="https://unpkg.com/vue@3.5.35/dist/vue.global.prod.js"></script>
 
     <link rel="manifest" href='manifest.json'>
@@ -270,7 +270,7 @@
                                     <circle cx="50" cy="50" r="38" fill="none" stroke-width="5" class="opacity-10"
                                         :style="{ stroke: {high:'var(--c-high)', med:'var(--c-med)', low:'var(--c-low)', rest:'var(--c-rest)'}[currentDayRecord.planType] }" />
                                     <circle cx="50" cy="50" r="38" fill="none" stroke-width="6" stroke-linecap="round"
-                                        :style="{ stroke: getGap('calories') < 0 ? '#ef4444' : ({high:'var(--c-high)', med:'var(--c-med)', low:'var(--c-low)', rest:'var(--c-rest)'}[currentDayRecord.planType]) }"
+                                        :style="{ stroke: getGap('calories') < 0 ? 'var(--c-danger)' : ({high:'var(--c-high)', med:'var(--c-med)', low:'var(--c-low)', rest:'var(--c-rest)'}[currentDayRecord.planType]) }"
                                         :stroke-dasharray="`${2 * 3.14159 * 38}`"
                                         :stroke-dashoffset="2 * 3.14159 * 38 * (1 - Math.min(getDailySum('calories') / getGoalMidpoint('calories'), 1))"
                                         style="transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s ease" />
@@ -278,7 +278,7 @@
                                 <div
                                     class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none px-2 sm:px-4">
                                     <div class="text-[10px] sm:text-xs font-bold mb-0.5 sm:mb-1"
-                                        :class="isGoalInRange('calories') ? 'text-teal-500' : 'text-muted'">{{
+                                        :class="isGoalInRange('calories') ? 'text-good' : 'text-muted'">{{
                                         isGoalInRange('calories') ? '已達標' : getGap('calories') >= 0 ? '還可以吃' : '已超出' }}</div>
                                     <div class="calorie-num truncate w-full">{{ formatNum(Math.abs(getGap('calories')))
                                         }}</div>
@@ -345,20 +345,20 @@
                                         {{ n.label }}</div>
                                     <div class="flex items-baseline gap-1">
                                         <span class="text-base sm:text-2xl font-black leading-none"
-                                            :class="isGoalInRange(n.key) ? 'text-teal-500' : getGap(n.key) < 0 ? 'text-rose-500' : ''">{{
+                                            :class="isGoalInRange(n.key) ? 'text-good' : getGap(n.key) < 0 ? 'text-danger' : ''">{{
                                             formatNum(Math.abs(getGap(n.key))) }}<span
                                                 class="text-[10px] sm:text-xs font-bold ml-0.5 uppercase"
-                                                :class="isGoalInRange(n.key) ? 'text-teal-400' : 'text-muted'">g</span></span>
+                                                :class="isGoalInRange(n.key) ? 'text-good' : 'text-muted'">g</span></span>
                                     </div>
                                     <div class="text-[9px] font-bold uppercase tracking-wider mt-0.5"
-                                        :class="isGoalInRange(n.key) ? 'text-teal-500' : getGap(n.key) < 0 ? 'text-rose-400' : 'text-muted opacity-60'">
+                                        :class="isGoalInRange(n.key) ? 'text-good' : getGap(n.key) < 0 ? 'text-danger' : 'text-muted opacity-60'">
                                         {{ isGoalInRange(n.key) ? '已達標' : getGap(n.key) >= 0 ? '還可以吃' : '已超出' }}
                                     </div>
                                 </div>
                                 <div class="rounded-full overflow-hidden h-1.5 sm:h-2 mb-3 sm:mb-4"
                                     :class="n.key === 'carbs' ? 'bg-brand/20' : n.key === 'protein' ? 'bg-violet-500/20' : 'bg-pink-500/20'">
                                     <div class="h-full rounded-full transition-all duration-1000"
-                                        :class="isGoalInRange(n.key) ? 'bg-teal-400' : n.key === 'carbs' ? 'bg-brand' : n.key === 'protein' ? 'bg-violet-500' : 'bg-pink-500'"
+                                        :class="isGoalInRange(n.key) ? 'bg-good' : getGap(n.key) < 0 ? 'bg-danger' : n.key === 'carbs' ? 'bg-brand' : n.key === 'protein' ? 'bg-violet-500' : 'bg-pink-500'"
                                         :style="{ width: Math.min((getDailySum(n.key) / getGoalMidpoint(n.key)) * 100, 100) + '%' }">
                                     </div>
                                 </div>
@@ -2099,7 +2099,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.7.10"></script>
+    <script type="module" src="app.js?v=0.7.11"></script>
 </body>
 
 </html>

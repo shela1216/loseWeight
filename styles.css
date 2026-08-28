@@ -12,7 +12,7 @@
     --card-radius-sub: var(--r-card);
     --btn-bg: #ffffff;
     --btn-bg-hover: #f4f4f5;
-    --ring-color: rgba(99, 102, 241, 0.1);
+    --ring-color: rgb(var(--c-brand-rgb) / 0.10);
     --shadow-subtle: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
 
     /* === Design tokens (v0.2.0) === */
@@ -46,7 +46,7 @@
     --border-color: #35383f;
     --btn-bg: #18181b;
     --btn-bg-hover: #27272a;
-    --ring-color: rgba(167, 139, 250, 0.15);
+    --ring-color: rgb(var(--c-brand-rgb) / 0.16);
     --shadow-subtle: none;
 
     --c-brand-rgb: 251 146 60;      /* #FB923C */
@@ -256,7 +256,7 @@ textarea:not([hidden]):not(.bg-transparent):focus,
     background: var(--accent-primary);
     color: white;
     border: none;
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
+    box-shadow: 0 4px 16px rgb(var(--c-brand-rgb) / 0.35);
 }
 
 /* 選中日期 */
@@ -340,7 +340,7 @@ textarea:not([hidden]):not(.bg-transparent):focus,
 
 .meal-card:hover {
     border-color: var(--accent-primary);
-    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.1);
+    box-shadow: 0 4px 20px rgb(var(--c-brand-rgb) / 0.10);
 }
 
 /* === 捲軸 === */
@@ -368,7 +368,7 @@ textarea:not([hidden]):not(.bg-transparent):focus,
 }
 .modal-input:focus {
     border-color: var(--accent-primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+    box-shadow: 0 0 0 3px rgb(var(--c-brand-rgb) / 0.12);
 }
 
 /* === 手機鍵盤彈出時的 Modal 行為 ===
