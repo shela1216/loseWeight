@@ -6,9 +6,9 @@
         // fetch() 仍會吃瀏覽器 HTTP 快取,URL 不變就抓不到新檔,會出現
         // 「新 app.js 配舊模組」的 does not provide an export named ... 錯誤。
         // 版號要跟 index.html 的 app.js?v= 一起改(見 CLAUDE.md 的 commit 檢查清單)。
-        import { pickPriorityNutrient } from './recommend.js?v=0.7.16';
-        import { mealTime, mealTypeForTime, snapTime, buildTimeline, DEFAULT_MEAL_TIME } from './timeline.js?v=0.7.16';
-        import { topMealRanking, paginate, monthsInRange } from './stats.js?v=0.7.16';
+        import { pickPriorityNutrient } from './recommend.js?v=0.7.17';
+        import { mealTime, mealTypeForTime, snapTime, buildTimeline, DEFAULT_MEAL_TIME } from './timeline.js?v=0.7.17';
+        import { topMealRanking, paginate, monthsInRange } from './stats.js?v=0.7.17';
 
         const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
 
@@ -56,7 +56,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.7.16');
+                console.log('App initialization starting... v0.7.17');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -432,7 +432,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.7.16');
+                const appVersion = ref('0.7.17');
                 const editingMeal = reactive({ type: 'lunch', time: '12:00', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
                 // 「是否為組合餐」在 markup 裡原本被展開重複了 8 次,
@@ -1435,37 +1435,69 @@
                     saveData();
                 };
 
+                // 待寫入的日期。在 saveData() 被呼叫的當下就記下來,而不是等 debounce 到期才讀
+                // selectedDate,否則 800ms 內切換日期會把前一天的編輯整份丟掉。
+                const pendingDays = new Set();
+
+                const commitSave = async () => {
+                    clearTimeout(window.saveTimer);
+                    if (!user.value || pendingDays.size === 0) return;
+                    const days = [...pendingDays];
+                    pendingDays.clear();
+                    saving.value = true;
+                    try {
+                        const batch = writeBatch(db);
+
+                        // 1. 儲存全局設定
+                        const settingsRef = doc(db, 'artifacts', appId, 'users', user.value.uid, 'settings', 'dietData');
+                        batch.set(settingsRef, {
+                            plans: JSON.parse(JSON.stringify(plans)),
+                            profile: JSON.parse(JSON.stringify(profile)),
+                            templates: JSON.parse(JSON.stringify(templates))
+                        }, { merge: true });
+
+                        // 2. 儲存這輪所有被改過的日期 (點 1: 分片寫入)
+                        days.forEach(date => {
+                            const dayData = allData[date];
+                            if (dayData) {
+                                const dayRef = doc(db, 'artifacts', appId, 'users', user.value.uid, 'dailyRecords', date);
+                                batch.set(dayRef, { ...JSON.parse(JSON.stringify(dayData)), date });
+                            }
+                        });
+
+                        await batch.commit();
+                    } catch (e) {
+                        console.error("同步失敗", e);
+                        days.forEach(d => pendingDays.add(d)); // 失敗的留在佇列,下次編輯或切背景時再試
+                    } finally {
+                        saving.value = false;
+                    }
+                };
+
                 const saveData = () => {
                     if (!user.value) return;
+                    pendingDays.add(selectedDate.value);
                     clearTimeout(window.saveTimer);
-                    window.saveTimer = setTimeout(async () => {
-                        saving.value = true;
-                        try {
-                            const batch = writeBatch(db);
-                            
-                            // 1. 儲存全局設定
-                            const settingsRef = doc(db, 'artifacts', appId, 'users', user.value.uid, 'settings', 'dietData');
-                            batch.set(settingsRef, {
-                                plans: JSON.parse(JSON.stringify(plans)),
-                                profile: JSON.parse(JSON.stringify(profile)),
-                                templates: JSON.parse(JSON.stringify(templates))
-                            }, { merge: true });
-
-                            // 2. 僅儲存「目前選中日期」的紀錄 (點 1: 分片寫入)
-                            const todayData = allData[selectedDate.value];
-                            if (todayData) {
-                                const dayRef = doc(db, 'artifacts', appId, 'users', user.value.uid, 'dailyRecords', selectedDate.value);
-                                batch.set(dayRef, { ...JSON.parse(JSON.stringify(todayData)), date: selectedDate.value });
-                            }
-
-                            await batch.commit();
-                        } catch (e) {
-                            console.error("同步失敗", e);
-                        } finally {
-                            saving.value = false;
-                        }
-                    }, 800);
+                    window.saveTimer = setTimeout(commitSave, 800);
                 };
+
+                // 回到前景時把別台裝置的更動抓回來。舊流程 dailyRecords 只在 loadMonthData
+                // 抓過一次就被 loadedMonths 鎖住,拿著過期資料再存會整份覆蓋掉另一台的編輯。
+                const refreshCurrentMonth = async () => {
+                    if (!user.value || pendingDays.size > 0) return;
+                    const d = new Date(`${selectedDate.value}T00:00:00`);
+                    if (isNaN(d)) return;
+                    loadedMonths.delete(`${d.getFullYear()}-${d.getMonth()}`);
+                    await loadMonthData(d);
+                };
+
+                // 手機切背景/鎖螢幕時頁面會被系統凍結,debounce 還沒到期的編輯就此消失。
+                // 在隱藏的當下立刻寫入(Firestore 會先落地 IndexedDB,連線恢復後自動補傳)。
+                document.addEventListener('visibilitychange', () => {
+                    if (document.visibilityState === 'hidden') commitSave();
+                    else refreshCurrentMonth();
+                });
+                window.addEventListener('pagehide', commitSave);
 
                 // 當下時間 'HH:MM',新增餐點/運動時帶預設值
                 const nowHHMM = () => {
