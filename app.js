@@ -6,9 +6,9 @@
         // fetch() 仍會吃瀏覽器 HTTP 快取,URL 不變就抓不到新檔,會出現
         // 「新 app.js 配舊模組」的 does not provide an export named ... 錯誤。
         // 版號要跟 index.html 的 app.js?v= 一起改(見 CLAUDE.md 的 commit 檢查清單)。
-        import { pickPriorityNutrient } from './recommend.js?v=0.7.17';
-        import { mealTime, mealTypeForTime, snapTime, buildTimeline, DEFAULT_MEAL_TIME } from './timeline.js?v=0.7.17';
-        import { topMealRanking, paginate, monthsInRange } from './stats.js?v=0.7.17';
+        import { pickPriorityNutrient } from './recommend.js?v=0.7.18';
+        import { mealTime, mealTypeForTime, snapTime, buildTimeline, DEFAULT_MEAL_TIME } from './timeline.js?v=0.7.18';
+        import { topMealRanking, paginate, monthsInRange } from './stats.js?v=0.7.18';
 
         const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
 
@@ -56,7 +56,7 @@
 
         createApp({
             setup() {
-                console.log('App initialization starting... v0.7.17');
+                console.log('App initialization starting... v0.7.18');
                 // 統一日期格式化工具 (確保 YYYY-MM-DD)
                 const formatDate = (d) => {
                     const y = d.getFullYear();
@@ -432,7 +432,7 @@
                 const editingIndex = ref(null);
                 const isAddingMeal = ref(false);
                 const skipHistorySave = ref(false);
-                const appVersion = ref('0.7.17');
+                const appVersion = ref('0.7.18');
                 const editingMeal = reactive({ type: 'lunch', time: '12:00', name: '', amount: 1, unit: '份', calories: 0, carbs: 0, protein: 0, fat: 0, items: [] });
                 const tempMealBackup = ref(null);
                 // 「是否為組合餐」在 markup 裡原本被展開重複了 8 次,
@@ -1438,6 +1438,9 @@
                 // 待寫入的日期。在 saveData() 被呼叫的當下就記下來,而不是等 debounce 到期才讀
                 // selectedDate,否則 800ms 內切換日期會把前一天的編輯整份丟掉。
                 const pendingDays = new Set();
+                // 正常 debounce 只有 800ms,若一有變更就亮按鈕會每次輸入都閃一下。
+                // 只有「最早那筆變更超過 3 秒還沒寫進去」(離線/寫入失敗) 才亮出手動同步。
+                const syncStuck = ref(false);
 
                 const commitSave = async () => {
                     clearTimeout(window.saveTimer);
@@ -1466,9 +1469,11 @@
                         });
 
                         await batch.commit();
+                        if (pendingDays.size === 0) { clearTimeout(window.stuckTimer); window.stuckTimer = null; syncStuck.value = false; }
                     } catch (e) {
                         console.error("同步失敗", e);
                         days.forEach(d => pendingDays.add(d)); // 失敗的留在佇列,下次編輯或切背景時再試
+                        syncStuck.value = true;                // 失敗就立刻亮按鈕,不等 3 秒
                     } finally {
                         saving.value = false;
                     }
@@ -1479,6 +1484,13 @@
                     pendingDays.add(selectedDate.value);
                     clearTimeout(window.saveTimer);
                     window.saveTimer = setTimeout(commitSave, 800);
+                    // 不重設 stuckTimer:要量的是「最早那筆」等多久,持續打字不該一直延後
+                    if (!window.stuckTimer) {
+                        window.stuckTimer = setTimeout(() => {
+                            window.stuckTimer = null;
+                            syncStuck.value = pendingDays.size > 0;
+                        }, 3000);
+                    }
                 };
 
                 // 回到前景時把別台裝置的更動抓回來。舊流程 dailyRecords 只在 loadMonthData
@@ -1711,7 +1723,7 @@
                 return {
                     appVersion, skipHistorySave,
                     isDark, toggleTheme,
-                    initialized, user, saving, showSettings, showHistory, showMonthPicker, historySearch, historySortBy, historySortOrder, historyTab, selectedDate, pickerMonth, loginEmail, loginPassword,
+                    initialized, user, saving, syncStuck, commitSave, showSettings, showHistory, showMonthPicker, historySearch, historySortBy, historySortOrder, historyTab, selectedDate, pickerMonth, loginEmail, loginPassword,
                     openHistory, closeHistory, historyPickMode, pendingHistoryMeal, chooseHistoryMeal, confirmHistoryAdd, priorityNutrient, priorityNutrientLabel,
                     pendingAmount, pendingAmountValid, pendingScaled, pendingType, pendingTime, pickPendingType, pendingTimeIsSuggestion,
                     editingIndex, isAddingMeal, mealToDelete, historyToDelete, nutrientKeys, profile, plans, tempPlans, allData, mealHistory, visibleMealHistory, handleHistoryScroll, editingMeal, hasItems, showSyncModal, templates,

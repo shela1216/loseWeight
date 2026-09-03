@@ -19,8 +19,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
     <!-- CSS 也要帶版號：tailwind.css 是 purge 產物，沒有 cache buster 時新 class 會被舊快取吃掉 -->
-    <link rel="stylesheet" href="tailwind.css?v=0.7.17">
-    <link rel="stylesheet" href="styles.css?v=0.7.17">
+    <link rel="stylesheet" href="tailwind.css?v=0.7.18">
+    <link rel="stylesheet" href="styles.css?v=0.7.18">
     <script src="https://unpkg.com/vue@3.5.35/dist/vue.global.prod.js"></script>
 
     <link rel="manifest" href='manifest.json'>
@@ -1713,11 +1713,14 @@
             </div>
         </div>
 
-        <div v-if="saving"
-            class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-ink backdrop-blur-md text-surface dark:bg-brand dark:text-white px-6 py-3 rounded-full text-xs font-semibold shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4">
-            <div class="w-2 h-2 bg-brand rounded-full animate-pulse shadow-[0_0_8px_rgb(var(--c-brand-rgb)/0.8)]"></div>
-            同步數據中...
-        </div>
+        <!-- 同步狀態膠囊：有變更還沒寫上雲端時可點擊立即同步,寫入成功就自動消失 -->
+        <button v-if="saving || syncStuck" @click="commitSave" :disabled="saving"
+            class="fixed bottom-8 left-1/2 -translate-x-1/2 backdrop-blur-md px-6 py-3 rounded-full text-xs font-semibold shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 transition-all"
+            :class="saving ? 'bg-ink text-surface dark:bg-brand dark:text-white' : 'bg-amber-500 text-white active:scale-95'">
+            <div class="w-2 h-2 rounded-full animate-pulse"
+                :class="saving ? 'bg-brand shadow-[0_0_8px_rgb(var(--c-brand-rgb)/0.8)]' : 'bg-white'"></div>
+            {{ saving ? '同步數據中...' : '立即同步雲端' }}
+        </button>
 
         <!-- 匯出範圍選擇 Modal -->
         <div v-if="showExportModal" class="fixed inset-0 z-[140] flex items-center justify-center p-4">
@@ -2110,7 +2113,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script type="module" src="app.js?v=0.7.17"></script>
+    <script type="module" src="app.js?v=0.7.18"></script>
 </body>
 
 </html>
